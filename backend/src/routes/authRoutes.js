@@ -1,0 +1,131 @@
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const { protect } = require('../middleware/auth');
+const { generateVerificationToken, sendVerificationEmail } = require('../services/emailService');
+
+const router = express.Router();
+
+const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+router.post('/register', async (req, res) => {
+  try {
+    const { name, email, password, phone } = req.body;
+
+    if (!name || !email || !password || !phone) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(409).json({ message: 'Email already registered' });
+    }
+
+    // Generate verification token
+    const verificationToken = generateVerificationToken();
+    const verificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    const user = await User.create({ 
+      name, 
+      email, 
+      password, 
+      phone,
+      verificationToken,
+      verificationTokenExpiry,
+    });
+
+    // Send verification email (non-blocking)
+    sendVerificationEmail(user, verificationToken).then((sent) => {
+      if (sent) {
+        console.log(`✅ Verification email sent to ${email}`);
+      } else {
+        console.warn(`⚠️ Could not send verification email to ${email}`);
+      }
+    });
+
+    const token = signToken(user._id);
+
+    return res.status(201).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        emailVerified: user.emailVerified,
+      },
+      message: 'Registration successful! Please check your email to verify your account.',
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    return res.status(500).json({ message: error.message || 'Registration failed' });
+  }
+});
+
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const token = signToken(user._id);
+    return res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        emailVerified: user.emailVerified,
+      },
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({ message: error.message || 'Login failed' });
+  }
+});
+
+router.get('/me', protect, async (req, res) => {
+  return res.json(req.user);
+});
+
+router.get('/verify-email', async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({ message: 'Verification token is required' });
+    }
+
+    const user = await User.findOne({
+      verificationToken: token,
+      verificationTokenExpiry: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired verification token' });
+    }
+
+    user.emailVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiry = undefined;
+    await user.save();
+
+    return res.json({ message: 'Email verified successfully! You can now login.' });
+  } catch (error) {
+    console.error('Email verification error:', error);
+    return res.status(500).json({ message: 'Email verification failed' });
+  }
+});
+
+module.exports = router;
