@@ -40,6 +40,7 @@ function LoginPage() {
       </form>
       <p className="text-sm mt-3">No customer account? <Link to="/signup" className="text-orange-700">Sign up</Link></p>
       <p className="text-sm mt-2">Admin account? <Link to="/admin-login" className="text-stone-800">Admin login</Link></p>
+      <p className="text-sm mt-2"><Link to="/forgot-password" className="text-orange-700">Forgot Password?</Link></p>
     </section>
   )
 }

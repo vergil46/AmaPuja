@@ -141,8 +141,45 @@ const sendBookingConfirmationEmail = async (booking, pooja, user) => {
   }
 };
 
+// Send password reset email
+const sendPasswordResetEmail = async (user, token) => {
+  const transporter = createTransporter();
+  if (!transporter) return false;
+
+  const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      to: user.email,
+      subject: 'Reset Your Ama Puja Password',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #b45309;">Password Reset Request 🔐</h2>
+          <p>Hello ${user.name},</p>
+          <p>We received a request to reset your password for your Ama Puja account.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetUrl}" style="background-color: #b45309; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+              Reset Password
+            </a>
+          </div>
+          <p style="color: #666; font-size: 14px;">Or copy this link to your browser:</p>
+          <p style="color: #666; font-size: 12px; word-break: break-all;">${resetUrl}</p>
+          <p style="color: #999; font-size: 12px; margin-top: 30px;">This link will expire in 1 hour.</p>
+          <p style="color: #999; font-size: 12px;">If you didn't request a password reset, please ignore this email.</p>
+        </div>
+      `,
+    });
+    return true;
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    return false;
+  }
+};
+
 module.exports = {
   generateVerificationToken,
   sendVerificationEmail,
   sendBookingConfirmationEmail,
+  sendPasswordResetEmail,
 };
