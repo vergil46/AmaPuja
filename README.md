@@ -20,6 +20,13 @@ Professional, trust-focused Pooja booking platform built with MongoDB, Express, 
 - `backend` - Express API + MongoDB models
 - `frontend` - React + Vite + Tailwind UI
 
+## Prerequisites
+
+- Node.js 20+ and npm
+- MongoDB instance (local or cloud)
+- Razorpay account (for online payment flow)
+- SMTP credentials (for booking/verification emails)
+
 ## Environment Setup
 
 ### Backend (`backend/.env`)
@@ -42,6 +49,8 @@ Copy from `frontend/.env.example` and set:
 - `VITE_RAZORPAY_KEY_ID`
 
 ## Run Locally
+
+Important: `node_modules` is intentionally ignored in Git. After cloning/pulling, run `npm install` inside both `backend` and `frontend`.
 
 ### 1) Start backend
 
@@ -67,3 +76,5 @@ Backend API: `http://localhost:5000/api`
 - Default pooja services are auto-seeded on first backend run when DB is empty.
 - Create one admin user manually in MongoDB by setting `role: "admin"` for that user document.
 - Razorpay checkout opens only when `VITE_RAZORPAY_KEY_ID` is set.
+- Never commit real `.env` files or payment/email secrets.
+- For production, set strict CORS origins and secure cookie/JWT settings.
