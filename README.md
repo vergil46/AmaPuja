@@ -7,7 +7,7 @@ Professional, trust-focused Pooja booking platform built with MongoDB, Express, 
 - User authentication with JWT (user/admin roles)
 - Home, Services, About, Contact, Dashboard, Admin panel
 - Pooja listing and detail pages with package-based booking form
-- Payment modes: full, advance 20%, advance 30%, pay-after-pooja
+- Payment modes: full, advance (30%), pay-after-pooja
 - Razorpay order creation + signature verification
 - Booking/enquiry/payment persistence in MongoDB
 - Admin dashboard with bookings, revenue, pooja and enquiry management

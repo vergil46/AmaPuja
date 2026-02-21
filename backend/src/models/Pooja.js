@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const packageSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, enum: ['Basic', 'Standard', 'Premium'] },
+    name: { type: String, required: true, enum: ['Without Samagri', 'With Samagri'] },
     price: { type: Number, required: true, min: 0 },
     includesSamagri: { type: Boolean, default: false },
   },

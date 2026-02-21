@@ -4,7 +4,7 @@ const bookingSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     poojaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pooja', required: true },
-    package: { type: String, required: true, enum: ['Basic', 'Standard', 'Premium'] },
+    package: { type: String, required: true, enum: ['Without Samagri', 'With Samagri'] },
     name: { type: String, required: true, trim: true },
     phone: { type: String, required: true, trim: true },
     email: { type: String, required: true, trim: true },
@@ -17,7 +17,7 @@ const bookingSchema = new mongoose.Schema(
     paymentOption: {
       type: String,
       required: true,
-      enum: ['full', 'advance-20', 'advance-30', 'pay-after-pooja'],
+      enum: ['full', 'advance', 'pay-after-pooja'],
     },
     paymentAmount: { type: Number, required: true, min: 0 },
     transactionId: { type: String, default: '' },

@@ -30,16 +30,16 @@ function AdminLoginPage() {
   }
 
   return (
-    <section className="max-w-md mx-auto px-4 py-10">
+    <section className="max-w-md mx-auto px-4 py-8 sm:py-10">
       <Seo title="Admin Login | Ama Puja" description="Login as an admin to manage Ama Puja operations." />
-      <h1 className="text-2xl font-semibold">Admin Login</h1>
-      <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white border border-stone-200 rounded-xl p-5">
+      <h1 className="text-2xl sm:text-3xl font-semibold">Admin Login</h1>
+      <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white border border-stone-200 rounded-xl p-4 sm:p-5">
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="email" placeholder="Admin Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="password" placeholder="Password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         {error && <p className="text-red-700 text-sm">{error}</p>}
         <button className="w-full py-2 rounded-lg bg-stone-900 text-white">Admin Login</button>
       </form>
-      <p className="text-sm mt-3">Customer account? <Link to="/login" className="text-orange-700">Go to customer login</Link></p>
+      <p className="text-sm mt-3 wrap-break-word">Customer account? <Link to="/login" className="text-orange-700">Go to customer login</Link></p>
     </section>
   )
 }

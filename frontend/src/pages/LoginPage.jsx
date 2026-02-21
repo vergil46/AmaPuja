@@ -29,18 +29,18 @@ function LoginPage() {
   }
 
   return (
-    <section className="max-w-md mx-auto px-4 py-10">
+    <section className="max-w-md mx-auto px-4 py-8 sm:py-10">
       <Seo title="Customer Login | Ama Puja" description="Login to your customer Ama Puja account." />
-      <h1 className="text-2xl font-semibold">Customer Login</h1>
-      <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white border border-stone-200 rounded-xl p-5">
+      <h1 className="text-2xl sm:text-3xl font-semibold">Customer Login</h1>
+      <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white border border-stone-200 rounded-xl p-4 sm:p-5">
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="email" placeholder="Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="password" placeholder="Password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         {error && <p className="text-red-700 text-sm">{error}</p>}
         <button className="w-full py-2 rounded-lg bg-orange-700 text-white">Login</button>
       </form>
-      <p className="text-sm mt-3">No customer account? <Link to="/signup" className="text-orange-700">Sign up</Link></p>
-      <p className="text-sm mt-2">Admin account? <Link to="/admin-login" className="text-stone-800">Admin login</Link></p>
-      <p className="text-sm mt-2"><Link to="/forgot-password" className="text-orange-700">Forgot Password?</Link></p>
+      <p className="text-sm mt-3 wrap-break-word">No customer account? <Link to="/signup" className="text-orange-700">Sign up</Link></p>
+      <p className="text-sm mt-2 wrap-break-word">Admin account? <Link to="/admin-login" className="text-stone-800">Admin login</Link></p>
+      <p className="text-sm mt-2 wrap-break-word"><Link to="/forgot-password" className="text-orange-700">Forgot Password?</Link></p>
     </section>
   )
 }

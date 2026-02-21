@@ -10,8 +10,17 @@ body {
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   background: #fffaf5;
   color: #3f2f21;
+  overflow-x: hidden;
 }
 
 a {
   text-decoration: none;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
 }

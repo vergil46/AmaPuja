@@ -59,8 +59,8 @@ function ResetPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-orange-50 to-amber-50 px-4">
       <Seo title="Reset Password | Ama Puja" />
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        <h2 className="text-3xl font-bold text-stone-800 text-center mb-2">Reset Password</h2>
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8">
+        <h2 className="text-2xl sm:text-3xl font-bold text-stone-800 text-center mb-2">Reset Password</h2>
         <p className="text-stone-600 text-center mb-6">Enter your new password</p>
 
         {status === 'success' && (

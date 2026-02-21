@@ -7,8 +7,7 @@ const { sendBookingConfirmationEmail } = require('../services/emailService');
 const router = express.Router();
 
 const computePaymentAmount = (price, paymentOption) => {
-  if (paymentOption === 'advance-20') return Math.round(price * 0.2);
-  if (paymentOption === 'advance-30') return Math.round(price * 0.3);
+  if (paymentOption === 'advance') return Math.round(price * 0.3);
   if (paymentOption === 'pay-after-pooja') return 0;
   return price;
 };
@@ -38,6 +37,10 @@ router.post('/', protect, async (req, res) => {
     const selectedPackage = pooja.packages.find((item) => item.name === packageName);
     if (!selectedPackage) {
       return res.status(400).json({ message: 'Invalid package selected' });
+    }
+
+    if (!['full', 'advance', 'pay-after-pooja'].includes(paymentOption)) {
+      return res.status(400).json({ message: 'Invalid payment option selected' });
     }
 
     const paymentAmount = computePaymentAmount(selectedPackage.price, paymentOption);

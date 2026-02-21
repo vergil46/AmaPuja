@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 
+dotenv.config();
+
 const connectDB = require('./config/db');
 const seedPoojas = require('./utils/seedPoojas');
 
@@ -13,8 +15,8 @@ const bookingRoutes = require('./routes/bookingRoutes');
 const enquiryRoutes = require('./routes/enquiryRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
-dotenv.config();
 connectDB().then(seedPoojas);
 
 const app = express();
@@ -27,10 +29,20 @@ app.use(
       }
 
       const configuredClientUrl = process.env.CLIENT_URL;
-      const isConfiguredClient = configuredClientUrl && origin === configuredClientUrl;
+      const configuredClientUrls = process.env.CLIENT_URLS
+        ? process.env.CLIENT_URLS.split(',').map((value) => value.trim()).filter(Boolean)
+        : [];
+
+      const normalizeOrigin = (value) => value.replace(/\/$/, '');
+      const normalizedOrigin = normalizeOrigin(origin);
+      const normalizedConfigured = configuredClientUrl ? normalizeOrigin(configuredClientUrl) : null;
+      const normalizedConfiguredList = configuredClientUrls.map(normalizeOrigin);
+
+      const isConfiguredClient = normalizedConfigured && normalizedOrigin === normalizedConfigured;
+      const isConfiguredClientList = normalizedConfiguredList.includes(normalizedOrigin);
       const isLocalhostVitePort = /^http:\/\/localhost:\d+$/.test(origin);
 
-      if (isConfiguredClient || isLocalhostVitePort) {
+      if (isConfiguredClient || isConfiguredClientList || isLocalhostVitePort) {
         return callback(null, true);
       }
 
@@ -54,6 +66,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);

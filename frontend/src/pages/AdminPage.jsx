@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Seo from '../components/Seo'
 import api from '../services/api'
 
@@ -11,6 +11,25 @@ function AdminPage() {
   const [payments, setPayments] = useState([])
   const [refreshingRecent, setRefreshingRecent] = useState(false)
   const [form, setForm] = useState({ title: '', description: '', image: '', startPrice: 0 })
+
+  const graphMetrics = useMemo(() => {
+    const workDone = bookings.filter((booking) => booking.bookingStatus === 'completed').length
+    const rejected = bookings.filter((booking) => booking.bookingStatus === 'cancelled').length
+    const pending = bookings.filter((booking) => booking.bookingStatus === 'pending').length
+
+    const metrics = [
+      { label: 'Earning (₹)', value: Number(stats.revenue) || 0, tone: 'bg-orange-600' },
+      { label: 'Work Done', value: workDone, tone: 'bg-green-600' },
+      { label: 'Rejected', value: rejected, tone: 'bg-red-600' },
+      { label: 'Pending', value: pending, tone: 'bg-amber-500' },
+    ]
+
+    const maxValue = Math.max(...metrics.map((item) => item.value), 1)
+    return metrics.map((item) => ({
+      ...item,
+      width: `${Math.max((item.value / maxValue) * 100, item.value > 0 ? 8 : 0)}%`,
+    }))
+  }, [bookings, stats.revenue])
 
   const loadData = async () => {
     const [statsRes, poojaRes, bookingRes, recentBookingRes, enquiryRes, paymentRes] = await Promise.all([
@@ -38,9 +57,8 @@ function AdminPage() {
     await api.post('/poojas', {
       ...form,
       packages: [
-        { name: 'Basic', price: Number(form.startPrice), includesSamagri: false },
-        { name: 'Standard', price: Math.round(Number(form.startPrice) * 1.35), includesSamagri: true },
-        { name: 'Premium', price: Math.round(Number(form.startPrice) * 1.8), includesSamagri: true },
+        { name: 'Without Samagri', price: Number(form.startPrice), includesSamagri: false },
+        { name: 'With Samagri', price: Math.round(Number(form.startPrice) * 1.35), includesSamagri: true },
       ],
     })
     setForm({ title: '', description: '', image: '', startPrice: 0 })
@@ -70,13 +88,30 @@ function AdminPage() {
   return (
     <section className="max-w-6xl mx-auto px-4 py-10">
       <Seo title="Admin Panel | Ama Puja" description="Manage poojas, bookings, enquiries, and payments." />
-      <h1 className="text-3xl font-semibold">Admin Dashboard</h1>
+      <h1 className="text-2xl sm:text-3xl font-semibold">Admin Dashboard</h1>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         <div className="bg-white p-4 rounded-xl border">Total Bookings: {stats.totalBookings}</div>
         <div className="bg-white p-4 rounded-xl border">Revenue: ₹{stats.revenue}</div>
         <div className="bg-white p-4 rounded-xl border">Enquiries: {stats.totalEnquiries}</div>
         <div className="bg-white p-4 rounded-xl border">Payments: {stats.totalPayments}</div>
+      </div>
+
+      <div className="mt-8 bg-white border rounded-xl p-4">
+        <h2 className="font-semibold">Performance Graph</h2>
+        <div className="mt-4 space-y-4">
+          {graphMetrics.map((metric) => (
+            <div key={metric.label}>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-stone-700">{metric.label}</span>
+                <span className="font-semibold text-stone-900">{metric.value}</span>
+              </div>
+              <div className="mt-1 h-2.5 rounded-full bg-stone-200 overflow-hidden">
+                <div className={`h-full rounded-full ${metric.tone}`} style={{ width: metric.width }} />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="mt-8 grid lg:grid-cols-2 gap-6">
@@ -103,9 +138,9 @@ function AdminPage() {
         </div>
       </div>
 
-      <div className="mt-8 bg-white border rounded-xl p-4 overflow-auto">
+      <div className="mt-8 bg-white border rounded-xl p-4 overflow-x-auto">
         <h2 className="font-semibold">Manage Bookings</h2>
-        <table className="w-full mt-3 text-sm">
+        <table className="w-full min-w-190 mt-3 text-sm">
           <thead>
             <tr className="text-left border-b">
               <th className="py-2">User</th>
@@ -140,8 +175,8 @@ function AdminPage() {
         </table>
       </div>
 
-      <div className="mt-8 bg-white border rounded-xl p-4 overflow-auto">
-        <div className="flex items-center justify-between gap-3">
+      <div className="mt-8 bg-white border rounded-xl p-4 overflow-x-auto">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-semibold">Recent Booking Requests (Last 10)</h2>
           <button
             onClick={refreshRecentBookings}
@@ -151,7 +186,7 @@ function AdminPage() {
             {refreshingRecent ? 'Refreshing...' : 'Refresh'}
           </button>
         </div>
-        <table className="w-full mt-3 text-sm">
+        <table className="w-full min-w-215 mt-3 text-sm">
           <thead>
             <tr className="text-left border-b">
               <th className="py-2">Created</th>

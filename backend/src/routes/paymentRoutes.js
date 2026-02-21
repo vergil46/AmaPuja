@@ -21,6 +21,10 @@ router.post('/create-order', protect, async (req, res) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
+    if (!['full', 'advance'].includes(booking.paymentOption)) {
+      return res.status(400).json({ message: 'Only advance or full payment is supported' });
+    }
+
     if (booking.paymentAmount <= 0) {
       return res.status(400).json({ message: 'No online payment required for this booking' });
     }
