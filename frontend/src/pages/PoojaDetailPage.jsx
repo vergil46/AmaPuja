@@ -4,6 +4,7 @@ import { getPoojaImage } from '../assets/poojaImageMap'
 import Seo from '../components/Seo'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import { PoojaDetailSkeleton } from '../components/LoadingSkeleton'
 
 function PoojaDetailPage() {
   const { id } = useParams()
@@ -161,7 +162,7 @@ function PoojaDetailPage() {
   }
 
   if (!pooja) {
-    return <div className="max-w-6xl mx-auto px-4 py-10">Loading puja details...</div>
+    return <PoojaDetailSkeleton />
   }
 
   return (
@@ -172,6 +173,7 @@ function PoojaDetailPage() {
           <img
             src={displayImage}
             alt={pooja.title}
+            loading="lazy"
             className="rounded-xl w-full h-56 sm:h-72 object-cover"
             onError={(event) => {
               event.currentTarget.src = pooja.image

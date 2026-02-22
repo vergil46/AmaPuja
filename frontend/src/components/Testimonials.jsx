@@ -6,11 +6,11 @@ function Testimonials() {
   ]
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-10">
-      <h3 className="text-2xl font-semibold text-center">Testimonials</h3>
+    <section className="max-w-6xl mx-auto px-4 py-8 sm:py-10">
+      <h3 className="text-xl sm:text-2xl font-semibold text-center">Testimonials</h3>
       <div className="grid md:grid-cols-3 gap-5 mt-6">
         {testimonials.map((item) => (
-          <article key={item.name} className="bg-white rounded-xl border border-stone-200 p-5">
+          <article key={item.name} className="bg-white rounded-xl border border-stone-200 p-4 sm:p-5">
             <p className="text-sm text-stone-700">“{item.text}”</p>
             <p className="mt-3 font-medium text-orange-700 text-sm">{item.name}</p>
           </article>

@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react'
 import Seo from '../components/Seo'
 import api from '../services/api'
+import { DashboardSkeleton } from '../components/LoadingSkeleton'
 
 function DashboardPage() {
   const [bookings, setBookings] = useState([])
   const [feedbacks, setFeedbacks] = useState([])
   const [feedbackForm, setFeedbackForm] = useState({})
   const [feedbackMessage, setFeedbackMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    Promise.all([api.get('/bookings/my'), api.get('/feedback/my')]).then(([bookingRes, feedbackRes]) => {
-      setBookings(bookingRes.data)
-      setFeedbacks(feedbackRes.data)
-    })
+    setIsLoading(true)
+    Promise.all([api.get('/bookings/my'), api.get('/feedback/my')])
+      .then(([bookingRes, feedbackRes]) => {
+        setBookings(bookingRes.data)
+        setFeedbacks(feedbackRes.data)
+      })
+      .finally(() => setIsLoading(false))
   }, [])
 
   const feedbackByBookingId = Object.fromEntries(feedbacks.map((item) => [item.bookingId, item]))
@@ -49,39 +54,183 @@ function DashboardPage() {
     setFeedbackMessage('Thank you! Your feedback has been submitted.')
   }
 
+  if (isLoading) {
+    return <DashboardSkeleton />
+  }
+
+  // Calculate stats
+  const stats = {
+    total: bookings.length,
+    pending: bookings.filter(b => b.bookingStatus === 'pending').length,
+    confirmed: bookings.filter(b => b.bookingStatus === 'confirmed').length,
+    completed: bookings.filter(b => b.bookingStatus === 'completed').length,
+  }
+
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      confirmed: 'bg-blue-100 text-blue-800 border-blue-200',
+      completed: 'bg-green-100 text-green-800 border-green-200',
+      cancelled: 'bg-red-100 text-red-800 border-red-200',
+    }
+    return colors[status] || 'bg-stone-100 text-stone-800 border-stone-200'
+  }
+
+  const getPaymentColor = (status) => {
+    const colors = {
+      paid: 'bg-green-100 text-green-800',
+      pending: 'bg-yellow-100 text-yellow-800',
+      partial: 'bg-orange-100 text-orange-800',
+      failed: 'bg-red-100 text-red-800',
+    }
+    return colors[status] || 'bg-stone-100 text-stone-800'
+  }
+
   return (
     <section className="max-w-6xl mx-auto px-4 py-10">
       <Seo title="Dashboard | Ama Puja" description="View your bookings and statuses on Ama Puja." />
-      <h1 className="text-2xl sm:text-3xl font-semibold">My Dashboard</h1>
-      <div className="mt-6 overflow-x-auto bg-white border border-stone-200 rounded-xl">
-        <table className="w-full min-w-170 text-sm">
-          <thead className="bg-stone-100">
-            <tr>
-              <th className="p-3 text-left">Puja</th>
-              <th className="p-3 text-left">Date</th>
-              <th className="p-3 text-left">Package</th>
-              <th className="p-3 text-left">Payment</th>
-              <th className="p-3 text-left">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bookings.map((booking) => (
-              <tr key={booking._id} className="border-t border-stone-200">
-                <td className="p-3">{booking.poojaId?.title}</td>
-                <td className="p-3">{booking.date} {booking.time}</td>
-                <td className="p-3">{booking.package}</td>
-                <td className="p-3">{booking.paymentStatus}</td>
-                <td className="p-3">{booking.bookingStatus}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-stone-800">My Dashboard</h1>
+          <p className="text-stone-600 mt-1">Manage your bookings and feedback</p>
+        </div>
       </div>
 
-      <div className="mt-8 bg-white border border-stone-200 rounded-xl p-4 sm:p-5">
-        <h2 className="text-xl font-semibold">Share Feedback After Pooja</h2>
-        <p className="mt-1 text-sm text-stone-600">You can submit feedback for completed poojas.</p>
-        {feedbackMessage && <p className="mt-2 text-sm text-green-700">{feedbackMessage}</p>}
+      {/* Stats Cards */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="bg-white border border-stone-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-stone-600">Total Bookings</p>
+              <p className="text-3xl font-bold text-stone-800 mt-1">{stats.total}</p>
+            </div>
+            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-stone-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-stone-600">Pending</p>
+              <p className="text-3xl font-bold text-yellow-600 mt-1">{stats.pending}</p>
+            </div>
+            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-stone-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-stone-600">Confirmed</p>
+              <p className="text-3xl font-bold text-blue-600 mt-1">{stats.confirmed}</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-stone-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-stone-600">Completed</p>
+              <p className="text-3xl font-bold text-green-600 mt-1">{stats.completed}</p>
+            </div>
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bookings Table */}
+      <div className="bg-white border border-stone-200 rounded-xl overflow-hidden mb-8">
+        <div className="bg-stone-50 px-6 py-4 border-b border-stone-200">
+          <h2 className="text-lg font-semibold text-stone-800">Recent Bookings</h2>
+        </div>
+        {bookings.length === 0 ? (
+          <div className="p-8 text-center">
+            <svg className="w-16 h-16 mx-auto text-stone-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <p className="text-stone-600">No bookings yet</p>
+            <p className="text-sm text-stone-500 mt-1">Start by booking a puja service</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-stone-50 border-b border-stone-200">
+                <tr>
+                  <th className="px-6 py-3 text-left font-semibold text-stone-700">Puja</th>
+                  <th className="px-6 py-3 text-left font-semibold text-stone-700">Date & Time</th>
+                  <th className="px-6 py-3 text-left font-semibold text-stone-700">Package</th>
+                  <th className="px-6 py-3 text-left font-semibold text-stone-700">Payment</th>
+                  <th className="px-6 py-3 text-left font-semibold text-stone-700">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stone-200">
+                {bookings.map((booking) => (
+                  <tr key={booking._id} className="hover:bg-stone-50 transition-colors">
+                    <td className="px-6 py-4">
+                      <p className="font-medium text-stone-800">{booking.poojaId?.title}</p>
+                      <p className="text-xs text-stone-500 mt-1">{booking.city}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                      <p className="text-stone-700">{booking.date}</p>
+                      <p className="text-xs text-stone-500">{booking.time}</p>
+                    </td>
+                    <td className="px-6 py-4 text-stone-700">{booking.package}</td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-block px-2 py-1 text-xs font-medium rounded ${getPaymentColor(booking.paymentStatus)}`}>
+                        {booking.paymentStatus}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(booking.bookingStatus)}`}>
+                        {booking.bookingStatus}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Feedback Section */}
+      <div className="bg-white border border-stone-200 rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+            <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-stone-800">Share Your Experience</h2>
+            <p className="text-sm text-stone-600">Help us improve by sharing feedback for completed poojas</p>
+          </div>
+        </div>
+        
+        {feedbackMessage && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">
+            {feedbackMessage}
+          </div>
+        )}
 
         {completedBookingsWithoutFeedback.length === 0 ? (
           <p className="mt-4 text-sm text-stone-600">No completed booking pending feedback.</p>

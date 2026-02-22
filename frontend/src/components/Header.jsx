@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import Logo from './Logo'
+import LanguageSwitcher from './LanguageSwitcher'
+import { useLanguage } from '../context/LanguageContext'
 
 function Header() {
   const { user, logout } = useAuth()
+  const { t } = useLanguage()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navClass = ({ isActive }) =>
@@ -15,45 +19,46 @@ function Header() {
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-orange-100">
       <div className="bg-orange-50 text-right px-4 py-1 text-xs text-stone-700">Helpline: +91 90000 12345</div>
       <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-        <Link to="/" className="text-xl sm:text-2xl font-semibold text-orange-700" onClick={closeMobileMenu}>
-          Ama Puja
+        <Link to="/" onClick={closeMobileMenu}>
+          <Logo variant="default" />
         </Link>
         <nav className="hidden lg:flex items-center gap-6">
           <NavLink to="/" className={navClass}>
-            Home
+            {t('home')}
           </NavLink>
           <NavLink to="/services" className={navClass}>
-            Services
+            {t('services')}
           </NavLink>
           <NavLink to="/about" className={navClass}>
-            About
+            {t('about')}
           </NavLink>
           <NavLink to="/contact" className={navClass}>
-            Contact
+            {t('contact')}
           </NavLink>
           {user && (
             <NavLink to="/dashboard" className={navClass}>
-              Dashboard
+              {t('dashboard')}
             </NavLink>
           )}
           {user?.role === 'admin' && (
             <NavLink to="/admin" className={navClass}>
-              Admin
+              {t('admin')}
             </NavLink>
           )}
         </nav>
         <div className="hidden lg:flex items-center gap-2">
+          <LanguageSwitcher />
           {user ? (
             <button onClick={logout} className="px-4 py-2 rounded-lg bg-stone-800 text-white text-sm">
-              Logout
+              {t('logout')}
             </button>
           ) : (
             <>
               <Link to="/login" className="px-4 py-2 rounded-lg bg-orange-700 text-white text-sm">
-                Customer Login / Signup
+                {t('login')} / {t('signup')}
               </Link>
               <Link to="/admin-login" className="px-4 py-2 rounded-lg bg-stone-800 text-white text-sm">
-                Admin Login
+                {t('admin')} {t('login')}
               </Link>
             </>
           )}
@@ -74,29 +79,30 @@ function Header() {
         <div className="lg:hidden border-t border-orange-100 bg-white">
           <nav className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-3">
             <NavLink to="/" className={navClass} onClick={closeMobileMenu}>
-              Home
+              {t('home')}
             </NavLink>
             <NavLink to="/services" className={navClass} onClick={closeMobileMenu}>
-              Services
+              {t('services')}
             </NavLink>
             <NavLink to="/about" className={navClass} onClick={closeMobileMenu}>
-              About
+              {t('about')}
             </NavLink>
             <NavLink to="/contact" className={navClass} onClick={closeMobileMenu}>
-              Contact
+              {t('contact')}
             </NavLink>
             {user && (
               <NavLink to="/dashboard" className={navClass} onClick={closeMobileMenu}>
-                Dashboard
+                {t('dashboard')}
               </NavLink>
             )}
             {user?.role === 'admin' && (
               <NavLink to="/admin" className={navClass} onClick={closeMobileMenu}>
-                Admin
+                {t('admin')}
               </NavLink>
             )}
 
             <div className="pt-1 flex flex-col gap-2">
+              <LanguageSwitcher />
               {user ? (
                 <button
                   onClick={() => {
@@ -105,7 +111,7 @@ function Header() {
                   }}
                   className="w-full px-4 py-2 rounded-lg bg-stone-800 text-white text-sm"
                 >
-                  Logout
+                  {t('logout')}
                 </button>
               ) : (
                 <>
@@ -114,14 +120,14 @@ function Header() {
                     onClick={closeMobileMenu}
                     className="w-full px-4 py-2 rounded-lg bg-orange-700 text-white text-sm text-center"
                   >
-                    Customer Login / Signup
+                    {t('login')} / {t('signup')}
                   </Link>
                   <Link
                     to="/admin-login"
                     onClick={closeMobileMenu}
                     className="w-full px-4 py-2 rounded-lg bg-stone-800 text-white text-sm text-center"
                   >
-                    Admin Login
+                    {t('admin')} {t('login')}
                   </Link>
                 </>
               )}

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import api from '../services/api'
 import { useState } from 'react'
+import Logo from './Logo'
 
 function Footer() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
@@ -15,13 +16,15 @@ function Footer() {
 
   return (
     <footer className="bg-stone-900 text-stone-100 mt-16">
-      <div className="max-w-6xl mx-auto px-4 py-12 grid md:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto px-4 py-10 sm:py-12 grid md:grid-cols-3 gap-8">
         <div>
-          <h3 className="text-xl font-semibold">Ama Puja</h3>
+          <div className="mb-4">
+            <Logo variant="default" className="[&_path]:fill-orange-400 [&_circle]:fill-orange-300 [&_span]:text-orange-100" />
+          </div>
           <p className="mt-3 text-sm text-stone-300">Contact: +91 90000 12345</p>
           <p className="text-sm text-stone-300">Email: support@amapuja.com</p>
           <p className="text-sm text-stone-300">Website: www.amapuja.com</p>
-          <div className="mt-3 flex gap-4 text-sm">
+          <div className="mt-3 flex flex-wrap gap-4 text-sm">
             <a href="#" className="hover:text-orange-300">
               Facebook
             </a>
@@ -35,24 +38,24 @@ function Footer() {
         </div>
         <div>
           <h4 className="text-lg font-medium">Quick Links</h4>
-          <div className="mt-3 flex flex-col gap-1 text-sm text-stone-300">
-            <Link to="/refund-policy">Refund Policy</Link>
-            <Link to="/privacy-policy">Privacy Policy</Link>
-            <Link to="/terms-and-conditions">Terms & Conditions</Link>
+          <div className="mt-3 flex flex-col gap-2 text-sm text-stone-300">
+            <Link to="/refund-policy" className="py-1">Refund Policy</Link>
+            <Link to="/privacy-policy" className="py-1">Privacy Policy</Link>
+            <Link to="/terms-and-conditions" className="py-1">Terms & Conditions</Link>
           </div>
         </div>
         <div>
           <h4 className="text-lg font-medium">Enquiry Form</h4>
           <form onSubmit={handleSubmit} className="mt-3 space-y-2">
             <input
-              className="w-full px-3 py-2 rounded bg-stone-800 border border-stone-700"
+              className="w-full px-3 py-2.5 rounded bg-stone-800 border border-stone-700"
               placeholder="Name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
             />
             <input
-              className="w-full px-3 py-2 rounded bg-stone-800 border border-stone-700"
+              className="w-full px-3 py-2.5 rounded bg-stone-800 border border-stone-700"
               placeholder="Email"
               value={form.email}
               type="email"
@@ -60,21 +63,21 @@ function Footer() {
               required
             />
             <input
-              className="w-full px-3 py-2 rounded bg-stone-800 border border-stone-700"
+              className="w-full px-3 py-2.5 rounded bg-stone-800 border border-stone-700"
               placeholder="Phone"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
               required
             />
             <textarea
-              className="w-full px-3 py-2 rounded bg-stone-800 border border-stone-700"
+              className="w-full px-3 py-2.5 rounded bg-stone-800 border border-stone-700"
               placeholder="Message"
               value={form.message}
               onChange={(e) => setForm({ ...form, message: e.target.value })}
               rows={3}
               required
             />
-            <button className="px-4 py-2 bg-orange-700 rounded text-white text-sm">Send</button>
+            <button className="w-full sm:w-auto px-4 py-2.5 bg-orange-700 rounded text-white text-sm">Send</button>
             {message && <p className="text-green-300 text-sm">{message}</p>}
           </form>
         </div>

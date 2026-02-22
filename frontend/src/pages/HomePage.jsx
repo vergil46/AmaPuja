@@ -10,31 +10,31 @@ function HomePage() {
         description="Book trusted pandits for sacred rituals with transparent packages and secure online booking."
       />
       <section
-        className="min-h-[70vh] bg-cover bg-center flex items-center"
+        className="min-h-[60vh] sm:min-h-[70vh] bg-cover bg-center flex items-center"
         style={{
           backgroundImage:
             `linear-gradient(120deg, rgba(120,53,15,.88), rgba(217,119,6,.62), rgba(120,53,15,.52)), url(${homeBackground})`,
         }}
       >
-        <div className="max-w-6xl mx-auto px-4 py-24 text-white">
+        <div className="max-w-6xl mx-auto px-4 py-14 sm:py-24 text-white">
           <p className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 uppercase text-xs tracking-widest text-orange-100 border border-white/20">
             Sacred • Trusted • Professional
           </p>
-          <h1 className="text-4xl md:text-5xl font-semibold mt-3 max-w-2xl">Book Trusted Pandits for Your Sacred Rituals</h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold mt-3 max-w-2xl leading-tight">Book Trusted Pandits for Your Sacred Rituals</h1>
           <p className="mt-4 max-w-xl text-orange-50/95">
             Premium puja support for homes and temples with verified priests, transparent pricing, and smooth booking.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link to="/services" className="inline-block px-6 py-3 rounded-lg bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-900/30">
+            <Link to="/services" className="inline-block px-5 sm:px-6 py-3 rounded-lg bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-900/30 text-sm sm:text-base">
               Book a Puja
             </Link>
-            <span className="text-sm rounded-lg px-4 py-2 bg-white/15 border border-white/20 text-orange-50">Serving Bangalore & Bhubaneswar</span>
+            <span className="text-xs sm:text-sm rounded-lg px-3 sm:px-4 py-2 bg-white/15 border border-white/20 text-orange-50">Serving Bangalore & Bhubaneswar</span>
           </div>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-4 py-12">
-        <h2 className="text-2xl font-semibold">Why Families Choose Ama Puja</h2>
+      <section className="max-w-6xl mx-auto px-4 py-10 sm:py-12">
+        <h2 className="text-xl sm:text-2xl font-semibold">Why Families Choose Ama Puja</h2>
         <div className="grid md:grid-cols-3 gap-4 mt-6">
           <article className="rounded-xl p-5 border border-orange-200 bg-linear-to-br from-orange-50 to-white">
             <h3 className="font-semibold text-stone-800">Verified Priests</h3>

@@ -5,8 +5,8 @@ const { protect, adminOnly } = require('../middleware/auth');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-  const { name, email, message, phone } = req.body;
-  const enquiry = await Enquiry.create({ name, email, message, phone });
+  const { name, email, phone, service, message } = req.body;
+  const enquiry = await Enquiry.create({ name, email, phone, service, message });
   return res.status(201).json(enquiry);
 });
 

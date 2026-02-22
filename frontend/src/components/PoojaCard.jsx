@@ -10,6 +10,7 @@ function PoojaCard({ pooja, selectedCity }) {
       <img
         src={customImage}
         alt={pooja.title}
+        loading="lazy"
         className="h-36 sm:h-40 w-full object-cover object-center"
         onError={(event) => {
           event.currentTarget.src = pooja.image
