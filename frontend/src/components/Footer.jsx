@@ -28,7 +28,7 @@ function Footer() {
             <a href="#" className="hover:text-orange-300">
               Facebook
             </a>
-            <a href="#" className="hover:text-orange-300">
+            <a href="https://instagram.com/my_best_puja" target="_blank" rel="noopener noreferrer" className="hover:text-orange-300">
               Instagram
             </a>
             <a href="#" className="hover:text-orange-300">
