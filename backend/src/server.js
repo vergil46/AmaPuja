@@ -3,8 +3,16 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 
-dotenv.config();
+const envFilePath = path.resolve(__dirname, '../.env');
+dotenv.config({
+  path: envFilePath,
+  quiet: process.env.NODE_ENV === 'production',
+});
+if (process.env.NODE_ENV !== 'production') {
+  console.log(`Loading environment variables from: ${envFilePath}`);
+}
 
 const connectDB = require('./config/db');
 const seedPoojas = require('./utils/seedPoojas');
