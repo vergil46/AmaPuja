@@ -21,12 +21,12 @@ function Footer() {
           <div className="mb-3">
             <Logo variant="default" className="[&_path]:fill-orange-400 [&_circle]:fill-orange-300 [&_span]:text-orange-100" />
           </div>
-          <p className="text-sm text-stone-300 leading-relaxed">
+          <p className="text-sm sm:text-base text-stone-300 leading-relaxed">
             Trusted priests, transparent packages, and smooth ritual booking for families.
           </p>
-          <p className="mt-3 text-sm text-stone-300">Contact: +91 90000 12345</p>
-          <p className="text-sm text-stone-300">Email: support@amapuja.com</p>
-          <p className="text-sm text-stone-300">Website: www.amapuja.com</p>
+          <p className="mt-3 text-sm sm:text-base text-stone-300">Contact: +91 90000 12345</p>
+          <p className="text-sm sm:text-base text-stone-300">Email: support@amapuja.com</p>
+          <p className="text-sm sm:text-base text-stone-300">Website: www.amapuja.com</p>
           <div className="mt-4 flex flex-wrap gap-3 text-sm">
             <a href="#" className="rounded-lg border border-stone-700 px-3 py-1.5 hover:text-orange-300 hover:border-orange-400/60 transition-colors">
               Facebook
@@ -45,15 +45,15 @@ function Footer() {
           </div>
         </div>
         <div className="rounded-2xl border border-stone-700/70 bg-stone-900/70 p-5 animate-fade-up" style={{ animationDelay: '0.16s' }}>
-          <h4 className="text-lg font-semibold">Quick Links</h4>
-          <div className="mt-4 flex flex-col gap-2 text-sm text-stone-300">
+          <h4 className="text-base sm:text-lg font-semibold">Quick Links</h4>
+          <div className="mt-4 flex flex-col gap-2 text-sm sm:text-base text-stone-300">
             <Link to="/refund-policy" className="rounded-lg px-3 py-2 hover:bg-stone-800 transition-colors">Refund Policy</Link>
             <Link to="/privacy-policy" className="rounded-lg px-3 py-2 hover:bg-stone-800 transition-colors">Privacy Policy</Link>
             <Link to="/terms-and-conditions" className="rounded-lg px-3 py-2 hover:bg-stone-800 transition-colors">Terms & Conditions</Link>
           </div>
         </div>
         <div className="rounded-2xl border border-stone-700/70 bg-stone-900/70 p-5 animate-fade-up" style={{ animationDelay: '0.24s' }}>
-          <h4 className="text-lg font-semibold">Enquiry Form</h4>
+          <h4 className="text-base sm:text-lg font-semibold">Enquiry Form</h4>
           <form onSubmit={handleSubmit} className="mt-4 space-y-2.5">
             <input
               className="w-full px-3 py-2.5 rounded-lg bg-stone-800 border border-stone-700 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-orange-500/70"

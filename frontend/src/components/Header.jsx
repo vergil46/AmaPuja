@@ -11,7 +11,7 @@ function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navClass = ({ isActive }) =>
-    `text-sm font-medium px-2 py-1 rounded-md transition-colors ${
+    `text-sm md:text-[15px] font-medium px-2.5 py-1.5 rounded-md transition-colors ${
       isActive ? 'text-orange-800 bg-orange-100/80' : 'text-stone-700 hover:text-orange-700 hover:bg-orange-50'
     }`
 
@@ -19,7 +19,7 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-orange-100/80 bg-white/85 backdrop-blur-xl shadow-sm">
-      <div className="bg-gradient-to-r from-orange-100 via-amber-50 to-orange-100 text-right px-4 py-1.5 text-xs text-stone-700 border-b border-orange-100/80">
+      <div className="bg-gradient-to-r from-orange-100 via-amber-50 to-orange-100 text-right px-4 py-1.5 text-xs sm:text-sm text-stone-700 border-b border-orange-100/80">
         Helpline: +91 90000 12345
       </div>
       <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-3">
@@ -114,7 +114,7 @@ function Header() {
               </NavLink>
             )}
 
-              <div className="mt-1 pt-3 border-t border-orange-100 flex flex-col gap-2">
+            <div className="mt-1 pt-3 border-t border-orange-100 flex flex-col gap-2">
               <LanguageSwitcher />
               {user ? (
                 <button
@@ -122,7 +122,7 @@ function Header() {
                     logout()
                     closeMobileMenu()
                   }}
-                    className="w-full px-4 py-2.5 rounded-xl bg-stone-800 text-white text-sm font-medium"
+                  className="w-full px-4 py-2.5 rounded-xl bg-stone-800 text-white text-sm font-medium"
                 >
                   {t('logout')}
                 </button>
@@ -131,14 +131,14 @@ function Header() {
                   <Link
                     to="/login"
                     onClick={closeMobileMenu}
-                      className="w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 text-white text-sm font-medium text-center"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 text-white text-sm font-medium text-center"
                   >
                     {t('login')} / {t('signup')}
                   </Link>
                   <Link
                     to="/admin-login"
                     onClick={closeMobileMenu}
-                      className="w-full px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-stone-700 text-sm font-medium text-center"
+                    className="w-full px-4 py-2.5 rounded-xl border border-stone-300 bg-white text-stone-700 text-sm font-medium text-center"
                   >
                     {t('admin')} {t('login')}
                   </Link>

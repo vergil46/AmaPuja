@@ -178,6 +178,8 @@ function ServicesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isUsingFallbackData, setIsUsingFallbackData] = useState(false)
 
+  const selectedLanguageCount = priestLanguagePoojas[priestPreference]?.size
+
   const poojasWithNormalizedTitles = useMemo(
     () => poojas.map((pooja) => ({ ...pooja, normalizedTitle: normalizeTitle(pooja.title) })),
     [poojas]
@@ -256,64 +258,112 @@ function ServicesPage() {
   }, [languageMatchedPoojas, searchTerm])
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-10">
+    <section className="max-w-6xl mx-auto px-4 py-7 sm:py-10">
       <Seo title="Ama Puja Services" description="Explore all available puja services and packages." />
-      <div className="rounded-2xl border border-orange-100 bg-white p-5 sm:p-6">
-        <h1 className="text-2xl sm:text-3xl font-semibold">Puja Services</h1>
-        <p className="mt-2 text-stone-600">Choose from our curated rituals performed by experienced pandits.</p>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
-          <div>
-            <label className="text-sm text-stone-700">Priest Preference</label>
-            <select
-              className="mt-1 w-full px-3 py-2 rounded border border-stone-300 bg-white"
-              value={priestPreference}
-              onChange={(event) => setPriestPreference(event.target.value)}
-            >
-              <option value="Hindi">Hindi</option>
-              <option value="Odia">Odia</option>
-              <option value="Bengali">Bengali</option>
-              <option value="Kannada">Kannada</option>
-            </select>
-          </div>
+      <div className="rounded-3xl overflow-hidden border border-orange-100 bg-gradient-to-br from-white via-orange-50/40 to-amber-50/60 shadow-sm">
+        <div className="px-5 py-7 sm:px-7 sm:py-8">
+          <p className="text-xs tracking-widest uppercase text-orange-700 font-medium">Sacred Services</p>
+          <h1 className="mt-2 text-xl sm:text-4xl font-semibold text-stone-900 leading-tight">Find the Right Puja in Seconds</h1>
+          <p className="mt-3 text-sm sm:text-base leading-relaxed text-stone-600 max-w-2xl">
+            Modern booking experience with verified priests, language preference, and city-wise availability.
+          </p>
 
-          <div>
-            <label className="text-sm text-stone-700">Select City</label>
-            <select
-              className="mt-1 w-full px-3 py-2 rounded border border-stone-300 bg-white"
-              value={selectedCity}
-              onChange={(event) => setSelectedCity(event.target.value)}
-            >
-              <option value="Bangalore">Bangalore</option>
-              <option value="Bhubaneswar">Bhubaneswar</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="text-sm text-stone-700">Search Pooja</label>
-            <input
-              className="mt-1 w-full px-3 py-2 rounded border border-stone-300 bg-white"
-              placeholder="Type pooja name"
-              value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
-            />
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3">
+              <p className="text-xs text-stone-500">Available Services</p>
+              <p className="mt-1 text-base sm:text-lg font-semibold text-stone-900">{isLoading ? '...' : filteredPoojas.length}</p>
+            </div>
+            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3">
+              <p className="text-xs text-stone-500">Selected City</p>
+              <p className="mt-1 text-base sm:text-lg font-semibold text-stone-900">{selectedCity}</p>
+            </div>
+            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3">
+              <p className="text-xs text-stone-500">Priest Language</p>
+              <p className="mt-1 text-base sm:text-lg font-semibold text-stone-900">{priestPreference}</p>
+            </div>
+            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3">
+              <p className="text-xs text-stone-500">Coverage</p>
+              <p className="mt-1 text-base sm:text-lg font-semibold text-stone-900">{selectedLanguageCount || 'All'} Poojas</p>
+            </div>
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-          <span className="rounded-full bg-orange-50 text-orange-700 px-3 py-1">{priestPreference} priest</span>
-          <span className="rounded-full bg-stone-100 text-stone-700 px-3 py-1">{selectedCity}</span>
-          <span className="rounded-full bg-stone-100 text-stone-700 px-3 py-1">{filteredPoojas.length} poojas</span>
+        <div className="border-t border-orange-100 bg-white/85 px-5 py-5 sm:px-7">
+          <div className="grid gap-3 md:grid-cols-3">
+            <div>
+              <label className="text-sm font-medium text-stone-700">Priest Preference</label>
+              <select
+                className="mt-1 w-full min-h-11 px-3 py-2 rounded-lg border border-stone-300 bg-white shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                value={priestPreference}
+                onChange={(event) => setPriestPreference(event.target.value)}
+              >
+                <option value="Hindi">Hindi</option>
+                <option value="Odia">Odia</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Kannada">Kannada</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-stone-700">Select City</label>
+              <select
+                className="mt-1 w-full min-h-11 px-3 py-2 rounded-lg border border-stone-300 bg-white shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                value={selectedCity}
+                onChange={(event) => setSelectedCity(event.target.value)}
+              >
+                <option value="Bangalore">Bangalore</option>
+                <option value="Bhubaneswar">Bhubaneswar</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-stone-700">Search Pooja</label>
+              <input
+                className="mt-1 w-full min-h-11 px-3 py-2 rounded-lg border border-stone-300 bg-white shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                placeholder="Type pooja name"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+            <span className="rounded-full bg-orange-100 text-orange-800 px-3 py-1">{priestPreference} priest</span>
+            <span className="rounded-full bg-stone-100 text-stone-700 px-3 py-1">{selectedCity}</span>
+            <span className="rounded-full bg-stone-100 text-stone-700 px-3 py-1">{filteredPoojas.length} poojas</span>
+            {(searchTerm || selectedCity !== 'Bangalore' || priestPreference !== 'Odia') && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm('')
+                  setSelectedCity('Bangalore')
+                  setPriestPreference('Odia')
+                }}
+                className="ml-auto rounded-full border border-stone-300 px-3 py-1.5 text-stone-700 hover:bg-stone-100 transition-colors"
+              >
+                Reset Filters
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       {isUsingFallbackData && (
-        <p className="mt-2 text-sm text-orange-700">Showing fallback data because backend pooja data is unavailable.</p>
+        <p className="mt-3 rounded-lg border border-orange-200 bg-orange-50 px-4 py-2 text-sm text-orange-700">
+          Showing fallback data because backend pooja data is unavailable.
+        </p>
       )}
+
+      <div className="mt-8 flex items-center justify-between gap-3">
+        <h2 className="text-base sm:text-xl font-semibold text-stone-900">Available Pooja Services</h2>
+        <span className="text-sm text-stone-500">{isLoading ? 'Loading services...' : `${filteredPoojas.length} found`}</span>
+      </div>
+
       {isLoading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="bg-white rounded-xl border border-orange-100 p-4 animate-pulse">
+            <div key={index} className="bg-white rounded-2xl border border-orange-100 p-4 animate-pulse shadow-sm">
               <div className="h-44 rounded bg-stone-200" />
               <div className="h-5 w-2/3 mt-4 rounded bg-stone-200" />
               <div className="h-4 w-full mt-3 rounded bg-stone-200" />
@@ -329,9 +379,10 @@ function ServicesPage() {
           ))}
         </div>
       )}
+
       {!isLoading && filteredPoojas.length === 0 && (
-        <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4">
-          <p className="text-stone-700">No pooja found for this filter.</p>
+        <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 text-center">
+          <p className="text-stone-800 font-medium">No pooja found for this filter.</p>
           <p className="text-sm text-stone-600 mt-1">Try changing priest preference or clear the search term.</p>
         </div>
       )}
