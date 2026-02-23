@@ -67,7 +67,13 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+
+    const user = await User.findOne({ email: normalizedEmail }).select('name email phone role emailVerified password');
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }

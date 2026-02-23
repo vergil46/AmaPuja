@@ -141,6 +141,52 @@ const sendBookingConfirmationEmail = async (booking, pooja, user) => {
   }
 };
 
+const sendPoojaCompletionReviewEmail = async (booking, pooja, reviewUrl) => {
+  const transporter = createTransporter();
+  if (!transporter) return false;
+
+  const poojaTitle = pooja?.title || 'your pooja';
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      to: booking.email,
+      subject: `Pooja Completed - Please Share Your Review`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f0f0f0; border-radius: 10px;">
+          <h2 style="color: #b45309; text-align: center;">🙏 Thank You for Booking with Ama Puja</h2>
+          <p>Namaste ${booking.name},</p>
+          <p>Your <strong>${poojaTitle}</strong> booking has been marked as completed.</p>
+          <p>We would love to hear your feedback about your experience.</p>
+
+          <div style="background-color: #fff7ed; padding: 16px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 4px 0;"><strong>Date:</strong> ${booking.date}</p>
+            <p style="margin: 4px 0;"><strong>Time:</strong> ${booking.time}</p>
+            <p style="margin: 4px 0;"><strong>Package:</strong> ${booking.package}</p>
+          </div>
+
+          <div style="text-align: center; margin: 28px 0;">
+            <a href="${reviewUrl}" style="background-color: #b45309; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              Leave a Review
+            </a>
+          </div>
+
+          <p style="color: #666; font-size: 14px;">If the button does not work, copy this link:</p>
+          <p style="color: #666; font-size: 12px; word-break: break-all;">${reviewUrl}</p>
+
+          <div style="text-align: center; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 16px;">
+            <p style="color: #999; font-size: 12px;">Thank you for your trust in Ama Puja</p>
+          </div>
+        </div>
+      `,
+    });
+    return true;
+  } catch (error) {
+    console.error('Error sending pooja completion review email:', error);
+    return false;
+  }
+};
+
 // Send password reset email
 const sendPasswordResetEmail = async (user, token) => {
   const transporter = createTransporter();
@@ -181,5 +227,6 @@ module.exports = {
   generateVerificationToken,
   sendVerificationEmail,
   sendBookingConfirmationEmail,
+  sendPoojaCompletionReviewEmail,
   sendPasswordResetEmail,
 };

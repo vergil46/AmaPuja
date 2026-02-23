@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import Seo from '../components/Seo'
 import api from '../services/api'
 import { DashboardSkeleton } from '../components/LoadingSkeleton'
 
 function DashboardPage() {
+  const location = useLocation()
   const [bookings, setBookings] = useState([])
   const [feedbacks, setFeedbacks] = useState([])
   const [feedbackForm, setFeedbackForm] = useState({})
@@ -25,6 +27,22 @@ function DashboardPage() {
   const completedBookingsWithoutFeedback = bookings.filter(
     (booking) => booking.bookingStatus === 'completed' && !feedbackByBookingId[booking._id]
   )
+
+  const reviewBookingId = new URLSearchParams(location.search).get('reviewBooking')
+
+  useEffect(() => {
+    if (isLoading || !reviewBookingId) return
+
+    const target = document.getElementById(`feedback-booking-${reviewBookingId}`)
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    } else {
+      const section = document.getElementById('feedback')
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }
+  }, [isLoading, reviewBookingId])
 
   const handleFeedbackChange = (bookingId, field, value) => {
     setFeedbackForm((prev) => ({
@@ -213,7 +231,7 @@ function DashboardPage() {
       </div>
 
       {/* Feedback Section */}
-      <div className="bg-white border border-stone-200 rounded-xl p-6">
+      <div id="feedback" className="bg-white border border-stone-200 rounded-xl p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
             <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +255,13 @@ function DashboardPage() {
         ) : (
           <div className="mt-4 space-y-4">
             {completedBookingsWithoutFeedback.map((booking) => (
-              <div key={booking._id} className="border border-stone-200 rounded-lg p-4">
+              <div
+                id={`feedback-booking-${booking._id}`}
+                key={booking._id}
+                className={`border rounded-lg p-4 ${
+                  reviewBookingId === booking._id ? 'border-orange-400 ring-2 ring-orange-200' : 'border-stone-200'
+                }`}
+              >
                 <p className="font-medium text-stone-800">{booking.poojaId?.title}</p>
                 <p className="text-sm text-stone-600 mt-1">{booking.date} {booking.time}</p>
 

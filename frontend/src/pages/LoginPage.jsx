@@ -7,14 +7,20 @@ import api from '../services/api'
 function LoginPage() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
   const { login } = useAuth()
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    if (isSubmitting) return
     setError('')
+    setIsSubmitting(true)
     try {
-      const res = await api.post('/auth/login', form)
+      const res = await api.post('/auth/login', {
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+      })
 
       if (res.data.user?.role === 'admin') {
         setError('Admin account detected. Please use the Admin Login page.')
@@ -25,6 +31,8 @@ function LoginPage() {
       navigate('/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -36,7 +44,9 @@ function LoginPage() {
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="email" placeholder="Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="password" placeholder="Password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         {error && <p className="text-red-700 text-sm">{error}</p>}
-        <button className="w-full py-2 rounded-lg bg-orange-700 text-white">Login</button>
+        <button className="w-full py-2 rounded-lg bg-orange-700 text-white disabled:opacity-60" disabled={isSubmitting}>
+          {isSubmitting ? 'Logging in...' : 'Login'}
+        </button>
       </form>
       <p className="text-sm mt-3 wrap-break-word">No customer account? <Link to="/signup" className="text-orange-700">Sign up</Link></p>
       <p className="text-sm mt-2 wrap-break-word">Admin account? <Link to="/admin-login" className="text-stone-800">Admin login</Link></p>

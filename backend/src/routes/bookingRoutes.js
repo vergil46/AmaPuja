@@ -3,6 +3,10 @@ const Booking = require('../models/Booking');
 const Pooja = require('../models/Pooja');
 const { protect, adminOnly } = require('../middleware/auth');
 const { sendBookingConfirmationEmail } = require('../services/emailService');
+const {
+  sendBookingCreatedNotifications,
+  sendCompletionReviewNotifications,
+} = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -63,12 +67,24 @@ router.post('/', protect, async (req, res) => {
       paymentStatus: paymentOption === 'pay-after-pooja' ? 'manual-pending' : 'pending',
     });
 
-    // Send booking confirmation email (non-blocking)
-    sendBookingConfirmationEmail(booking, pooja, req.user).then((sent) => {
-      if (sent) {
+    // Send booking confirmation notifications (non-blocking)
+    sendBookingCreatedNotifications({ booking, pooja }).then((result) => {
+      if (result.emailSent) {
         console.log(`✅ Booking confirmation email sent to ${email}`);
       } else {
         console.warn(`⚠️ Could not send booking confirmation email to ${email}`);
+      }
+
+      if (result.smsSent) {
+        console.log(`✅ Booking confirmation SMS sent to ${booking.phone}`);
+      } else {
+        console.warn(`⚠️ Could not send booking confirmation SMS to ${booking.phone}`);
+      }
+
+      if (result.whatsappSent) {
+        console.log(`✅ Booking confirmation WhatsApp sent to ${booking.phone}`);
+      } else {
+        console.warn(`⚠️ Could not send booking confirmation WhatsApp to ${booking.phone}`);
       }
     });
 
@@ -102,22 +118,79 @@ router.get('/admin/recent', protect, adminOnly, async (req, res) => {
 });
 
 router.patch('/:id/status', protect, adminOnly, async (req, res) => {
-  const { bookingStatus } = req.body;
-  const booking = await Booking.findByIdAndUpdate(req.params.id, { bookingStatus }, { new: true }).populate('poojaId');
+  try {
+    const { bookingStatus } = req.body;
+    const booking = await Booking.findById(req.params.id).populate('poojaId');
 
-  if (!booking) {
-    return res.status(404).json({ message: 'Booking not found' });
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    const previousStatus = booking.bookingStatus;
+    booking.bookingStatus = bookingStatus;
+    await booking.save();
+
+    if (bookingStatus === 'confirmed') {
+      sendBookingConfirmationEmail(booking, booking.poojaId).then((sent) => {
+        if (sent) {
+          console.log(`✅ Status update confirmation email sent to ${booking.email}`);
+        }
+      });
+    }
+
+    if (previousStatus !== 'completed' && bookingStatus === 'completed') {
+      sendCompletionReviewNotifications({ booking, pooja: booking.poojaId }).then((result) => {
+        if (result.emailSent) {
+          console.log(`✅ Review request email sent to ${booking.email}`);
+        } else {
+          console.warn(`⚠️ Could not send review request email to ${booking.email}`);
+        }
+
+        if (result.smsSent) {
+          console.log(`✅ Review request SMS sent to ${booking.phone}`);
+        } else {
+          console.warn(`⚠️ Could not send review request SMS to ${booking.phone}`);
+        }
+
+        if (result.whatsappSent) {
+          console.log(`✅ Review request WhatsApp sent to ${booking.phone}`);
+        } else {
+          console.warn(`⚠️ Could not send review request WhatsApp to ${booking.phone}`);
+        }
+      }).catch((notifyError) => {
+        console.error('❌ Review notification workflow failed:', notifyError.message || notifyError);
+      });
+    }
+
+    return res.json(booking);
+  } catch (error) {
+    console.error('Update booking status error:', error);
+    return res.status(500).json({ message: error.message || 'Failed to update booking status' });
   }
+});
 
-  if (bookingStatus === 'confirmed') {
-    sendBookingConfirmationEmail(booking, booking.poojaId).then((sent) => {
-      if (sent) {
-        console.log(`✅ Status update confirmation email sent to ${booking.email}`);
-      }
+router.post('/:id/resend-review', protect, adminOnly, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id).populate('poojaId');
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    if (booking.bookingStatus !== 'completed') {
+      return res.status(400).json({ message: 'Review request can only be sent for completed bookings' });
+    }
+
+    const result = await sendCompletionReviewNotifications({ booking, pooja: booking.poojaId });
+
+    return res.json({
+      message: 'Review request sent',
+      channels: result,
     });
+  } catch (error) {
+    console.error('Resend review request error:', error);
+    return res.status(500).json({ message: error.message || 'Failed to resend review request' });
   }
-
-  return res.json(booking);
 });
 
 module.exports = router;

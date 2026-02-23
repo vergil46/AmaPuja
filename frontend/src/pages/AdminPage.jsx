@@ -9,7 +9,12 @@ function AdminPage() {
   const [recentBookings, setRecentBookings] = useState([])
   const [enquiries, setEnquiries] = useState([])
   const [payments, setPayments] = useState([])
+  const [refreshingDashboard, setRefreshingDashboard] = useState(false)
   const [refreshingRecent, setRefreshingRecent] = useState(false)
+  const [packageFilter, setPackageFilter] = useState('all')
+  const [recentPackageFilter, setRecentPackageFilter] = useState('all')
+  const [reviewRequestLoadingById, setReviewRequestLoadingById] = useState({})
+  const [reviewRequestMessage, setReviewRequestMessage] = useState('')
   const [form, setForm] = useState({ title: '', description: '', image: '', startPrice: 0 })
 
   const graphMetrics = useMemo(() => {
@@ -31,6 +36,16 @@ function AdminPage() {
     }))
   }, [bookings, stats.revenue])
 
+  const filteredBookings = bookings.filter((booking) => {
+    if (packageFilter === 'all') return true
+    return booking.package === packageFilter
+  })
+
+  const filteredRecentBookings = recentBookings.filter((booking) => {
+    if (recentPackageFilter === 'all') return true
+    return booking.package === recentPackageFilter
+  })
+
   const loadData = async () => {
     const [statsRes, poojaRes, bookingRes, recentBookingRes, enquiryRes, paymentRes] = await Promise.all([
       api.get('/dashboard/admin/stats'),
@@ -46,6 +61,15 @@ function AdminPage() {
     setRecentBookings(recentBookingRes.data)
     setEnquiries(enquiryRes.data)
     setPayments(paymentRes.data)
+  }
+
+  const refreshDashboard = async () => {
+    setRefreshingDashboard(true)
+    try {
+      await loadData()
+    } finally {
+      setRefreshingDashboard(false)
+    }
   }
 
   useEffect(() => {
@@ -85,10 +109,32 @@ function AdminPage() {
     }
   }
 
+  const resendReviewRequest = async (bookingId) => {
+    setReviewRequestMessage('')
+    setReviewRequestLoadingById((prev) => ({ ...prev, [bookingId]: true }))
+    try {
+      await api.post(`/bookings/${bookingId}/resend-review`)
+      setReviewRequestMessage('Review request sent successfully.')
+    } catch (error) {
+      setReviewRequestMessage(error.response?.data?.message || 'Failed to send review request.')
+    } finally {
+      setReviewRequestLoadingById((prev) => ({ ...prev, [bookingId]: false }))
+    }
+  }
+
   return (
     <section className="max-w-6xl mx-auto px-4 py-10">
       <Seo title="Admin Panel | Ama Puja" description="Manage poojas, bookings, enquiries, and payments." />
-      <h1 className="text-2xl sm:text-3xl font-semibold">Admin Dashboard</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl sm:text-3xl font-semibold">Admin Dashboard</h1>
+        <button
+          onClick={refreshDashboard}
+          className="px-3.5 py-2 text-sm rounded-lg bg-orange-700 text-white hover:bg-orange-800 disabled:opacity-60"
+          disabled={refreshingDashboard}
+        >
+          {refreshingDashboard ? 'Refreshing Dashboard...' : 'Refresh Dashboard'}
+        </button>
+      </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         <div className="bg-white p-4 rounded-xl border">Total Bookings: {stats.totalBookings}</div>
@@ -139,35 +185,65 @@ function AdminPage() {
       </div>
 
       <div className="mt-8 bg-white border rounded-xl p-4 overflow-x-auto">
-        <h2 className="font-semibold">Manage Bookings</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold">Manage Bookings</h2>
+          <select
+            className="border rounded px-2 py-1.5 text-sm"
+            value={packageFilter}
+            onChange={(e) => setPackageFilter(e.target.value)}
+          >
+            <option value="all">All Packages</option>
+            <option value="Without Samagri">Without Samagri</option>
+            <option value="With Samagri">With Samagri</option>
+          </select>
+        </div>
+        <p className="mt-2 text-xs text-stone-500">Showing {filteredBookings.length} of {bookings.length} bookings</p>
+        {reviewRequestMessage && <p className="mt-2 text-sm text-stone-700">{reviewRequestMessage}</p>}
         <table className="w-full min-w-190 mt-3 text-sm">
           <thead>
             <tr className="text-left border-b">
               <th className="py-2">User</th>
               <th>Puja</th>
+              <th>Package Type</th>
               <th>Date</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {bookings.map((booking) => (
+            {filteredBookings.map((booking) => (
               <tr key={booking._id} className="border-b">
                 <td className="py-2">{booking.name}</td>
                 <td>{booking.poojaId?.title}</td>
+                <td>
+                  <span className="inline-block px-2 py-1 text-xs rounded bg-orange-100 text-orange-800">
+                    {booking.package || 'Without Samagri'}
+                  </span>
+                </td>
                 <td>{booking.date}</td>
                 <td>{booking.bookingStatus}</td>
                 <td>
-                  <select
-                    className="border rounded px-2 py-1"
-                    value={booking.bookingStatus}
-                    onChange={(e) => updateBookingStatus(booking._id, e.target.value)}
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <select
+                      className="border rounded px-2 py-1"
+                      value={booking.bookingStatus}
+                      onChange={(e) => updateBookingStatus(booking._id, e.target.value)}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                    {booking.bookingStatus === 'completed' && (
+                      <button
+                        onClick={() => resendReviewRequest(booking._id)}
+                        className="px-2 py-1 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
+                        disabled={Boolean(reviewRequestLoadingById[booking._id])}
+                      >
+                        {reviewRequestLoadingById[booking._id] ? 'Sending...' : 'Resend Review'}
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -178,14 +254,26 @@ function AdminPage() {
       <div className="mt-8 bg-white border rounded-xl p-4 overflow-x-auto">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-semibold">Recent Booking Requests (Last 10)</h2>
-          <button
-            onClick={refreshRecentBookings}
-            className="px-3 py-1.5 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
-            disabled={refreshingRecent}
-          >
-            {refreshingRecent ? 'Refreshing...' : 'Refresh'}
-          </button>
+          <div className="flex items-center gap-2">
+            <select
+              className="border rounded px-2 py-1.5 text-sm"
+              value={recentPackageFilter}
+              onChange={(e) => setRecentPackageFilter(e.target.value)}
+            >
+              <option value="all">All Packages</option>
+              <option value="Without Samagri">Without Samagri</option>
+              <option value="With Samagri">With Samagri</option>
+            </select>
+            <button
+              onClick={refreshRecentBookings}
+              className="px-3 py-1.5 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
+              disabled={refreshingRecent}
+            >
+              {refreshingRecent ? 'Refreshing...' : 'Refresh'}
+            </button>
+          </div>
         </div>
+        <p className="mt-2 text-xs text-stone-500">Showing {filteredRecentBookings.length} of {recentBookings.length} recent bookings</p>
         <table className="w-full min-w-215 mt-3 text-sm">
           <thead>
             <tr className="text-left border-b">
@@ -198,7 +286,7 @@ function AdminPage() {
             </tr>
           </thead>
           <tbody>
-            {recentBookings.map((booking) => (
+            {filteredRecentBookings.map((booking) => (
               <tr key={booking._id} className="border-b">
                 <td className="py-2">{new Date(booking.createdAt).toLocaleString()}</td>
                 <td>{booking.name}</td>
@@ -214,8 +302,17 @@ function AdminPage() {
                       Confirm
                     </button>
                   )}
+                  {booking.bookingStatus === 'completed' && (
+                    <button
+                      onClick={() => resendReviewRequest(booking._id)}
+                      className="px-2 py-1 text-xs rounded bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-60"
+                      disabled={Boolean(reviewRequestLoadingById[booking._id])}
+                    >
+                      {reviewRequestLoadingById[booking._id] ? 'Sending...' : 'Resend Review'}
+                    </button>
+                  )}
                   {booking.bookingStatus !== 'pending' && (
-                    <span className="text-stone-400 text-xs">-</span>
+                    booking.bookingStatus !== 'completed' ? <span className="text-stone-400 text-xs">-</span> : null
                   )}
                 </td>
               </tr>

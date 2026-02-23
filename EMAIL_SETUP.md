@@ -15,6 +15,12 @@ SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 SMTP_FROM=Ama Puja <no-reply@amapuja.com>
+
+# Optional: SMS + WhatsApp (Twilio)
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_SMS_FROM=+1234567890
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
 ```
 
 ## Gmail Setup (Recommended)
@@ -98,6 +104,19 @@ If emails aren't sending, check backend console for:
 1. User books a pooja → Receives confirmation email
 2. Email includes: Puja details, date/time, city, priest preference, amount
 3. Admin confirms booking → User receives status update email
+
+### Booking Notifications (Email + SMS + WhatsApp)
+1. User completes booking form and submits → confirmation is sent on configured channels
+2. Channels:
+	- Email via SMTP
+	- SMS via Twilio (if configured)
+	- WhatsApp via Twilio WhatsApp sender (if configured)
+3. If Twilio is not configured, booking still succeeds and email continues to work
+
+### Review Request After Pooja Completion
+1. Admin updates booking status to `completed`
+2. User receives review request over configured channels
+3. Review link points to dashboard feedback section with the exact booking highlighted
 
 ## Important Notes
 

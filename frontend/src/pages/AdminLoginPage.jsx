@@ -7,15 +7,21 @@ import api from '../services/api'
 function AdminLoginPage() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
   const { login } = useAuth()
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    if (isSubmitting) return
     setError('')
+    setIsSubmitting(true)
 
     try {
-      const res = await api.post('/auth/login', form)
+      const res = await api.post('/auth/login', {
+        email: form.email.trim().toLowerCase(),
+        password: form.password,
+      })
 
       if (res.data.user?.role !== 'admin') {
         setError('This account is not an admin account. Please use customer login.')
@@ -26,6 +32,8 @@ function AdminLoginPage() {
       navigate('/admin')
     } catch (err) {
       setError(err.response?.data?.message || 'Admin login failed')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -37,7 +45,9 @@ function AdminLoginPage() {
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="email" placeholder="Admin Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="password" placeholder="Password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
         {error && <p className="text-red-700 text-sm">{error}</p>}
-        <button className="w-full py-2 rounded-lg bg-stone-900 text-white">Admin Login</button>
+        <button className="w-full py-2 rounded-lg bg-stone-900 text-white disabled:opacity-60" disabled={isSubmitting}>
+          {isSubmitting ? 'Logging in...' : 'Admin Login'}
+        </button>
       </form>
       <p className="text-sm mt-3 wrap-break-word">Customer account? <Link to="/login" className="text-orange-700">Go to customer login</Link></p>
     </section>
