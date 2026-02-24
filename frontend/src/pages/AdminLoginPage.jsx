@@ -8,6 +8,7 @@ function AdminLoginPage() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
   const { login } = useAuth()
 
@@ -43,7 +44,24 @@ function AdminLoginPage() {
       <h1 className="text-2xl sm:text-3xl font-semibold">Admin Login</h1>
       <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white border border-stone-200 rounded-xl p-4 sm:p-5">
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="email" placeholder="Admin Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-        <input className="w-full px-3 py-2 rounded border border-stone-300" type="password" placeholder="Password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
+        <div>
+          <input
+            className="w-full px-3 py-2 rounded border border-stone-300"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="Password"
+            required
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+          />
+          <label className="mt-2 inline-flex items-center gap-2 text-sm text-stone-700">
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={(event) => setShowPassword(event.target.checked)}
+            />
+            Show password
+          </label>
+        </div>
         {error && <p className="text-red-700 text-sm">{error}</p>}
         <button className="w-full py-2 rounded-lg bg-stone-900 text-white disabled:opacity-60" disabled={isSubmitting}>
           {isSubmitting ? 'Logging in...' : 'Admin Login'}
