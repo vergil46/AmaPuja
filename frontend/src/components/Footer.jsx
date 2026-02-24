@@ -15,7 +15,7 @@ function Footer() {
   }
 
   return (
-    <footer className="mt-16 bg-gradient-to-b from-stone-900 to-stone-950 text-stone-100 border-t border-orange-900/50">
+    <footer className="mt-16 bg-linear-to-b from-stone-900 to-stone-950 text-stone-100 border-t border-orange-900/50">
       <div className="max-w-6xl mx-auto px-4 py-10 sm:py-12 grid md:grid-cols-3 gap-6">
         <div className="rounded-2xl border border-stone-700/70 bg-stone-900/70 p-5 animate-fade-up" style={{ animationDelay: '0.08s' }}>
           <div className="mb-3">
@@ -25,8 +25,8 @@ function Footer() {
             Trusted priests, transparent packages, and smooth ritual booking for families.
           </p>
           <p className="mt-3 text-sm sm:text-base text-stone-300">Contact: +91 90000 12345</p>
-          <p className="text-sm sm:text-base text-stone-300">Email: support@amapuja.com</p>
-          <p className="text-sm sm:text-base text-stone-300">Website: www.amapuja.com</p>
+          <p className="text-sm sm:text-base text-stone-300">Email: support@pujasamrddhi.com</p>
+          <p className="text-sm sm:text-base text-stone-300">Website: www.pujasamrddhi.com</p>
           <div className="mt-4 flex flex-wrap gap-3 text-sm">
             <a href="#" className="rounded-lg border border-stone-700 px-3 py-1.5 flex items-center gap-2 hover:text-orange-300 hover:border-orange-400/60 transition-colors">
               <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0h-21.35C.6 0 0 .6 0 1.326v21.348C0 23.4.6 24 1.326 24h11.495v-9.294H9.692v-3.622h3.129V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.797.143v3.24l-1.918.001c-1.504 0-1.797.715-1.797 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116C23.4 24 24 23.4 24 22.674V1.326C24 .6 23.4 0 22.675 0"/></svg>
@@ -92,7 +92,7 @@ function Footer() {
               rows={3}
               required
             />
-            <button className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-gradient-to-r from-orange-600 to-amber-600 text-white text-sm font-medium hover:from-orange-700 hover:to-amber-700 transition-all">
+            <button className="w-full sm:w-auto px-4 py-2.5 rounded-lg bg-linear-to-r from-orange-600 to-amber-600 text-white text-sm font-medium hover:from-orange-700 hover:to-amber-700 transition-all">
               Send
             </button>
             {message && <p className="text-green-300 text-sm">{message}</p>}
@@ -100,7 +100,7 @@ function Footer() {
         </div>
       </div>
       <p className="text-center text-xs text-stone-400 border-t border-stone-800 py-3.5">
-        © {new Date().getFullYear()} Ama Puja. All rights reserved.
+        © {new Date().getFullYear()} PujaSamrddhi. All rights reserved.
       </p>
     </footer>
   )

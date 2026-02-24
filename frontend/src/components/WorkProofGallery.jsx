@@ -70,7 +70,7 @@ function WorkProofGallery({
           >
             <img
               src={image}
-              alt={`Ama Puja work proof ${index + 1}`}
+              alt={`PujaSamrddhi work proof ${index + 1}`}
               loading="lazy"
               className="h-52 sm:h-52 w-full object-cover"
             />

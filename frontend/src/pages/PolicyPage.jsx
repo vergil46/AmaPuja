@@ -11,7 +11,7 @@ const policyContent = {
   },
   terms: {
     title: 'Terms & Conditions',
-    body: 'By booking with Ama Puja, you agree to package inclusions, payment terms, and respectful conduct standards during services.',
+    body: 'By booking with PujaSamrddhi, you agree to package inclusions, payment terms, and respectful conduct standards during services.',
   },
 }
 
@@ -20,7 +20,7 @@ function PolicyPage({ type }) {
 
   return (
     <section className="max-w-4xl mx-auto px-4 py-10">
-      <Seo title={`${content.title} | Ama Puja`} description={content.body} />
+      <Seo title={`${content.title} | PujaSamrddhi`} description={content.body} />
       <h1 className="text-3xl font-semibold">{content.title}</h1>
       <p className="mt-4 text-stone-700">{content.body}</p>
     </section>

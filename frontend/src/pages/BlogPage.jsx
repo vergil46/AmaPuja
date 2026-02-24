@@ -21,7 +21,7 @@ const blogPosts = [
 function BlogPage() {
   return (
     <>
-      <Seo title="Blog & Articles | Ama Puja" description="Read helpful articles about pujas, rituals, and spiritual guidance." />
+      <Seo title="Blog & Articles | PujaSamrddhi" description="Read helpful articles about pujas, rituals, and spiritual guidance." />
       <section className="max-w-5xl mx-auto px-4 py-10 sm:py-14">
         <h1 className="text-2xl sm:text-3xl font-semibold mb-6">Blog & Articles</h1>
         <div className="grid md:grid-cols-2 gap-8">

@@ -4,9 +4,9 @@ import api from '../services/api'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(sessionStorage.getItem('amapuja_token') || '')
+  const [token, setToken] = useState(sessionStorage.getItem('pujasamrddhi_token') || '')
   const [user, setUser] = useState(() => {
-    const raw = sessionStorage.getItem('amapuja_user')
+    const raw = sessionStorage.getItem('pujasamrddhi_user')
     return raw ? JSON.parse(raw) : null
   })
 
@@ -21,15 +21,15 @@ export function AuthProvider({ children }) {
   const login = ({ token: nextToken, user: nextUser }) => {
     setToken(nextToken)
     setUser(nextUser)
-    sessionStorage.setItem('amapuja_token', nextToken)
-    sessionStorage.setItem('amapuja_user', JSON.stringify(nextUser))
+    sessionStorage.setItem('pujasamrddhi_token', nextToken)
+    sessionStorage.setItem('pujasamrddhi_user', JSON.stringify(nextUser))
   }
 
   const logout = () => {
     setToken('')
     setUser(null)
-    sessionStorage.removeItem('amapuja_token')
-    sessionStorage.removeItem('amapuja_user')
+    sessionStorage.removeItem('pujasamrddhi_token')
+    sessionStorage.removeItem('pujasamrddhi_user')
   }
 
   const value = useMemo(() => ({ token, user, login, logout }), [token, user])

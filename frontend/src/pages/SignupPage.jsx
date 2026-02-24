@@ -24,7 +24,7 @@ function SignupPage() {
 
   return (
     <section className="max-w-md mx-auto px-4 py-8 sm:py-10">
-      <Seo title="Customer Signup | Ama Puja" description="Create your customer Ama Puja account." />
+      <Seo title="Customer Signup | PujaSamrddhi" description="Create your customer PujaSamrddhi account." />
       <h1 className="text-2xl sm:text-3xl font-semibold">Customer Signup</h1>
       <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white border border-stone-200 rounded-xl p-4 sm:p-5">
         <input className="w-full px-3 py-2 rounded border border-stone-300" placeholder="Name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />

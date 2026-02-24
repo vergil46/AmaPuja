@@ -21,7 +21,7 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem('amapuja_token')
+  const token = sessionStorage.getItem('pujasamrddhi_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }

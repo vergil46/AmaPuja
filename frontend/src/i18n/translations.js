@@ -16,7 +16,7 @@ export const translations = {
     heroSubtitle: 'Premium puja support for homes and temples with verified priests, transparent pricing, and smooth booking.',
     bookAPuja: 'Book a Puja',
     servingCities: 'Serving Bangalore & Bhubaneswar',
-    whyChooseUs: 'Why Families Choose Ama Puja',
+    whyChooseUs: 'Why Families Choose PujaSamrddhi',
     verifiedPriests: 'Verified Priests',
     verifiedPriestsDesc: 'Experienced priests for all major rituals in your preferred language.',
     transparentPackages: 'Transparent Packages',

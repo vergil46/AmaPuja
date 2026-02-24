@@ -39,7 +39,7 @@ function LoginPage() {
 
   return (
     <section className="max-w-md mx-auto px-4 py-8 sm:py-10">
-      <Seo title="Customer Login | Ama Puja" description="Login to your customer Ama Puja account." />
+      <Seo title="Customer Login | PujaSamrddhi" description="Login to your customer PujaSamrddhi account." />
       <h1 className="text-2xl sm:text-3xl font-semibold">Customer Login</h1>
       <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white border border-stone-200 rounded-xl p-4 sm:p-5">
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="email" placeholder="Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />

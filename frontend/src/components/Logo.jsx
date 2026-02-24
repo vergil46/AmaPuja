@@ -46,7 +46,7 @@ function Logo({ className = '', variant = 'default' }) {
       </svg>
       <div className="flex flex-col leading-tight">
         <span className="font-bold text-orange-800 tracking-tight" style={{ fontSize: variant === 'small' ? '1rem' : variant === 'large' ? '1.5rem' : '1.25rem' }}>
-          Ama Puja
+          PujaSamrddhi
         </span>
         {variant !== 'small' && (
           <span className="text-xs text-orange-600 -mt-0.5">Sacred Rituals</span>

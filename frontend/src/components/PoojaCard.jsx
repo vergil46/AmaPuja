@@ -17,7 +17,7 @@ function PoojaCard({ pooja, selectedCity }) {
             event.currentTarget.src = pooja.image
           }}
         />
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-black/40 to-transparent" />
       </div>
       <div className="p-4 flex flex-col flex-1">
         <h3 className="font-semibold text-base sm:text-lg leading-snug text-stone-900 line-clamp-2">{pooja.title}</h3>
@@ -27,7 +27,7 @@ function PoojaCard({ pooja, selectedCity }) {
           to={`/services/${pooja._id}${cityQuery}`}
           className="inline-block mt-auto pt-4"
         >
-          <span className="inline-block w-full sm:w-auto text-center px-4 py-2.5 text-sm rounded-lg bg-gradient-to-r from-stone-900 to-stone-700 text-white shadow-sm group-hover:shadow-md">
+          <span className="inline-block w-full sm:w-auto text-center px-4 py-2.5 text-sm rounded-lg bg-linear-to-r from-stone-900 to-stone-700 text-white shadow-sm group-hover:shadow-md">
             View Details
           </span>
         </Link>

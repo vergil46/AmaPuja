@@ -259,9 +259,9 @@ function ServicesPage() {
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-7 sm:py-10">
-      <Seo title="Ama Puja Services" description="Explore all available puja services and packages." />
+      <Seo title="PujaSamrddhi Services" description="Explore all available puja services and packages." />
 
-      <div className="rounded-3xl overflow-hidden border border-orange-100 bg-gradient-to-br from-white via-orange-50/40 to-amber-50/60 shadow-sm">
+      <div className="rounded-3xl overflow-hidden border border-orange-100 bg-linear-to-br from-white via-orange-50/40 to-amber-50/60 shadow-sm">
         <div className="px-5 py-7 sm:px-7 sm:py-8">
           <p className="text-xs tracking-widest uppercase text-orange-700 font-medium">Sacred Services</p>
           <h1 className="mt-2 text-xl sm:text-4xl font-semibold text-stone-900 leading-tight">Find the Right Puja in Seconds</h1>

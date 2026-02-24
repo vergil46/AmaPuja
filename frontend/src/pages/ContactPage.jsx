@@ -52,7 +52,7 @@ function ContactPage() {
 
   return (
     <section className="max-w-4xl mx-auto px-4 py-10">
-      <Seo title="Contact Ama Puja" description="Contact Ama Puja for bookings and support." />
+      <Seo title="Contact PujaSamrddhi" description="Contact PujaSamrddhi for bookings and support." />
       
       <h1 className="text-3xl sm:text-4xl font-bold text-stone-800 mb-6">Contact Us</h1>
       
@@ -77,7 +77,7 @@ function ContactPage() {
               </svg>
               <div>
                 <p className="text-sm text-stone-600">Email</p>
-                <p className="font-semibold text-stone-800">support@amapuja.com</p>
+                <p className="font-semibold text-stone-800">support@pujasamrddhi.com</p>
               </div>
             </div>
 
@@ -208,7 +208,7 @@ function ContactPage() {
 
       {/* Additional Info */}
       <div className="bg-linear-to-r from-orange-50 to-red-50 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold text-stone-800 mb-3">Why Choose Ama Puja?</h3>
+        <h3 className="text-lg font-semibold text-stone-800 mb-3">Why Choose PujaSamrddhi?</h3>
         <ul className="grid sm:grid-cols-2 gap-2 text-stone-700">
           <li className="flex items-start gap-2">
             <span className="text-red-600 mt-1">✓</span>

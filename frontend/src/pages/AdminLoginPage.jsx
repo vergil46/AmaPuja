@@ -40,7 +40,7 @@ function AdminLoginPage() {
 
   return (
     <section className="max-w-md mx-auto px-4 py-8 sm:py-10">
-      <Seo title="Admin Login | Ama Puja" description="Login as an admin to manage Ama Puja operations." />
+      <Seo title="Admin Login | PujaSamrddhi" description="Login as an admin to manage PujaSamrddhi operations." />
       <h1 className="text-2xl sm:text-3xl font-semibold">Admin Login</h1>
       <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white border border-stone-200 rounded-xl p-4 sm:p-5">
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="email" placeholder="Admin Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />

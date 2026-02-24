@@ -39,7 +39,7 @@ function VerifyEmailPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50 px-4">
-      <Seo title="Verify Email | Ama Puja" />
+      <Seo title="Verify Email | PujaSamrddhi" />
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
         {status === 'verifying' && (
           <>

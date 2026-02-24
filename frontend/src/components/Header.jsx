@@ -19,7 +19,7 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-orange-200/90 bg-white/95 backdrop-blur-xl shadow-lg transition-shadow">
-      <div className="bg-gradient-to-r from-orange-100 via-amber-50 to-orange-100 text-right px-4 py-1.5 text-xs sm:text-sm text-stone-700 border-b border-orange-100/80">
+      <div className="bg-linear-to-r from-orange-100 via-amber-50 to-orange-100 text-right px-4 py-1.5 text-xs sm:text-sm text-stone-700 border-b border-orange-100/80">
         Helpline: +91 90000 12345
       </div>
       <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-3">
@@ -66,7 +66,7 @@ function Header() {
             <>
               <Link
                 to="/login"
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 text-white text-sm font-medium shadow-sm hover:from-orange-700 hover:to-amber-700 transition-all"
+                className="px-4 py-2 rounded-xl bg-linear-to-r from-orange-600 to-amber-600 text-white text-sm font-medium shadow-sm hover:from-orange-700 hover:to-amber-700 transition-all"
               >
                 {t('login')} / {t('signup')}
               </Link>
@@ -134,7 +134,7 @@ function Header() {
                   <Link
                     to="/login"
                     onClick={closeMobileMenu}
-                    className="w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 text-white text-sm font-medium text-center"
+                    className="w-full px-4 py-2.5 rounded-xl bg-linear-to-r from-orange-600 to-amber-600 text-white text-sm font-medium text-center"
                   >
                     {t('login')} / {t('signup')}
                   </Link>

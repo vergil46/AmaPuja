@@ -124,7 +124,7 @@ function AdminPage() {
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-10">
-      <Seo title="Admin Panel | Ama Puja" description="Manage poojas, bookings, enquiries, and payments." />
+      <Seo title="Admin Panel | PujaSamrddhi" description="Manage poojas, bookings, enquiries, and payments." />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl sm:text-3xl font-semibold">Admin Dashboard</h1>
         <button

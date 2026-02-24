@@ -125,7 +125,7 @@ function PoojaDetailPage() {
         key: razorpayKey,
         amount: order.amount,
         currency: order.currency,
-        name: 'Ama Puja',
+        name: 'PujaSamrddhi',
         description: `${pooja.title} Booking`,
         order_id: order.id,
         handler: async (response) => {
@@ -167,7 +167,7 @@ function PoojaDetailPage() {
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-10">
-      <Seo title={`${pooja.title} | Ama Puja`} description={pooja.description} />
+      <Seo title={`${pooja.title} | PujaSamrddhi`} description={pooja.description} />
       <div className="grid lg:grid-cols-2 gap-8">
         <div>
           <img
