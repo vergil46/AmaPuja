@@ -71,29 +71,32 @@ function HomePage() {
           </Link>
         </div>
 
-        <div className="mt-6 rounded-3xl border border-orange-100 bg-gradient-to-br from-white via-orange-50/40 to-amber-50/60 p-4 sm:p-5 shadow-sm">
-          <div className="grid md:grid-cols-3 gap-4">
-          <article
-            className="rounded-2xl p-5 border border-orange-200 bg-gradient-to-br from-orange-50 to-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
-            style={{ animationDelay: '0.18s' }}
-          >
-            <h3 className="font-semibold text-stone-800">Verified Priests</h3>
-            <p className="mt-2 text-sm text-stone-600">Experienced priests for all major rituals in your preferred language.</p>
-          </article>
-          <article
-            className="rounded-2xl p-5 border border-amber-200 bg-gradient-to-br from-amber-50 to-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
-            style={{ animationDelay: '0.28s' }}
-          >
-            <h3 className="font-semibold text-stone-800">Transparent Packages</h3>
-            <p className="mt-2 text-sm text-stone-600">Simple and clear package prices with secure booking confirmation.</p>
-          </article>
-          <article
-            className="rounded-2xl p-5 border border-yellow-200 bg-gradient-to-br from-yellow-50 to-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
-            style={{ animationDelay: '0.38s' }}
-          >
-            <h3 className="font-semibold text-stone-800">City-Wise Service</h3>
-            <p className="mt-2 text-sm text-stone-600">Available in Bangalore and Bhubaneswar with timely support.</p>
-          </article>
+        <div className="mt-8 rounded-3xl border border-orange-100 bg-gradient-to-br from-white via-orange-50/40 to-amber-50/60 p-6 sm:p-8 shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            <article
+              className="rounded-2xl p-7 flex flex-col items-center text-center border border-orange-200 bg-gradient-to-br from-orange-50 to-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
+              style={{ animationDelay: '0.18s' }}
+            >
+              <svg className="w-10 h-10 mb-3 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+              <h3 className="font-semibold text-stone-800 text-lg mb-2">Verified Priests</h3>
+              <p className="text-sm text-stone-600">Experienced priests for all major rituals in your preferred language.</p>
+            </article>
+            <article
+              className="rounded-2xl p-7 flex flex-col items-center text-center border border-amber-200 bg-gradient-to-br from-amber-50 to-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
+              style={{ animationDelay: '0.28s' }}
+            >
+              <svg className="w-10 h-10 mb-3 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <h3 className="font-semibold text-stone-800 text-lg mb-2">Transparent Packages</h3>
+              <p className="text-sm text-stone-600">Simple and clear package prices with secure booking confirmation.</p>
+            </article>
+            <article
+              className="rounded-2xl p-7 flex flex-col items-center text-center border border-yellow-200 bg-gradient-to-br from-yellow-50 to-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
+              style={{ animationDelay: '0.38s' }}
+            >
+              <svg className="w-10 h-10 mb-3 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <h3 className="font-semibold text-stone-800 text-lg mb-2">City-Wise Service</h3>
+              <p className="text-sm text-stone-600">Available in Bangalore and Bhubaneswar with timely support.</p>
+            </article>
           </div>
         </div>
       </section>

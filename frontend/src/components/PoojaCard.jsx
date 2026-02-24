@@ -6,7 +6,7 @@ function PoojaCard({ pooja, selectedCity }) {
   const cityQuery = selectedCity ? `?city=${encodeURIComponent(selectedCity)}` : ''
 
   return (
-    <article className="group h-full bg-white rounded-2xl overflow-hidden border border-orange-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+    <article className="card group h-full bg-white rounded-2xl overflow-hidden border border-orange-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
       <div className="relative overflow-hidden">
         <img
           src={customImage}
