@@ -6,6 +6,9 @@ import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 import { PoojaDetailSkeleton } from '../components/LoadingSkeleton'
 
+// Auto book logic
+// ...existing code...
+
 function PoojaDetailPage() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
@@ -203,6 +206,11 @@ function PoojaDetailPage() {
           <h2 className="text-xl font-semibold">Book Now</h2>
           <p className="text-sm text-stone-600">Selected package: {selectedPackage} (₹{packagePrice})</p>
           <p className="text-sm text-stone-600 mt-1">Payable now: ₹{payableAmount}</p>
+          {autoBookEnabled && (
+            <button type="button" className="mb-3 px-4 py-2 rounded-lg bg-orange-900 text-white font-semibold shadow-lg" onClick={handleAutoBook}>
+              Auto Book Pooja (Use Last Details)
+            </button>
+          )}
           <form onSubmit={handleBook} className="grid gap-3 mt-4">
             <input className="w-full px-3 py-2 rounded border border-stone-300" placeholder="Name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <input className="w-full px-3 py-2 rounded border border-stone-300" placeholder="Phone" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
@@ -231,7 +239,7 @@ function PoojaDetailPage() {
             </select>
 
             <input className="w-full px-3 py-2 rounded border border-stone-300" type="date" required value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-            <input className="w-full px-3 py-2 rounded border border-stone-300" type="time" required value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} />
+            <input className="w-full px-3 py-2 rounded border border-stone-300" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} />
             <input className="w-full px-3 py-2 rounded border border-stone-300" placeholder="Address" required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
             <textarea className="w-full px-3 py-2 rounded border border-stone-300" rows={3} placeholder="Special Notes" value={form.specialNotes} onChange={(e) => setForm({ ...form, specialNotes: e.target.value })} />
             <select

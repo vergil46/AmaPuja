@@ -1,3 +1,22 @@
+/* Floating color animation for logo */
+@keyframes float1 {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.1); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes float2 {
+  0% { transform: translateX(0) scale(1); }
+  50% { transform: translateX(-8px) scale(1.05); }
+ 100% { transform: translateX(0) scale(1); }
+}
+@keyframes float3 {
+  0% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(8px) scale(0.95); }
+ 100% { transform: translateY(0) scale(1); }
+}
+.animate-float1 { animation: float1 3s infinite ease-in-out; }
+.animate-float2 { animation: float2 4s infinite ease-in-out; }
+.animate-float3 { animation: float3 5s infinite ease-in-out; }
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;700&display=swap');
  @import "tailwindcss";
  

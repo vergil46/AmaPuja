@@ -6,9 +6,13 @@ function Logo({ className = '', variant = 'default' }) {
   }
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div className={`flex items-center gap-2 relative ${className}`}>
+      {/* Floating color blobs */}
+      <div className="absolute left-0 top-0 w-14 h-14 rounded-full bg-orange-900 opacity-50 animate-float1 z-0" style={{ filter: 'blur(18px)' }}></div>
+      <div className="absolute right-0 top-2 w-12 h-12 rounded-full bg-yellow-700 opacity-45 animate-float2 z-0" style={{ filter: 'blur(14px)' }}></div>
+      <div className="absolute left-6 bottom-0 w-10 h-10 rounded-full bg-[#78350F] opacity-40 animate-float3 z-0" style={{ filter: 'blur(12px)' }}></div>
       <svg 
-        className={sizes[variant]} 
+        className={sizes[variant] + ' relative z-10'} 
         viewBox="0 0 48 48" 
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
@@ -44,7 +48,7 @@ function Logo({ className = '', variant = 'default' }) {
         <circle cx="21" cy="30" r="1" fill="#FBBF24" opacity="0.6" />
         <circle cx="27" cy="30" r="1" fill="#FBBF24" opacity="0.6" />
       </svg>
-      <div className="flex flex-col leading-tight">
+      <div className="flex flex-col leading-tight relative z-10 bg-white/80 px-2 py-1 rounded-xl shadow-md">
         <span className="font-bold text-orange-800 tracking-tight" style={{ fontSize: variant === 'small' ? '1rem' : variant === 'large' ? '1.5rem' : '1.25rem' }}>
           PujaSamrddhi
         </span>

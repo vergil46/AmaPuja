@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import api from '../services/api'
 import { useState } from 'react'
 import Logo from './Logo'
+import footerLogo from '../assets/footer-logo.png'
 
 function Footer() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
