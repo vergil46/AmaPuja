@@ -80,9 +80,8 @@ function PoojaDetailPage() {
       form.city,
       form.priestPreference,
       form.date,
-      form.time,
       form.address,
-    ]
+    ] // time is now preferred, not required
 
     if (requiredFields.some((value) => !String(value || '').trim())) {
       setBookingMessage('Please fill all required fields before booking.')

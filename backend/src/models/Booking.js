@@ -11,7 +11,7 @@ const bookingSchema = new mongoose.Schema(
     city: { type: String, enum: ['Bangalore', 'Bhubaneswar'], required: true },
     priestPreference: { type: String, enum: ['Odia', 'Hindi', 'Bengali', 'Kannada'], required: true },
     date: { type: String, required: true },
-    time: { type: String, required: true },
+    time: { type: String }, // Preferred, not required
     address: { type: String, required: true },
     specialNotes: { type: String, default: '' },
     paymentOption: {

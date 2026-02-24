@@ -29,8 +29,11 @@ function ForgotPasswordPage() {
       <Seo title="Forgot Password | PujaSamrddhi" />
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8">
         <h2 className="text-2xl sm:text-3xl font-bold text-stone-800 text-center mb-2">Forgot Password?</h2>
-        <p className="text-stone-600 text-center mb-6">
+        <p className="text-stone-600 text-center mb-2">
           Enter your email and we'll send you a reset link
+        </p>
+        <p className="text-xs text-stone-500 text-center mb-4">
+          This works for both customer and admin accounts.
         </p>
 
         {status === 'success' && (

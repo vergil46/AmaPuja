@@ -68,6 +68,7 @@ function AdminLoginPage() {
         </button>
       </form>
       <p className="text-sm mt-3 wrap-break-word">Customer account? <Link to="/login" className="text-orange-700">Go to customer login</Link></p>
+      <p className="text-sm mt-2 wrap-break-word"><Link to="/forgot-password" className="text-orange-700">Forgot Password?</Link></p>
     </section>
   )
 }
