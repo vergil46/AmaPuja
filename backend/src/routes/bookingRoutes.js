@@ -16,7 +16,7 @@ const computePaymentAmount = (price, paymentOption) => {
   return price;
 };
 
-router.post('/', protect, async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const {
       poojaId,
@@ -49,8 +49,7 @@ router.post('/', protect, async (req, res) => {
 
     const paymentAmount = computePaymentAmount(selectedPackage.price, paymentOption);
 
-    const booking = await Booking.create({
-      userId: req.user._id,
+    const bookingData = {
       poojaId,
       package: packageName,
       name,
@@ -65,7 +64,12 @@ router.post('/', protect, async (req, res) => {
       paymentOption,
       paymentAmount,
       paymentStatus: paymentOption === 'pay-after-pooja' ? 'manual-pending' : 'pending',
-    });
+    };
+    // If user is logged in, associate userId
+    if (req.user && req.user._id) {
+      bookingData.userId = req.user._id;
+    }
+    const booking = await Booking.create(bookingData);
 
     // Send booking confirmation notifications (non-blocking)
     sendBookingCreatedNotifications({ booking, pooja }).then((result) => {

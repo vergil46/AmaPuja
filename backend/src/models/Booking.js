@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
     poojaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pooja', required: true },
     package: { type: String, required: true, enum: ['Without Samagri', 'With Samagri'] },
     name: { type: String, required: true, trim: true },
@@ -11,7 +11,7 @@ const bookingSchema = new mongoose.Schema(
     city: { type: String, enum: ['Bangalore', 'Bhubaneswar'], required: true },
     priestPreference: { type: String, enum: ['Odia', 'Hindi', 'Bengali', 'Kannada'], required: true },
     date: { type: String, required: true },
-    time: { type: String }, // Preferred, not required
+    time: { type: String, required: false }, // Optional
     address: { type: String, required: true },
     specialNotes: { type: String, default: '' },
     paymentOption: {

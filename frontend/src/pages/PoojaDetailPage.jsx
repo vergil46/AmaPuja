@@ -88,10 +88,7 @@ function PoojaDetailPage() {
   const handleBook = async (event) => {
     event.preventDefault()
     setBookingMessage('')
-    if (!token) {
-      navigate('/login')
-      return
-    }
+    // Allow booking without login
     if (isSubmitting) {
       return
     }
@@ -104,7 +101,7 @@ function PoojaDetailPage() {
       form.priestPreference,
       form.date,
       form.address,
-    ] // time is now preferred, not required
+    ] // time is now optional
 
     if (requiredFields.some((value) => !String(value || '').trim())) {
       setBookingMessage('Please fill all required fields before booking.')
@@ -171,8 +168,8 @@ function PoojaDetailPage() {
       }
     } catch (error) {
       const status = error?.response?.status
-      if (status === 401) {
-        setBookingMessage('Please login to complete your booking.')
+      if (status === 401 && form.paymentOption !== 'pay-after-pooja') {
+        setBookingMessage('Please login to complete your booking payment.')
         navigate('/login')
         return
       }
@@ -313,7 +310,7 @@ function PoojaDetailPage() {
             </select>
 
             <input className="w-full px-3 py-2 rounded border border-stone-300" type="date" required value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-            <input className="w-full px-3 py-2 rounded border border-stone-300" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} />
+            <input className="w-full px-3 py-2 rounded border border-stone-300" type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} placeholder="Time (optional)" />
             <input className="w-full px-3 py-2 rounded border border-stone-300" placeholder="Address" required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
             <textarea className="w-full px-3 py-2 rounded border border-stone-300" rows={3} placeholder="Special Notes" value={form.specialNotes} onChange={(e) => setForm({ ...form, specialNotes: e.target.value })} />
             <select
