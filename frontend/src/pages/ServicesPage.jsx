@@ -358,6 +358,31 @@ function ServicesPage() {
     return uniquePoojas
   }, [languageMatchedPoojas, searchTerm])
 
+  const displayPoojas = useMemo(() => {
+    const selectedLanguageKey = String(priestPreference || '').toLowerCase()
+
+    return filteredPoojas.map((pooja) => {
+      const languagePackages =
+        Array.isArray(pooja?.pricing?.[selectedLanguageKey]?.packages)
+          ? pooja.pricing[selectedLanguageKey].packages
+          : []
+
+      const languagePackagePrices = languagePackages
+        .map((pkg) => Number(pkg?.price))
+        .filter((price) => Number.isFinite(price) && price > 0)
+
+      const languageStartPrice =
+        languagePackagePrices.length > 0
+          ? Math.min(...languagePackagePrices)
+          : pooja.startPrice
+
+      return {
+        ...pooja,
+        startPrice: languageStartPrice,
+      }
+    })
+  }, [filteredPoojas, priestPreference])
+
   return (
     <section className="max-w-6xl mx-auto px-4 py-7 sm:py-10">
       <Seo title="PujaSamrddhi Services" description="Explore all available puja services and packages." />
@@ -373,7 +398,7 @@ function ServicesPage() {
           <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3">
               <p className="text-xs text-stone-500">Available Services</p>
-              <p className="mt-1 text-base sm:text-lg font-semibold text-stone-900">{isLoading ? '...' : filteredPoojas.length}</p>
+              <p className="mt-1 text-base sm:text-lg font-semibold text-stone-900">{isLoading ? '...' : displayPoojas.length}</p>
             </div>
             <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3">
               <p className="text-xs text-stone-500">Selected City</p>
@@ -432,7 +457,7 @@ function ServicesPage() {
           <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
             <span className="rounded-full bg-orange-100 text-orange-800 px-3 py-1">{priestPreference} priest</span>
             <span className="rounded-full bg-stone-100 text-stone-700 px-3 py-1">{selectedCity}</span>
-            <span className="rounded-full bg-stone-100 text-stone-700 px-3 py-1">{filteredPoojas.length} poojas</span>
+            <span className="rounded-full bg-stone-100 text-stone-700 px-3 py-1">{displayPoojas.length} poojas</span>
             {(searchTerm || selectedCity !== 'Bangalore' || priestPreference !== 'Odia') && (
               <button
                 type="button"
@@ -458,7 +483,7 @@ function ServicesPage() {
 
       <div className="mt-8 flex items-center justify-between gap-3">
         <h2 className="text-base sm:text-xl font-semibold text-stone-900">Available Pooja Services</h2>
-        <span className="text-sm text-stone-500">{isLoading ? 'Loading services...' : `${filteredPoojas.length} found`}</span>
+        <span className="text-sm text-stone-500">{isLoading ? 'Loading services...' : `${displayPoojas.length} found`}</span>
       </div>
 
       {isLoading ? (
@@ -475,13 +500,18 @@ function ServicesPage() {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {filteredPoojas.map((pooja) => (
-            <PoojaCard key={pooja._id} pooja={pooja} selectedCity={selectedCity} />
+          {displayPoojas.map((pooja) => (
+            <PoojaCard
+              key={pooja._id}
+              pooja={pooja}
+              selectedCity={selectedCity}
+              selectedLanguage={priestPreference}
+            />
           ))}
         </div>
       )}
 
-      {!isLoading && filteredPoojas.length === 0 && (
+      {!isLoading && displayPoojas.length === 0 && (
         <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 text-center">
           <p className="text-stone-800 font-medium">No pooja found for this filter.</p>
           <p className="text-sm text-stone-600 mt-1">Try changing priest preference or clear the search term.</p>

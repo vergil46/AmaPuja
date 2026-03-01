@@ -60,7 +60,21 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Invalid payment option selected' });
     }
 
-    const selectedPackage = pooja.packages.find(
+    const normalizedLanguageKey = String(priestPreference || '').trim().toLowerCase();
+    const languagePricing =
+      pooja.pricing &&
+      typeof pooja.pricing === 'object' &&
+      normalizedLanguageKey &&
+      pooja.pricing[normalizedLanguageKey]
+        ? pooja.pricing[normalizedLanguageKey]
+        : null;
+
+    const availablePackages =
+      Array.isArray(languagePricing?.packages) && languagePricing.packages.length > 0
+        ? languagePricing.packages
+        : pooja.packages;
+
+    const selectedPackage = availablePackages.find(
       (pkg) => pkg.name === packageName
     );
 
@@ -70,9 +84,18 @@ router.post('/', async (req, res) => {
 
     let baseAmount = Number(selectedPackage.price || 0);
 
-    if (Array.isArray(selectedAddOns) && selectedAddOns.length > 0 && Array.isArray(pooja.addOns)) {
+    const availableAddOns =
+      Array.isArray(selectedPackage.addOns) && selectedPackage.addOns.length > 0
+        ? selectedPackage.addOns
+        : Array.isArray(languagePricing?.addOns) && languagePricing.addOns.length > 0
+          ? languagePricing.addOns
+          : Array.isArray(pooja.addOns)
+          ? pooja.addOns
+          : [];
+
+    if (Array.isArray(selectedAddOns) && selectedAddOns.length > 0 && availableAddOns.length > 0) {
       selectedAddOns.forEach((addonName) => {
-        const addon = pooja.addOns.find((item) => item.name === addonName);
+        const addon = availableAddOns.find((item) => item.name === addonName);
         if (addon) {
           baseAmount += Number(addon.price || 0);
         }

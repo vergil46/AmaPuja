@@ -9,6 +9,19 @@ function PoojaDetailPage() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
 
+  const languageQuery = String(
+    searchParams.get('language') || ''
+  )
+    .trim()
+    .toLowerCase()
+
+  const selectedLanguageFromServices = {
+    odia: 'Odia',
+    hindi: 'Hindi',
+    bengali: 'Bengali',
+    kannada: 'Kannada',
+  }[languageQuery] || 'Odia'
+
   const selectedCityFromServices =
     searchParams.get('city') === 'Bhubaneswar'
       ? 'Bhubaneswar'
@@ -25,7 +38,8 @@ function PoojaDetailPage() {
     phone: '',
     email: '',
     city: selectedCityFromServices,
-    priestPreference: 'Odia',
+    priestPreference:
+      selectedLanguageFromServices,
     date: '',
     time: '',
     address: '',
@@ -36,30 +50,145 @@ function PoojaDetailPage() {
   useEffect(() => {
     api.get(`/poojas/${id}`).then((res) => {
       setPooja(res.data)
-      setSelectedPackage(res.data.packages?.[0]?.name || '')
+      setSelectedPackage('')
       setSelectedAddOns([])
     })
   }, [id])
 
+  const activeLanguageKey = useMemo(
+    () =>
+      String(form.priestPreference || '')
+        .trim()
+        .toLowerCase(),
+    [form.priestPreference]
+  )
+
+  const activeLanguagePricing = useMemo(() => {
+    if (
+      !pooja?.pricing ||
+      typeof pooja.pricing !== 'object' ||
+      !activeLanguageKey
+    ) {
+      return null
+    }
+
+    return pooja.pricing[activeLanguageKey] || null
+  }, [pooja, activeLanguageKey])
+
+  const languageOptions = useMemo(() => {
+    const available = Array.isArray(
+      pooja?.availableLanguages
+    )
+      ? pooja.availableLanguages
+      : []
+
+    if (available.length === 0) {
+      return [
+        'Odia',
+        'Hindi',
+        'Bengali',
+        'Kannada',
+      ]
+    }
+
+    return available.map((item) => {
+      const value = String(item || '').trim()
+      if (!value) return ''
+      return (
+        value.charAt(0).toUpperCase() +
+        value.slice(1).toLowerCase()
+      )
+    }).filter(Boolean)
+  }, [pooja])
+
+  useEffect(() => {
+    if (languageOptions.length === 0) return
+
+    const hasCurrent = languageOptions.some(
+      (option) =>
+        option.toLowerCase() ===
+        String(form.priestPreference || '')
+          .toLowerCase()
+    )
+
+    if (!hasCurrent) {
+      setForm((previous) => ({
+        ...previous,
+        priestPreference:
+          languageOptions[0],
+      }))
+    }
+  }, [languageOptions, form.priestPreference])
+
+  const activePackages = useMemo(() => {
+    if (
+      activeLanguagePricing?.packages?.length > 0
+    ) {
+      return activeLanguagePricing.packages
+    }
+
+    return pooja?.packages || []
+  }, [pooja, activeLanguagePricing])
+
+  useEffect(() => {
+    if (activePackages.length === 0) {
+      if (selectedPackage) {
+        setSelectedPackage('')
+      }
+      return
+    }
+
+    const hasSelected = activePackages.some(
+      (pkg) => pkg.name === selectedPackage
+    )
+
+    if (!hasSelected) {
+      setSelectedPackage(activePackages[0].name)
+    }
+  }, [activePackages, selectedPackage])
+
   const selectedPackageData = useMemo(() => {
-    if (!pooja || !selectedPackage) return null
+    if (!selectedPackage) return null
 
     return (
-      pooja.packages?.find(
+      activePackages?.find(
         (pkg) => pkg.name === selectedPackage
       ) || null
     )
-  }, [pooja, selectedPackage])
+  }, [activePackages, selectedPackage])
+
+  const availableAddOns = useMemo(() => {
+    if (
+      selectedPackageData?.addOns?.length > 0
+    ) {
+      return selectedPackageData.addOns
+    }
+
+    if (
+      activeLanguagePricing?.addOns?.length > 0
+    ) {
+      return activeLanguagePricing.addOns
+    }
+
+    return pooja?.addOns || []
+  }, [pooja, selectedPackageData, activeLanguagePricing])
+
+  useEffect(() => {
+    setSelectedAddOns([])
+  }, [selectedPackage])
 
   // ✅ Dynamic Price Calculation
   const packagePrice = useMemo(() => {
-    if (!pooja) return 0
+    if (!selectedPackageData) return 0
 
     let total = Number(selectedPackageData?.price || 0)
 
-    if (selectedAddOns.length > 0 && pooja.addOns) {
+    if (
+      selectedAddOns.length > 0 &&
+      availableAddOns.length > 0
+    ) {
       selectedAddOns.forEach((addonName) => {
-        const found = pooja.addOns.find(
+        const found = availableAddOns.find(
           (a) => a.name === addonName
         )
         if (found) total += found.price
@@ -67,7 +196,7 @@ function PoojaDetailPage() {
     }
 
     return total
-  }, [pooja, selectedPackageData, selectedAddOns])
+  }, [selectedPackageData, selectedAddOns, availableAddOns])
 
   const payableAmount = useMemo(() => {
     if (form.paymentOption === 'advance')
@@ -157,7 +286,7 @@ function PoojaDetailPage() {
         amount: order.amount,
         currency: order.currency,
         name: 'PujaSamrddhi',
-        description: `${pooja.title} Booking`,
+        description: `${displayTitle} Booking`,
         order_id: order.id,
         handler: async (response) => {
           await api.post('/payments/verify', response)
@@ -191,6 +320,25 @@ function PoojaDetailPage() {
     pooja?.image
   )
 
+  const localizedDescription =
+    activeLanguagePricing?.description
+      ?.full ||
+    pooja?.localizedDescription?.[
+      activeLanguageKey
+    ]?.full ||
+    ''
+
+  const displayTitle =
+    activeLanguagePricing?.title ||
+    pooja?.localizedTitle?.[
+      activeLanguageKey
+    ] ||
+    pooja?.title
+
+  const displayDescription =
+    localizedDescription ||
+    pooja?.description
+
   const packageProcedure =
     selectedPackageData?.procedure?.filter(Boolean) ||
     []
@@ -203,24 +351,24 @@ function PoojaDetailPage() {
   return (
     <section className="max-w-6xl mx-auto px-4 py-10">
       <Seo
-        title={`${pooja.title} | PujaSamrddhi`}
-        description={pooja.description}
+        title={`${displayTitle} | PujaSamrddhi`}
+        description={displayDescription}
       />
 
       <div className="grid lg:grid-cols-2 gap-8 items-start">
         <div>
           <img
             src={displayImage}
-            alt={pooja.title}
+            alt={displayTitle}
             className="rounded-xl w-full h-64 object-cover"
           />
 
           <h1 className="text-3xl font-semibold mt-5">
-            {pooja.title}
+            {displayTitle}
           </h1>
 
           <p className="mt-3 text-stone-700">
-            {pooja.description}
+            {displayDescription}
           </p>
 
           {/* Packages */}
@@ -229,7 +377,7 @@ function PoojaDetailPage() {
               Select Package
             </div>
 
-            {pooja.packages.map((pkg) => (
+            {activePackages.map((pkg) => (
               <label
                 key={pkg.name}
                 className="block border p-3 rounded mb-3"
@@ -247,13 +395,13 @@ function PoojaDetailPage() {
             ))}
 
             {/* Add-ons */}
-            {pooja.addOns?.length > 0 && (
+            {availableAddOns.length > 0 && (
               <div className="mt-4">
                 <div className="font-semibold">
                   Add-ons
                 </div>
 
-                {pooja.addOns.map((addon) => (
+                {availableAddOns.map((addon) => (
                   <label
                     key={addon.name}
                     className="flex items-center gap-2 mt-2"
@@ -454,10 +602,14 @@ function PoojaDetailPage() {
                 }
               >
                 <option value="">Select Language</option>
-                <option value="Odia">Odia</option>
-                <option value="Hindi">Hindi</option>
-                <option value="Bengali">Bengali</option>
-                <option value="Kannada">Kannada</option>
+                {languageOptions.map((language) => (
+                  <option
+                    key={language}
+                    value={language}
+                  >
+                    {language}
+                  </option>
+                ))}
               </select>
 
               <input

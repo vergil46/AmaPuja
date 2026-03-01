@@ -5,6 +5,115 @@ const Pooja = require('./src/models/Pooja');
 const DEFAULT_IMAGE =
   'https://images.unsplash.com/photo-1542327897-d73f4005b533?auto=format&fit=crop&w=1200&q=80';
 
+const SUPPORTED_LANGUAGES = ['odia', 'hindi', 'bengali', 'kannada'];
+
+const createServiceKey = (title = '') =>
+  String(title)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+
+const deepClone = (value) => JSON.parse(JSON.stringify(value));
+
+const ensureLanguageArchitecture = (pooja) => {
+  const serviceKey = pooja.serviceKey || createServiceKey(pooja.title);
+
+  const localizedTitle =
+    pooja.localizedTitle && typeof pooja.localizedTitle === 'object'
+      ? { ...pooja.localizedTitle }
+      : {};
+
+  const localizedDescription =
+    pooja.localizedDescription && typeof pooja.localizedDescription === 'object'
+      ? { ...pooja.localizedDescription }
+      : {};
+
+  const pricing =
+    pooja.pricing && typeof pooja.pricing === 'object'
+      ? deepClone(pooja.pricing)
+      : {};
+
+  SUPPORTED_LANGUAGES.forEach((languageKey) => {
+    if (!localizedTitle[languageKey]) {
+      localizedTitle[languageKey] = pooja.title;
+    }
+
+    if (!localizedDescription[languageKey]) {
+      localizedDescription[languageKey] = {
+        short: pooja.description,
+        full: pooja.description,
+      };
+    } else {
+      localizedDescription[languageKey] = {
+        short:
+          localizedDescription[languageKey].short ||
+          pooja.description,
+        full:
+          localizedDescription[languageKey].full ||
+          pooja.description,
+      };
+    }
+
+    if (!pricing[languageKey]) {
+      pricing[languageKey] = {
+        title: localizedTitle[languageKey],
+        description: deepClone(localizedDescription[languageKey]),
+        packages: deepClone(pooja.packages || []),
+        addOns: deepClone(pooja.addOns || []),
+      };
+    } else {
+      pricing[languageKey] = {
+        ...pricing[languageKey],
+        title:
+          pricing[languageKey].title ||
+          localizedTitle[languageKey],
+        description: {
+          short:
+            pricing[languageKey].description?.short ||
+            localizedDescription[languageKey].short,
+          full:
+            pricing[languageKey].description?.full ||
+            localizedDescription[languageKey].full,
+        },
+        packages:
+          Array.isArray(pricing[languageKey].packages) &&
+          pricing[languageKey].packages.length > 0
+            ? pricing[languageKey].packages
+            : deepClone(pooja.packages || []),
+        addOns:
+          Array.isArray(pricing[languageKey].addOns)
+            ? pricing[languageKey].addOns
+            : deepClone(pooja.addOns || []),
+      };
+    }
+  });
+
+  const availableLanguageSet = new Set(
+    (Array.isArray(pooja.availableLanguages)
+      ? pooja.availableLanguages
+      : [])
+      .map((item) => String(item || '').trim().toLowerCase())
+      .filter(Boolean)
+  );
+
+  Object.keys(pricing).forEach((languageKey) => {
+    availableLanguageSet.add(languageKey);
+  });
+
+  SUPPORTED_LANGUAGES.forEach((languageKey) => {
+    availableLanguageSet.add(languageKey);
+  });
+
+  return {
+    ...pooja,
+    serviceKey,
+    availableLanguages: Array.from(availableLanguageSet),
+    localizedTitle,
+    localizedDescription,
+    pricing,
+  };
+};
+
 const pujasToUpsert = [
   {
     title: 'Annaprashan Puja',
@@ -96,77 +205,308 @@ const pujasToUpsert = [
     ],
   },
   {
+    serviceKey: 'griha_pravesh',
     title: 'Griha Pravesh',
+    availableLanguages: ['odia', 'hindi', 'bengali'],
+    localizedTitle: {
+      odia: 'Griha Pravesh',
+      hindi: 'Griha Pravesh',
+      bengali: 'Griho Probesh',
+    },
+    localizedDescription: {
+      odia: {
+        short: 'Griha Pravesh puja for peaceful new home entry',
+        full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
+      },
+      hindi: {
+        short: 'Griha Pravesh puja with Hindi pandits',
+        full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
+      },
+      bengali: {
+        short: 'Griho Probesh puja with Bengali pandits',
+        full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
+      },
+    },
     description:
       'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
-    startPrice: 7800,
+    startPrice: 6200,
     packages: [
       {
-        name: 'Economy',
-        price: 7800,
+        name: 'Basic',
+        price: 6200,
         includesSamagri: true,
         pandits: '1 Panditji + All Puja Samagries',
         description:
-          'Basic Griha Pravesh Puja goes on for 1:30-2 hours. Recommended for those looking for simple, short puja or puja for rented home.',
+          'Basic Griha Pravesh Puja goes on for 1:30-2 hrs. Recommended for those looking for simple, short puja or puja for rented home.',
         procedure: [
-          'Ghata Sthapana',
-          'Dwarapal Puja',
-          'Surya Puja',
-          'Panchagavya Sinchana',
-          'Ganapati Ghata Puja',
-          'Navagraha Mandal Puja',
-          'Durga Madhava Puja',
-          'Naryana Lakshmivardhani Ghata Puja',
-          'Vrindavati Puja',
+          'Dwar Puja',
+          'Griha Pravesh',
+          'Kitchen Puja',
+          'Boiling Milk with new vessel',
+          'Gauri Ganesh Puja',
+          'Kalash Navgraha Puja',
           'Vastu Puja',
-          'Havan',
-          'Gruha Pravesh',
-          'Aarti and Pushpanjali',
+          'Havans – Ganesh, Navagraha, Laxmi, Varun and Vastu Havan',
+          'Poornahuthi, Aarti & Prasad Distribution',
         ],
         inclusions: ['Dakshina', 'All Puja Samagries'],
         note:
-          'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji dan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will receive a detailed to-do list after booking.',
+          'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will be receiving a detailed to-do list after booking.',
+        addOns: [
+          { name: 'Flowers & Fruits', price: 1500 },
+          { name: 'Satyanarayan Katha', price: 1700 },
+        ],
       },
       {
-        name: 'Standard',
+        name: 'Economy',
         price: 11000,
         includesSamagri: true,
-        pandits: '2 Panditjis + All Puja Samagries',
+        pandits: '2 Panditji + All Puja Samagries',
         description:
-          'In Standard Griha Pravesh Puja, 1 main panditji and 1 assistant panditji perform additional pujas and more mandals. Total puja goes on for 2:30-3:00 hours.',
+          'In Economy package 2 vedic pandits will be there, more number of vedis/mandals will be put, more number of mantra aahutis will be performed and Griha Pravesh puja will be performed in a grand way and goes on for 2:30-3:00 hrs. This package is recommended for new home.',
         procedure: [
-          'Ghata Sthapana',
-          'Dwarapal Puja',
-          'Guru Puja',
-          'Surya Puja',
-          'Matru Pitru Puja',
-          'Purohit Varan',
-          'Saptadhanya Abhimantrita',
-          'Panchagavya Sinchana',
-          'Ganapati Ghata Puja',
-          'Brahma Mandal Puja',
-          'Savitri Puja',
-          'Navagraha Mandal Puja',
-          'Dashadikpal Mandal Puja',
-          'Astadasha Matrika Puja',
-          'Durga Madhava Puja',
-          'Naryana Lakshmivardhani Ghata Puja',
-          'Vrindavati Puja',
-          'Vastu Mandal Puja',
-          'Vishwakarma Puja',
-          'Havan',
-          'Gruha Pravesh',
-          'Aarti and Pushpanjali',
+          'Dwar Puja',
+          'Griha Pravesh',
+          'Kitchen Puja',
+          'Boiling Milk with new vessel',
+          'Gauri Ganesh Puja',
+          'Kalasha Navgraha Puja',
+          'Vastu Puja',
+          'Havans – Ganesh, Navagraha, Laxmi, Varun and Vastu Havan',
+          'Poornahuthi, Aarti & Prasad Distribution',
         ],
         inclusions: ['Dakshina', 'All Puja Samagries'],
         note:
-          'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji daan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will receive a detailed to-do list after booking.',
+          'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will be receiving a detailed to-do list after booking.',
+        addOns: [
+          { name: 'Flowers & Fruits', price: 1600 },
+          { name: 'Satyanarayan Katha', price: 1700 },
+        ],
       },
     ],
-    addOns: [
-      { name: 'Flowers & Fruits', price: 1500 },
-      { name: 'Satyanarayan Katha', price: 1500 },
-    ],
+    pricing: {
+      hindi: {
+        title: 'Griha Pravesh',
+        description: {
+          short: 'Griha Pravesh puja with Hindi pandits',
+          full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
+        },
+        packages: [
+          {
+            name: 'Basic',
+            price: 6200,
+            includesSamagri: true,
+            pandits: '1 Panditji + All Puja Samagries',
+            description:
+              'Basic Griha Pravesh Puja goes on for 1:30-2 hrs. Recommended for those looking for simple, short puja or puja for rented home.',
+            procedure: [
+              'Dwar Puja',
+              'Griha Pravesh',
+              'Kitchen Puja',
+              'Boiling Milk with new vessel',
+              'Gauri Ganesh Puja',
+              'Kalash Navgraha Puja',
+              'Vastu Puja',
+              'Havans – Ganesh, Navagraha, Laxmi, Varun and Vastu Havan',
+              'Poornahuthi, Aarti & Prasad Distribution',
+            ],
+            inclusions: ['Dakshina', 'All Puja Samagries'],
+            note:
+              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will be receiving a detailed to-do list after booking.',
+            addOns: [
+              { name: 'Flowers & Fruits', price: 1500 },
+              { name: 'Satyanarayan Katha', price: 1700 },
+            ],
+          },
+          {
+            name: 'Economy',
+            price: 11000,
+            includesSamagri: true,
+            pandits: '2 Panditji + All Puja Samagries',
+            description:
+              'In Economy package 2 vedic pandits will be there, more number of vedis/mandals will be put, more number of mantra aahutis will be performed and Griha Pravesh puja will be performed in a grand way and goes on for 2:30-3:00 hrs. This package is recommended for new home.',
+            procedure: [
+              'Dwar Puja',
+              'Griha Pravesh',
+              'Kitchen Puja',
+              'Boiling Milk with new vessel',
+              'Gauri Ganesh Puja',
+              'Kalasha Navgraha Puja',
+              'Vastu Puja',
+              'Havans – Ganesh, Navagraha, Laxmi, Varun and Vastu Havan',
+              'Poornahuthi, Aarti & Prasad Distribution',
+            ],
+            inclusions: ['Dakshina', 'All Puja Samagries'],
+            note:
+              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will be receiving a detailed to-do list after booking.',
+            addOns: [
+              { name: 'Flowers & Fruits', price: 1600 },
+              { name: 'Satyanarayan Katha', price: 1700 },
+            ],
+          },
+        ],
+        addOns: [],
+      },
+      odia: {
+        title: 'Griha Pravesh',
+        description: {
+          short: 'Traditional Odia Griha Pravesh packages',
+          full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
+        },
+        packages: [
+          {
+            name: 'Economy',
+            price: 7200,
+            includesSamagri: true,
+            pandits: '1 Panditji + All Puja Samagries',
+            description:
+              'Basic Griha Pravesh Puja goes on for 1:30-2 hrs. Recommended for those looking for Simple, Short Puja or Puja for rented home.',
+            procedure: [
+              'Ghata sthapana',
+              'Dwarapal Puja',
+              'Surya puja',
+              'Panchagavya Sinchana',
+              'Ganapati Ghata Puja',
+              'Navagraha Mandal Puja',
+              'Durga Madhava Puja',
+              'Naryana Lakshmivardhani Ghata Puja.',
+              'Vrindavati Puja',
+              'Vastu Puja',
+              'Havan',
+              'Gruha pravesh',
+              'Aarti and Pushpanjali',
+            ],
+            inclusions: ['Dakshina', 'All Puja Samagries'],
+            note:
+              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji dan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc you will be receiving detailed to do list after booking.',
+            addOns: [
+              { name: 'Flowers & Fruits', price: 1500 },
+              { name: 'Satyanarayan Katha', price: 1500 },
+            ],
+          },
+          {
+            name: 'Standard',
+            price: 11000,
+            includesSamagri: true,
+            pandits: '2 Panditjis + All Puja Samagries',
+            description:
+              'In Standard Griha Pravesh Puja 1 main panditji and 1 assistant panditji will be there, More number of pujas will be performed and more number of mandals are drawn, total pooja goes on for 2:30-3:00 hours.',
+            procedure: [
+              'Ghata sthapana',
+              'Dwarapal Puja',
+              'Guru Puja',
+              'Surya puja',
+              'Matru pitru Puja',
+              'Purohit varan',
+              'Saptadhanya Abhimantrita',
+              'Panchagavya Sinchana',
+              'Ganapati Ghata Puja',
+              'Brahma Mandal Puja',
+              'Savitri Puja',
+              'Navagraha Mandal Puja',
+              'Dashadikpal Mandal Puja',
+              'Astadasha Matrika Puja',
+              'Durga Madhava Puja',
+              'Naryana Lakshmivardhani Ghata Puja.',
+              'Vrindavati Puja',
+              'Vastu Mandal Puja',
+              'Vishwakarma Puja',
+              'Havan',
+              'Gruha pravesh',
+              'Aarti and Pushpanjali',
+            ],
+            inclusions: ['Dakshina', 'All Puja Samagries'],
+            note:
+              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji daan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc you will be receiving detailed to do list after booking.',
+            addOns: [
+              { name: 'Flowers & Fruits', price: 2000 },
+              { name: 'Satyanarayan Katha', price: 1500 },
+            ],
+          },
+        ],
+        addOns: [],
+      },
+      bengali: {
+        title: 'Griho Probesh',
+        description: {
+          short: 'Traditional Bengali Griho Probesh packages',
+          full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
+        },
+        packages: [
+          {
+            name: 'Economy',
+            price: 7800,
+            includesSamagri: true,
+            pandits: '1 Panditji + All Puja Samagries',
+            description:
+              'Basic Griho Probesh Puja goes on for 1:30-2 hours. Recommended for those looking for simple, short puja or puja for rented home.',
+            procedure: [
+              'Ghata Sthapana',
+              'Dwarapal Puja',
+              'Surya Puja',
+              'Panchagavya Sinchana',
+              'Ganapati Ghata Puja',
+              'Navagraha Mandal Puja',
+              'Durga Madhava Puja',
+              'Naryana Lakshmivardhani Ghata Puja',
+              'Vrindavati Puja',
+              'Vastu Puja',
+              'Havan',
+              'Griho Probesh',
+              'Aarti and Pushpanjali',
+            ],
+            inclusions: ['Dakshina', 'All Puja Samagries'],
+            note:
+              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji dan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will receive a detailed to-do list after booking.',
+            addOns: [
+              { name: 'Flowers & Fruits', price: 1500 },
+              { name: 'Satyanarayan Katha', price: 1500 },
+            ],
+          },
+          {
+            name: 'Standard',
+            price: 11000,
+            includesSamagri: true,
+            pandits: '2 Panditjis + All Puja Samagries',
+            description:
+              'In Standard Griho Probesh Puja, 1 main panditji and 1 assistant panditji perform additional pujas and more mandals. Total puja goes on for 2:30-3:00 hours.',
+            procedure: [
+              'Ghata Sthapana',
+              'Dwarapal Puja',
+              'Guru Puja',
+              'Surya Puja',
+              'Matru Pitru Puja',
+              'Purohit Varan',
+              'Saptadhanya Abhimantrita',
+              'Panchagavya Sinchana',
+              'Ganapati Ghata Puja',
+              'Brahma Mandal Puja',
+              'Savitri Puja',
+              'Navagraha Mandal Puja',
+              'Dashadikpal Mandal Puja',
+              'Astadasha Matrika Puja',
+              'Durga Madhava Puja',
+              'Naryana Lakshmivardhani Ghata Puja',
+              'Vrindavati Puja',
+              'Vastu Mandal Puja',
+              'Vishwakarma Puja',
+              'Havan',
+              'Griho Probesh',
+              'Aarti and Pushpanjali',
+            ],
+            inclusions: ['Dakshina', 'All Puja Samagries'],
+            note:
+              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji daan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will receive a detailed to-do list after booking.',
+            addOns: [
+              { name: 'Flowers & Fruits', price: 2000 },
+              { name: 'Satyanarayan Katha', price: 1500 },
+            ],
+          },
+        ],
+        addOns: [],
+      },
+    },
+    addOns: [],
   },
   {
     title: 'Janma Chuti Poka (Mundan)',
@@ -454,16 +794,22 @@ async function upsertAndVerify() {
     console.log('Connected to MongoDB');
 
     let upserted = 0;
-    for (const pooja of pujasToUpsert) {
+    for (const rawPooja of pujasToUpsert) {
+      const pooja = ensureLanguageArchitecture(rawPooja);
       const primaryNote = pooja.packages?.[0]?.note;
       const updatePayload = {
         $set: {
+          serviceKey: pooja.serviceKey,
           title: pooja.title,
+          availableLanguages: pooja.availableLanguages,
+          localizedTitle: pooja.localizedTitle,
+          localizedDescription: pooja.localizedDescription,
           description: pooja.description,
           image: DEFAULT_IMAGE,
           startPrice: pooja.startPrice,
           packages: pooja.packages,
           addOns: pooja.addOns,
+          pricing: pooja.pricing,
         },
       };
 

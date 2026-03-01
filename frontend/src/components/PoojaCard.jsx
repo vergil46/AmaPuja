@@ -1,9 +1,20 @@
 import { Link } from 'react-router-dom'
 import { getPoojaImage } from '../assets/poojaImageMap'
 
-function PoojaCard({ pooja, selectedCity }) {
+function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
   const customImage = getPoojaImage(pooja.title, pooja.image)
-  const cityQuery = selectedCity ? `?city=${encodeURIComponent(selectedCity)}` : ''
+  const queryParams = new URLSearchParams()
+
+  if (selectedCity) {
+    queryParams.set('city', selectedCity)
+  }
+
+  if (selectedLanguage) {
+    queryParams.set('language', selectedLanguage)
+  }
+
+  const queryString = queryParams.toString()
+  const cityQuery = queryString ? `?${queryString}` : ''
 
   return (
     <article className="card group h-full bg-white rounded-2xl overflow-hidden border border-orange-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">

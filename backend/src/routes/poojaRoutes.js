@@ -22,6 +22,52 @@ const normalizeStringArray = (items) =>
     .map((item) => normalizeText(item))
     .filter(Boolean);
 
+const normalizeAddOns = (items) =>
+  (Array.isArray(items) ? items : [])
+    .map((addon) => ({
+      name: normalizeText(addon?.name),
+      price: toValidPrice(addon?.price, 0),
+    }))
+    .filter((addon) => addon.name);
+
+const normalizePricingMap = (pricing = {}) => {
+  if (!pricing || typeof pricing !== 'object' || Array.isArray(pricing)) {
+    return {};
+  }
+
+  const entries = Object.entries(pricing);
+  const normalized = {};
+
+  entries.forEach(([languageKey, config]) => {
+    const normalizedLanguageKey = normalizeText(languageKey).toLowerCase();
+    if (!normalizedLanguageKey || !config || typeof config !== 'object') {
+      return;
+    }
+
+    const packages = (Array.isArray(config.packages) ? config.packages : [])
+      .map((pkg) => normalizePackageItem(pkg, 0))
+      .filter(Boolean);
+
+    const addOns = normalizeAddOns(config.addOns);
+
+    const descriptionConfig = config.description && typeof config.description === 'object'
+      ? {
+          short: normalizeText(config.description.short),
+          full: normalizeText(config.description.full),
+        }
+      : undefined;
+
+    normalized[normalizedLanguageKey] = {
+      title: normalizeText(config.title),
+      description: descriptionConfig,
+      packages,
+      addOns,
+    };
+  });
+
+  return normalized;
+};
+
 const normalizePackageItem = (item, fallbackPrice = 0) => {
   const name = normalizeText(item?.name);
   const price = toValidPrice(item?.price, fallbackPrice);
@@ -39,6 +85,7 @@ const normalizePackageItem = (item, fallbackPrice = 0) => {
     procedure: normalizeStringArray(item?.procedure),
     inclusions: normalizeStringArray(item?.inclusions),
     note: normalizeText(item?.note),
+    addOns: normalizeAddOns(item?.addOns),
   };
 };
 
@@ -82,20 +129,20 @@ const normalizePoojaPayload = (input = {}) => {
   const packagePrices = packages.map((pkg) => toValidPrice(pkg.price, startPrice));
   const normalizedStartPrice = packagePrices.length > 0 ? Math.min(...packagePrices) : startPrice;
 
-  const addOns = (Array.isArray(input.addOns) ? input.addOns : [])
-    .map((addon) => ({
-      name: normalizeText(addon?.name),
-      price: toValidPrice(addon?.price, 0),
-    }))
-    .filter((addon) => addon.name);
+  const addOns = normalizeAddOns(input.addOns);
 
   return {
+    serviceKey: normalizeText(input.serviceKey),
     title,
+    availableLanguages: normalizeStringArray(input.availableLanguages).map((item) => item.toLowerCase()),
+    localizedTitle: input.localizedTitle && typeof input.localizedTitle === 'object' ? input.localizedTitle : {},
+    localizedDescription: input.localizedDescription && typeof input.localizedDescription === 'object' ? input.localizedDescription : {},
     description: normalizeText(input.description) || defaultDescription(title),
     image: normalizeText(input.image),
     startPrice: normalizedStartPrice,
     packages,
     addOns,
+    pricing: normalizePricingMap(input.pricing),
     details: input.details,
     maxHours: input.maxHours,
     extraHourCharge: input.extraHourCharge,
