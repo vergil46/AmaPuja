@@ -904,8 +904,8 @@ module.exports = [
         "full": ""
       },
       "hindi": {
-        "short": "Mata Saraswati is the deity of intelligence, wisdom, arts, music, memory power, and other soft skills. This havan relieves people from mental pressure. It improves concentration, memory power, focus, and the ability to understand complex things.",
-        "full": "Mata Saraswati is the deity of intelligence, wisdom, arts, music, memory power, and other soft skills. This havan relieves people from mental pressure. It improves concentration, memory power, focus, and the ability to understand complex things."
+        "short": "Saraswati Puja is performed to seek the blessings of Goddess Saraswati for intelligence, wisdom, arts, and learning.",
+        "full": "Saraswati Puja is performed to seek the blessings of Goddess Saraswati, the deity of intelligence, wisdom, arts, music, education, memory power, and knowledge."
       },
       "kannada": {
         "short": "",
@@ -925,36 +925,63 @@ module.exports = [
         "packages": [
           {
             "name": "Standard",
-            "price": 4300,
+            "price": 3200,
             "includesSamagri": true,
-            "pandits": "1 Panditji + Pooja Samagries",
+            "pandits": "1 Panditji + All Puja Materials",
             "procedure": [
-              "Ghata Sthapana",
-              "Sankalpa",
+              "Swasti Vachanam",
+              "Maha Sankalp",
               "Ganapathi Puja",
-              "Panchdevata Puja",
-              "Saraswati Devi Avahan",
-              "Bhog Neivedhya",
-              "Aarti",
-              "Pushpanjali",
-              "Prasad Sevan"
+              "Saraswati Puja",
+              "Aarti & Prasad Distribution"
             ],
             "inclusions": [
               "Dakshina",
-              "Puja Samagries"
-            ]
-          }
-        ],
-        "addOns": [
-          {
-            "name": "Flowers & Fruits",
-            "price": 1000
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              },
+              {
+                "name": "Havan",
+                "price": 1000
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, etc., will be brought by us."
           },
           {
-            "name": "Havan",
-            "price": 1000
+            "name": "Premium",
+            "price": 6200,
+            "includesSamagri": true,
+            "pandits": "2 Panditjis + All Puja Samagri",
+            "procedure": [
+              "Swasti Vachanam",
+              "Maha Sankalp",
+              "Ganapathi Puja",
+              "Punyaha Vachanam",
+              "Saraswati Puja",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1500
+              },
+              {
+                "name": "Havan",
+                "price": 1700
+              }
+            ],
+            "note": "All puja samagri including Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, etc., will be arranged and brought by us."
           }
-        ]
+        ],
+        "addOns": []
       },
       "kannada": {
         "packages": [],
@@ -983,8 +1010,8 @@ module.exports = [
         "full": ""
       },
       "hindi": {
-        "short": "Satyanarayan Puja is performed to remove all the obstacles and negative energies and gives victory or success. It acquires wealth and prosperity and brings harmony to the family and success in life.",
-        "full": "Satyanarayan Puja is performed to remove all the obstacles and negative energies and gives victory or success. It acquires wealth and prosperity and brings harmony to the family and success in life."
+        "short": "Satyanarayan Puja is performed to remove obstacles, eliminate negative energies, and bring success and prosperity.",
+        "full": "Satyanarayan Puja is performed to remove obstacles, eliminate negative energies, and bring success and victory in life by invoking the blessings of Lord Vishnu in the form of Lord Satyanarayan."
       },
       "kannada": {
         "short": "",
@@ -1003,37 +1030,85 @@ module.exports = [
       "hindi": {
         "packages": [
           {
-            "name": "Standard",
-            "price": 4000,
+            "name": "Economy",
+            "price": 3500,
             "includesSamagri": true,
-            "pandits": "1 Panditji + All Pooja Samagries",
+            "pandits": "1 Panditji + All Puja Samagri",
+            "description": "Complete Satyanarayan Puja with proper rituals and mantra chanting. Duration 1.5 to 2 hours.",
             "procedure": [
-              "Ganapathi Puja",
-              "Varun Puja",
-              "Narayan Puja",
-              "Pachdevta Puja",
-              "Navagraha Puja",
-              "Asthadasha Matrika Puja",
-              "Satyanarayan Katha Shravan",
-              "Havan",
-              "Pushpanjali",
-              "Neivedhya",
-              "Aarti",
-              "Prasad Vitran"
+              "Swasti Vachanam",
+              "Maha Sankalp",
+              "Gauri Ganesh Puja",
+              "Kalash Navagraha Puja",
+              "Satyanarayan Katha, Puja & Havan",
+              "Aarti & Prasad Distribution"
             ],
             "inclusions": [
               "Dakshina",
-              "All Puja Samagries"
+              "All Puja Samagri"
             ],
-            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos, Bhojya daan (raw rice, dal, vegetables etc.) You will receive a detailed to-do list after booking."
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1200
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee, etc., will be brought by us."
+          },
+          {
+            "name": "Standard",
+            "price": 7200,
+            "includesSamagri": true,
+            "pandits": "2 Panditjis + All Puja Samagri",
+            "description": "Elaborate Satyanarayan Puja with more vedis/mandals and additional mantra aahutis. Duration approx 2 hours.",
+            "procedure": [
+              "Swasti Vachanam",
+              "Maha Sankalp",
+              "Gauri Ganesh Puja",
+              "Kalash Navagraha Puja",
+              "Satyanarayan Path, Puja & Havan",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1500
+              }
+            ],
+            "note": "All puja samagri including Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee, etc., will be arranged and brought by us."
+          },
+          {
+            "name": "Premium",
+            "price": 21000,
+            "includesSamagri": true,
+            "pandits": "5 Panditjis + Sangeetmay Satyanarayan Puja",
+            "description": "Grand Satyanarayan Puja with bhajans/kirtans and sound system. Duration approx 3 to 4 hours.",
+            "procedure": [
+              "Swasti Vachanam",
+              "Maha Sankalp",
+              "Gauri Ganesh Puja",
+              "Kalash Navagraha Puja",
+              "Satyanarayan Path, Puja & Havan",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 2000
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee, etc., will be brought by us."
           }
         ],
-        "addOns": [
-          {
-            "name": "Flowers & Fruits",
-            "price": 1000
-          }
-        ]
+        "addOns": []
       },
       "kannada": {
         "packages": [],
@@ -1062,8 +1137,8 @@ module.exports = [
         "full": ""
       },
       "hindi": {
-        "short": "Lord Vishwakarma is the chief deity of all architects and craftsmen, also known as Devashilpi. This puja is performed to please Lord Vishwakarma and get his blessings for a happy and wealthy life.",
-        "full": "Lord Vishwakarma is the chief deity of all architects and craftsmen, also known as Devashilpi. This puja is performed to please Lord Vishwakarma and get his blessings for a happy and wealthy life."
+        "short": "Vishwakarma Puja is performed to seek blessings of Lord Vishwakarma for prosperity, protection, and professional success.",
+        "full": "Vishwakarma Puja is performed to seek the blessings of Lord Vishwakarma, the divine architect and chief deity of engineers, craftsmen, and workers."
       },
       "kannada": {
         "short": "",
@@ -1083,35 +1158,34 @@ module.exports = [
         "packages": [
           {
             "name": "Standard",
-            "price": 4000,
+            "price": 3500,
             "includesSamagri": true,
-            "pandits": "1 Panditji + Puja Samagries",
+            "pandits": "1 Panditji + All Puja Samagri",
             "procedure": [
-              "Kaya Shudhi",
-              "Ghata Sthapana",
-              "Sankalpa",
-              "Ganapathi Panchdevta Puja",
-              "Narayan Vardhani Ghata Puja",
+              "Swasti Vachanam",
+              "Maha Sankalp",
+              "Ganapathi Puja",
               "Vishwakarma Puja",
-              "Neivedhya, Aarti",
-              "Pushpanjali and Bhojyadana"
+              "Aarti & Prasad Distribution"
             ],
             "inclusions": [
               "Dakshina",
-              "All Puja Samagries"
-            ]
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1200
+              },
+              {
+                "name": "Havan",
+                "price": 1000
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, etc., will be brought by us."
           }
         ],
-        "addOns": [
-          {
-            "name": "Flowers & Fruits",
-            "price": 1000
-          },
-          {
-            "name": "Havan",
-            "price": 1000
-          }
-        ]
+        "addOns": []
       },
       "kannada": {
         "packages": [],
@@ -2848,6 +2922,898 @@ module.exports = [
               }
             ],
             "note": "All puja samagri including Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee, etc., will be arranged and brought by us."
+          }
+        ],
+        "addOns": []
+      },
+      "kannada": {
+        "packages": [],
+        "addOns": []
+      },
+      "bengali": {
+        "packages": [],
+        "addOns": []
+      }
+    }
+  },
+  {
+    "key": "roka_ceremony",
+    "availableLanguages": [
+      "hindi"
+    ],
+    "title": {
+      "odia": "",
+      "hindi": "Roka Ceremony",
+      "kannada": "",
+      "bengali": ""
+    },
+    "description": {
+      "odia": {
+        "short": "",
+        "full": ""
+      },
+      "hindi": {
+        "short": "Roka Ceremony is a significant pre-wedding ritual that marks the formal agreement between two families for marriage.",
+        "full": "Roka Ceremony is a significant pre-wedding ritual that marks the formal agreement between two families for marriage. This sacred ceremony symbolizes commitment, acceptance, and the beginning of wedding celebrations."
+      },
+      "kannada": {
+        "short": "",
+        "full": ""
+      },
+      "bengali": {
+        "short": "",
+        "full": ""
+      }
+    },
+    "pricing": {
+      "odia": {
+        "packages": [],
+        "addOns": []
+      },
+      "hindi": {
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4500,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + Puja Samagri",
+            "procedure": [
+              "Swastivachan",
+              "Sankalp",
+              "Gowri-Ganesh Puja",
+              "Kalash Puja",
+              "Ashirwad",
+              "Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1500
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, etc., will be brought by us. The Yajaman (host) must arrange household items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, and Photos."
+          }
+        ],
+        "addOns": []
+      },
+      "kannada": {
+        "packages": [],
+        "addOns": []
+      },
+      "bengali": {
+        "packages": [],
+        "addOns": []
+      }
+    }
+  },
+  {
+    "key": "rudrabhishek_puja",
+    "availableLanguages": [
+      "hindi"
+    ],
+    "title": {
+      "odia": "",
+      "hindi": "Rudrabhishek Puja",
+      "kannada": "",
+      "bengali": ""
+    },
+    "description": {
+      "odia": {
+        "short": "",
+        "full": ""
+      },
+      "hindi": {
+        "short": "Rudrabhishek Puja is a powerful and sacred ritual dedicated to Lord Shiva.",
+        "full": "Rudrabhishek Puja is a powerful and sacred ritual dedicated to Lord Shiva. It involves ceremonial abhishek of the Shivling while chanting Vedic mantras and helps remove negativity, improve health, and bring peace and prosperity."
+      },
+      "kannada": {
+        "short": "",
+        "full": ""
+      },
+      "bengali": {
+        "short": "",
+        "full": ""
+      }
+    },
+    "pricing": {
+      "odia": {
+        "packages": [],
+        "addOns": []
+      },
+      "hindi": {
+        "packages": [
+          {
+            "name": "Eka Rudram",
+            "price": 4200,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Samagri",
+            "description": "Rudri Path is chanted once while performing Abhishek to the Shivling. Duration approx 2 hours.",
+            "procedure": [
+              "Gowri Ganesh Puja",
+              "Kalash & Navagraha Puja",
+              "Sodasamatrika Puja",
+              "Rudrabhishek and Eka Rudri Path",
+              "Archana",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1200
+              },
+              {
+                "name": "Havan",
+                "price": 1200
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Bilvapatra, Honey, Janeu, Mouli, Gangajal, Shringi, Shivling, Gaumutra, Kapda, etc., will be brought by us."
+          },
+          {
+            "name": "Parthiv Shivling Rudrabhishekam",
+            "price": 9200,
+            "includesSamagri": true,
+            "pandits": "2 Panditjis + All Puja Samagri",
+            "description": "2 Pandits perform the ritual with Parthiv Shivling and Eka Rudri Path. Duration approx 2.5 hours.",
+            "procedure": [
+              "Gowri Ganesh Puja",
+              "Kalash & Navagraha Puja",
+              "Sodasamatrika Puja",
+              "Rudrabhishek and Eka Rudri Path",
+              "Archana",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1500
+              },
+              {
+                "name": "Havan",
+                "price": 1500
+              }
+            ],
+            "note": "All puja samagri including Mitti (for Shivling), Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Bilvapatra, Honey, Janeu, Mouli, Gangajal, Shringi, Shivling items, Gaumutra, Kapda, etc., will be arranged and brought by us."
+          },
+          {
+            "name": "Panch Rudram",
+            "price": 11200,
+            "includesSamagri": true,
+            "pandits": "3 Panditjis + Puja Samagri",
+            "description": "3 Pandits perform Panch Rudri Path followed by Rudrabhishek. Duration approx 2.5 to 3 hours.",
+            "procedure": [
+              "Gowri Ganesh Puja",
+              "Kalash & Navagraha Puja",
+              "Sodasamatrika Puja",
+              "Rudrabhishek and Panch Rudri Path",
+              "Archana",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1700
+              },
+              {
+                "name": "Havan",
+                "price": 2000
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Bilvapatra, Honey, Janeu, Mouli, Gangajal, Shringi, Shivling, Gaumutra, Kapda, etc., will be brought by us."
+          }
+        ],
+        "addOns": []
+      },
+      "kannada": {
+        "packages": [],
+        "addOns": []
+      },
+      "bengali": {
+        "packages": [],
+        "addOns": []
+      }
+    }
+  },
+  {
+    "key": "shuddhikaran_puja",
+    "availableLanguages": [
+      "hindi"
+    ],
+    "title": {
+      "odia": "",
+      "hindi": "Shuddhikaran Puja",
+      "kannada": "",
+      "bengali": ""
+    },
+    "description": {
+      "odia": {
+        "short": "",
+        "full": ""
+      },
+      "hindi": {
+        "short": "Shuddhikaran Puja is performed for purification of the house and family members on specific occasions.",
+        "full": "Shuddhikaran Puja is performed on specific occasions such as after puberty, after a death in the family, or on the 11th day of childbirth for purification of the house and family members."
+      },
+      "kannada": {
+        "short": "",
+        "full": ""
+      },
+      "bengali": {
+        "short": "",
+        "full": ""
+      }
+    },
+    "pricing": {
+      "odia": {
+        "packages": [],
+        "addOns": []
+      },
+      "hindi": {
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 3500,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Samagri",
+            "procedure": [
+              "Gauri Ganesh Puja",
+              "Kalash Puja",
+              "Punyahavachan",
+              "Havan",
+              "Jal Prokshan (Sprinkling of Holy Water)",
+              "Aarti",
+              "Pushpanjali"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1200
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, etc., will be brought by us."
+          }
+        ],
+        "addOns": []
+      },
+      "kannada": {
+        "packages": [],
+        "addOns": []
+      },
+      "bengali": {
+        "packages": [],
+        "addOns": []
+      }
+    }
+  },
+  {
+    "key": "solah_somvar_udyapan_puja",
+    "availableLanguages": [
+      "hindi"
+    ],
+    "title": {
+      "odia": "",
+      "hindi": "Solah Somvar Udyapan Puja",
+      "kannada": "",
+      "bengali": ""
+    },
+    "description": {
+      "odia": {
+        "short": "",
+        "full": ""
+      },
+      "hindi": {
+        "short": "Solah Somvar Udyapan Puja is performed on the 17th Monday after completing the sacred Solah Somvar Vrat.",
+        "full": "Solah Somvar Udyapan Puja is performed on the 17th Monday after completing the sacred Solah Somvar Vrat. Lord Shiva is the main deity worshipped in this Vrat Udyapan Puja."
+      },
+      "kannada": {
+        "short": "",
+        "full": ""
+      },
+      "bengali": {
+        "short": "",
+        "full": ""
+      }
+    },
+    "pricing": {
+      "odia": {
+        "packages": [],
+        "addOns": []
+      },
+      "hindi": {
+        "packages": [
+          {
+            "name": "Economy",
+            "price": 8500,
+            "includesSamagri": true,
+            "pandits": "2 Panditjis + Puja Samagri",
+            "description": "Complete Solah Somvar Udyapan Puja with Eka Rudrabhishek. Duration 2 to 2.5 hours.",
+            "procedure": [
+              "Swasti Vachan",
+              "Sankalp",
+              "Ganapathi Pujan",
+              "Kalash Pujan",
+              "Navagraha Pujan",
+              "Eka Lingatobhadra Mandal Pujan",
+              "Shiv Parivar Pujan",
+              "Eka Rudrabhishek & Katha Shravan",
+              "Havan",
+              "Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "Puja Materials"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1200
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Shivling, Bilvapatra, Ghee, etc., will be brought by us."
+          },
+          {
+            "name": "Standard",
+            "price": 17200,
+            "includesSamagri": true,
+            "pandits": "5 Panditjis + Puja Samagri",
+            "description": "Grand Udyapan Puja with Chatur Lingatobhadra Mandal and Ekadasha Rudrabhishek. Duration 3 to 3.5 hours.",
+            "procedure": [
+              "Swasti Vachan",
+              "Sankalp",
+              "Ganapathi Pujan",
+              "Kalash Pujan",
+              "Navagraha Pujan",
+              "Chatur Lingatobhadra Mandal Pujan",
+              "Shiv Parivar Pujan",
+              "Ekadasha Rudrabhishek & Katha Shravan",
+              "Havan",
+              "Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "Puja Materials"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 3000
+              }
+            ],
+            "note": "All required puja samagri including Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Shivling, Bilvapatra, Ghee, etc., will be arranged and brought by us."
+          }
+        ],
+        "addOns": []
+      },
+      "kannada": {
+        "packages": [],
+        "addOns": []
+      },
+      "bengali": {
+        "packages": [],
+        "addOns": []
+      }
+    }
+  },
+  {
+    "key": "surya_puja",
+    "availableLanguages": [
+      "hindi"
+    ],
+    "title": {
+      "odia": "",
+      "hindi": "Surya Puja",
+      "kannada": "",
+      "bengali": ""
+    },
+    "description": {
+      "odia": {
+        "short": "",
+        "full": ""
+      },
+      "hindi": {
+        "short": "Surya Puja is performed to seek the blessings of Lord Surya, the deity of wisdom, health, authority, and vitality.",
+        "full": "Surya Puja is performed to seek the blessings of Lord Surya, the deity of wisdom, knowledge, health, authority, and vitality. It reduces negative effects of Surya and Shani dosha."
+      },
+      "kannada": {
+        "short": "",
+        "full": ""
+      },
+      "bengali": {
+        "short": "",
+        "full": ""
+      }
+    },
+    "pricing": {
+      "odia": {
+        "packages": [],
+        "addOns": []
+      },
+      "hindi": {
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 3500,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Materials",
+            "procedure": [
+              "Ganapathi Pujan",
+              "Maha Sankalpam",
+              "Kalasha Pujan",
+              "Surya Pujan",
+              "Surya Sukta Path",
+              "Havan",
+              "Aarti & Pushpanjali",
+              "Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Materials"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, etc., will be brought by us."
+          }
+        ],
+        "addOns": []
+      },
+      "kannada": {
+        "packages": [],
+        "addOns": []
+      },
+      "bengali": {
+        "packages": [],
+        "addOns": []
+      }
+    }
+  },
+  {
+    "key": "vastu_shanti_puja",
+    "availableLanguages": [
+      "hindi"
+    ],
+    "title": {
+      "odia": "",
+      "hindi": "Vastu Shanti Puja",
+      "kannada": "",
+      "bengali": ""
+    },
+    "description": {
+      "odia": {
+        "short": "",
+        "full": ""
+      },
+      "hindi": {
+        "short": "Vastu Shanti Puja is performed to remove Vastu Dosha and negative influences from a home or office.",
+        "full": "Vastu Shanti Puja is performed to remove Vastu Dosha and negative influences from a home or office. This ritual restores balance, positivity, prosperity, and harmony."
+      },
+      "kannada": {
+        "short": "",
+        "full": ""
+      },
+      "bengali": {
+        "short": "",
+        "full": ""
+      }
+    },
+    "pricing": {
+      "odia": {
+        "packages": [],
+        "addOns": []
+      },
+      "hindi": {
+        "packages": [
+          {
+            "name": "Economy",
+            "price": 11200,
+            "includesSamagri": true,
+            "pandits": "2 Panditjis + All Puja Samagri",
+            "description": "Complete Vastu Shanti Puja. Duration approx 2 hours.",
+            "procedure": [
+              "Swastivachan",
+              "Maha Sankalp",
+              "Gauri Ganesh Puja",
+              "Kalash Navagraha Puja",
+              "Vastu Puja",
+              "Vastu Shanti Havan",
+              "Poornahuti, Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1500
+              },
+              {
+                "name": "Satyanarayan Katha",
+                "price": 1500
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, Havan Sticks, Samidha, Havan Kund, etc., will be brought by us."
+          },
+          {
+            "name": "Standard",
+            "price": 14200,
+            "includesSamagri": true,
+            "pandits": "3 Panditjis + All Puja Samagri",
+            "description": "Elaborate Vastu Shanti with Vastu Jaap and more mandals. Duration approx 3 hours.",
+            "procedure": [
+              "Swastivachan",
+              "Maha Sankalp",
+              "Gauri Ganesh Puja",
+              "Kalash Navagraha Puja",
+              "Vastu Jaap",
+              "Vastu Puja",
+              "Vastu Shanti Havan",
+              "Poornahuti, Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1500
+              },
+              {
+                "name": "Satyanarayan Katha",
+                "price": 1700
+              }
+            ],
+            "note": "All required puja samagri including Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, Havan Sticks, Samidha, Havan Kund, etc., will be arranged and brought by us."
+          }
+        ],
+        "addOns": []
+      },
+      "kannada": {
+        "packages": [],
+        "addOns": []
+      },
+      "bengali": {
+        "packages": [],
+        "addOns": []
+      }
+    }
+  },
+  {
+    "key": "vidyarambham_patti_pujan",
+    "availableLanguages": [
+      "hindi"
+    ],
+    "title": {
+      "odia": "",
+      "hindi": "Vidyarambham (Patti Pujan)",
+      "kannada": "",
+      "bengali": ""
+    },
+    "description": {
+      "odia": {
+        "short": "",
+        "full": ""
+      },
+      "hindi": {
+        "short": "Vidyarambham marks a child’s first step into formal learning and seeks blessings of Saraswati and Ganapati.",
+        "full": "Vidyarambham is a sacred Hindu ritual that marks a child’s first step into formal learning. It is considered highly auspicious to begin a child’s academic journey with this ritual."
+      },
+      "kannada": {
+        "short": "",
+        "full": ""
+      },
+      "bengali": {
+        "short": "",
+        "full": ""
+      }
+    },
+    "pricing": {
+      "odia": {
+        "packages": [],
+        "addOns": []
+      },
+      "hindi": {
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 3500,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Samagri",
+            "procedure": [
+              "Swastivachanam",
+              "Maha Sankalp",
+              "Gauri Ganesh Puja",
+              "Saraswati Puja",
+              "Vidyarambham Ritual",
+              "Havan",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Materials"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1200
+              },
+              {
+                "name": "Satyanarayan Katha",
+                "price": 1700
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee, etc., will be brought by us. Host must keep Slate and Chalk."
+          }
+        ],
+        "addOns": []
+      },
+      "kannada": {
+        "packages": [],
+        "addOns": []
+      },
+      "bengali": {
+        "packages": [],
+        "addOns": []
+      }
+    }
+  },
+  {
+    "key": "vivah_marriage",
+    "availableLanguages": [
+      "hindi"
+    ],
+    "title": {
+      "odia": "",
+      "hindi": "Vivah (Marriage)",
+      "kannada": "",
+      "bengali": ""
+    },
+    "description": {
+      "odia": {
+        "short": "",
+        "full": ""
+      },
+      "hindi": {
+        "short": "Marriage Puja is one of the most sacred and important events in life and is performed according to Vedic traditions.",
+        "full": "Marriage Puja or Wedding Ceremony is one of the most sacred and important events in life. Performing Vivah as per Vedic traditions invokes blessings for a prosperous and harmonious married life."
+      },
+      "kannada": {
+        "short": "",
+        "full": ""
+      },
+      "bengali": {
+        "short": "",
+        "full": ""
+      }
+    },
+    "pricing": {
+      "odia": {
+        "packages": [],
+        "addOns": []
+      },
+      "hindi": {
+        "packages": [
+          {
+            "name": "Economy",
+            "price": 14000,
+            "includesSamagri": true,
+            "pandits": "1 Panditji Dakshina + Marriage Puja Samagri",
+            "description": "Recommended for one side only or simple short ceremony with one Pandit.",
+            "procedure": [
+              "Ganapathi Poojan",
+              "Tika/Tilak",
+              "Dwar Puja",
+              "Var Puja",
+              "Kanyadaan",
+              "Havan (Laja/Jaya/Pitra)",
+              "Phere",
+              "Saptapadi",
+              "7 Vachan",
+              "Sindoor Daan",
+              "Mangalsutra Dharan",
+              "Bichiya",
+              "Dhruv Tara Darshan"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "Puja Materials",
+              "Pandit for 2–4 Hours"
+            ],
+            "addOns": [
+              {
+                "name": "Pandit for 4–8 Hours",
+                "price": 2000
+              },
+              {
+                "name": "Pandit for 8–12 Hours",
+                "price": 5000
+              }
+            ],
+            "note": "You must arrange Mangalsutra, Bichiya, Clothes, Chowki, Pata, Sweets, Flower Garlands, Flowers, Fruits, and Vessels before the ceremony."
+          },
+          {
+            "name": "Standard",
+            "price": 19000,
+            "includesSamagri": true,
+            "pandits": "2 Panditjis Dakshina + Marriage Puja Samagri",
+            "description": "Recommended for both bride and groom sides and grand traditional wedding.",
+            "procedure": [
+              "Ganapathi Poojan",
+              "Tika/Tilak",
+              "Dwar Puja",
+              "Var Puja",
+              "Kanyadaan",
+              "Havan (Laja/Jaya/Pitra)",
+              "Phere",
+              "Saptapadi",
+              "7 Vachan",
+              "Sindoor Daan",
+              "Mangalsutra Dharan",
+              "Bichiya",
+              "Dhruv Tara Darshan"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "Puja Materials",
+              "Pandit for 2–4 Hours"
+            ],
+            "addOns": [
+              {
+                "name": "Pandit for 4–8 Hours",
+                "price": 3000
+              },
+              {
+                "name": "Pandit for 8–12 Hours",
+                "price": 7000
+              }
+            ],
+            "note": "You must keep Mangalsutra, Bichiya, Clothes, Chowki, Pata, Sweets, Flower Garlands, Flowers, Fruits, and Vessels ready before the ceremony."
+          }
+        ],
+        "addOns": []
+      },
+      "kannada": {
+        "packages": [],
+        "addOns": []
+      },
+      "bengali": {
+        "packages": [],
+        "addOns": []
+      }
+    }
+  },
+  {
+    "key": "yagnopavit_sanskar_upanayan_sanskar",
+    "availableLanguages": [
+      "hindi"
+    ],
+    "title": {
+      "odia": "",
+      "hindi": "Yagnopavit Sanskar (Upanayan Sanskar)",
+      "kannada": "",
+      "bengali": ""
+    },
+    "description": {
+      "odia": {
+        "short": "",
+        "full": ""
+      },
+      "hindi": {
+        "short": "Yagnopavit Sanskar, also known as Upanayan Sanskar, marks the beginning of formal spiritual education.",
+        "full": "Yagnopavit Sanskar, also known as Upanayan Sanskar, is an important Hindu ritual that marks spiritual rebirth, discipline, and initiation into Gayatri Mantra and Vedic study."
+      },
+      "kannada": {
+        "short": "",
+        "full": ""
+      },
+      "bengali": {
+        "short": "",
+        "full": ""
+      }
+    },
+    "pricing": {
+      "odia": {
+        "packages": [],
+        "addOns": []
+      },
+      "hindi": {
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 9200,
+            "includesSamagri": true,
+            "pandits": "2 Panditjis + All Puja Samagri",
+            "procedure": [
+              "Gauri Ganesh Puja",
+              "Kalash Navagraha Puja",
+              "Yagnopavit Dharan",
+              "Gayatri Mantra Upadesh",
+              "Bhikshatan",
+              "Havan",
+              "Aarti & Pushpanjali"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1600
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, Havan Sticks, Samidha, Havan Kund, etc., will be brought by us."
+          },
+          {
+            "name": "Premium",
+            "price": 18200,
+            "includesSamagri": true,
+            "pandits": "5 Panditjis + All Puja Samagri",
+            "description": "Grand ceremony with more paths and jaaps. Duration approx 3–4 hours.",
+            "procedure": [
+              "Gauri Ganesh Puja",
+              "Kalash Navagraha Puja",
+              "Yagnopavit Dharan",
+              "Gayatri Mantra Upadesh",
+              "Bhikshatan",
+              "Paths & Jaaps",
+              "Havan",
+              "Aarti & Pushpanjali"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 2000
+              }
+            ],
+            "note": "All required puja samagri including Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, Havan Sticks, Samidha, Havan Kund, etc., will be arranged and brought by us."
           }
         ],
         "addOns": []
