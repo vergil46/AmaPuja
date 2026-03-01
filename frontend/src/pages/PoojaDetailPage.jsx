@@ -348,66 +348,88 @@ function PoojaDetailPage() {
   const packageNote =
     selectedPackageData?.note || ''
 
+  const fieldClass =
+    'w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm text-stone-800 shadow-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100'
+
   return (
-    <section className="max-w-6xl mx-auto px-4 py-10">
+    <section className="max-w-6xl mx-auto px-4 py-8 sm:py-10">
       <Seo
         title={`${displayTitle} | PujaSamrddhi`}
         description={displayDescription}
       />
 
-      <div className="grid lg:grid-cols-2 gap-8 items-start">
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-start">
         <div>
-          <img
-            src={displayImage}
-            alt={displayTitle}
-            className="rounded-xl w-full h-64 object-cover"
-          />
+          <div className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
+            <img
+              src={displayImage}
+              alt={displayTitle}
+              className="w-full h-64 sm:h-80 object-cover"
+            />
+          </div>
 
-          <h1 className="text-3xl font-semibold mt-5">
+          <h1 className="text-3xl sm:text-4xl font-semibold mt-5 text-stone-900 leading-tight">
             {displayTitle}
           </h1>
 
-          <p className="mt-3 text-stone-700">
+          <p className="mt-3 text-lg leading-relaxed text-stone-700">
             {displayDescription}
           </p>
 
-          {/* Packages */}
-          <div className="mt-6 border rounded-xl p-4 bg-stone-50">
-            <div className="text-lg font-semibold mb-3">
+          <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-4 sm:p-5 shadow-sm">
+            <div className="text-lg font-semibold mb-3 text-stone-900">
               Select Package
             </div>
 
             {activePackages.map((pkg) => (
               <label
                 key={pkg.name}
-                className="block border p-3 rounded mb-3"
+                className={`block border p-3.5 rounded-xl mb-3 cursor-pointer transition ${
+                  selectedPackage === pkg.name
+                    ? 'border-orange-400 bg-orange-50 ring-2 ring-orange-100'
+                    : 'border-stone-300 bg-white hover:border-orange-300'
+                }`}
               >
-                <input
-                  type="radio"
-                  name="package"
-                  checked={selectedPackage === pkg.name}
-                  onChange={() =>
-                    setSelectedPackage(pkg.name)
-                  }
-                />{' '}
-                {pkg.name} – ₹{pkg.price}
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="radio"
+                      name="package"
+                      className="h-4 w-4 accent-orange-600"
+                      checked={selectedPackage === pkg.name}
+                      onChange={() =>
+                        setSelectedPackage(pkg.name)
+                      }
+                    />
+                    <span className="font-medium text-stone-900">
+                      {pkg.name}
+                    </span>
+                  </div>
+                  <span className="font-semibold text-stone-900">
+                    ₹{pkg.price}
+                  </span>
+                </div>
               </label>
             ))}
 
-            {/* Add-ons */}
             {availableAddOns.length > 0 && (
               <div className="mt-4">
-                <div className="font-semibold">
+                <div className="font-semibold text-stone-900">
                   Add-ons
                 </div>
 
                 {availableAddOns.map((addon) => (
                   <label
                     key={addon.name}
-                    className="flex items-center gap-2 mt-2"
+                    className={`mt-2 flex items-center gap-2.5 rounded-lg border px-3 py-2 cursor-pointer transition ${
+                      selectedAddOns.includes(addon.name)
+                        ? 'border-orange-300 bg-orange-50'
+                        : 'border-stone-200 bg-white hover:border-orange-200'
+                    }`}
                   >
                     <input
                       type="checkbox"
+                      className="h-4 w-4 accent-orange-600"
                       checked={selectedAddOns.includes(
                         addon.name
                       )}
@@ -437,8 +459,8 @@ function PoojaDetailPage() {
             )}
 
             {selectedPackageData && (
-              <div className="mt-5 p-4 border rounded-xl bg-stone-50">
-                <div className="text-sm text-stone-700 space-y-2">
+              <div className="mt-5 p-4 border border-stone-200 rounded-xl bg-stone-50">
+                <div className="text-sm text-stone-700 space-y-2.5">
                   {selectedPackageData.pandits && (
                     <p>
                       <span className="font-semibold text-stone-900">
@@ -500,8 +522,7 @@ function PoojaDetailPage() {
           </div>
         </div>
 
-        {/* Booking Form */}
-        <div className="rounded-2xl border border-stone-300 bg-stone-100 p-4 shadow-sm">
+        <div className="rounded-3xl border border-stone-300 bg-stone-100/95 p-4 sm:p-5 shadow-md lg:sticky lg:top-24">
           <h2 className="text-2xl font-semibold uppercase tracking-wide text-stone-900">
             Book Now
           </h2>
@@ -535,7 +556,7 @@ function PoojaDetailPage() {
           >
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <input
-                className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500"
+                className={fieldClass}
                 placeholder="Full Name *"
                 required
                 value={form.name}
@@ -548,7 +569,7 @@ function PoojaDetailPage() {
               />
 
               <input
-                className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500"
+                className={fieldClass}
                 placeholder="Phone *"
                 required
                 value={form.phone}
@@ -562,7 +583,7 @@ function PoojaDetailPage() {
             </div>
 
             <input
-              className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500"
+              className={fieldClass}
               type="email"
               placeholder="Email *"
               required
@@ -576,7 +597,7 @@ function PoojaDetailPage() {
             />
 
             <select
-              className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500"
+              className={fieldClass}
               value={form.city}
               onChange={(e) =>
                 setForm({
@@ -592,7 +613,7 @@ function PoojaDetailPage() {
 
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <select
-                className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500"
+                className={fieldClass}
                 value={form.priestPreference}
                 onChange={(e) =>
                   setForm({
@@ -613,7 +634,7 @@ function PoojaDetailPage() {
               </select>
 
               <input
-                className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500"
+                className={fieldClass}
                 type="time"
                 value={form.time}
                 onChange={(e) =>
@@ -626,7 +647,7 @@ function PoojaDetailPage() {
             </div>
 
             <input
-              className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500"
+              className={fieldClass}
               type="date"
               required
               value={form.date}
@@ -639,7 +660,7 @@ function PoojaDetailPage() {
             />
 
             <input
-              className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500"
+              className={fieldClass}
               placeholder="Address *"
               required
               value={form.address}
@@ -653,7 +674,7 @@ function PoojaDetailPage() {
 
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <select
-                className="w-full rounded-md border border-stone-400 bg-white px-3 py-2 text-sm outline-none transition focus:border-orange-500"
+                className={fieldClass}
                 value={form.paymentOption}
                 onChange={(e) =>
                   setForm({
@@ -667,7 +688,7 @@ function PoojaDetailPage() {
                 <option value="pay-after-pooja">Pay After Pooja</option>
               </select>
 
-              <button className="w-full rounded-md bg-stone-800 py-2 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-stone-900 disabled:opacity-60">
+              <button className="w-full rounded-xl bg-stone-900 py-2.5 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-stone-800 disabled:opacity-60 disabled:cursor-not-allowed">
                 {isSubmitting
                   ? 'Booking...'
                   : 'Book Now'}
