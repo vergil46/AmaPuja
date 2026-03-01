@@ -1,0 +1,354 @@
+import { useEffect, useMemo, useState } from 'react'
+import Seo from '../components/Seo'
+import api from '../services/api'
+
+function AdminPage() {
+  const [stats, setStats] = useState({ totalBookings: 0, revenue: 0, totalEnquiries: 0, totalPayments: 0 })
+  const [poojas, setPoojas] = useState([])
+  const [bookings, setBookings] = useState([])
+  const [recentBookings, setRecentBookings] = useState([])
+  const [enquiries, setEnquiries] = useState([])
+  const [payments, setPayments] = useState([])
+  const [refreshingDashboard, setRefreshingDashboard] = useState(false)
+  const [refreshingRecent, setRefreshingRecent] = useState(false)
+  const [packageFilter, setPackageFilter] = useState('all')
+  const [recentPackageFilter, setRecentPackageFilter] = useState('all')
+  const [reviewRequestLoadingById, setReviewRequestLoadingById] = useState({})
+  const [reviewRequestMessage, setReviewRequestMessage] = useState('')
+  const [form, setForm] = useState({ title: '', description: '', image: '', startPrice: 0 })
+
+  const graphMetrics = useMemo(() => {
+    const workDone = bookings.filter((booking) => booking.bookingStatus === 'completed').length
+    const rejected = bookings.filter((booking) => booking.bookingStatus === 'cancelled').length
+    const pending = bookings.filter((booking) => booking.bookingStatus === 'pending').length
+
+    const metrics = [
+      { label: 'Earning (₹)', value: Number(stats.revenue) || 0, tone: 'bg-orange-600' },
+      { label: 'Work Done', value: workDone, tone: 'bg-green-600' },
+      { label: 'Rejected', value: rejected, tone: 'bg-red-600' },
+      { label: 'Pending', value: pending, tone: 'bg-amber-500' },
+    ]
+
+    const maxValue = Math.max(...metrics.map((item) => item.value), 1)
+    return metrics.map((item) => ({
+      ...item,
+      width: `${Math.max((item.value / maxValue) * 100, item.value > 0 ? 8 : 0)}%`,
+    }))
+  }, [bookings, stats.revenue])
+
+  const filteredBookings = bookings.filter((booking) => {
+    if (packageFilter === 'all') return true
+    return booking.package === packageFilter
+  })
+
+  const filteredRecentBookings = recentBookings.filter((booking) => {
+    if (recentPackageFilter === 'all') return true
+    return booking.package === recentPackageFilter
+  })
+
+  const loadData = async () => {
+    const [statsRes, poojaRes, bookingRes, recentBookingRes, enquiryRes, paymentRes] = await Promise.all([
+      api.get('/dashboard/admin/stats'),
+      api.get('/poojas'),
+      api.get('/bookings/admin/all'),
+      api.get('/bookings/admin/recent?limit=10'),
+      api.get('/enquiries'),
+      api.get('/payments/admin/all'),
+    ])
+    setStats(statsRes.data)
+    setPoojas(poojaRes.data)
+    setBookings(bookingRes.data)
+    setRecentBookings(recentBookingRes.data)
+    setEnquiries(enquiryRes.data)
+    setPayments(paymentRes.data)
+  }
+
+  const refreshDashboard = async () => {
+    setRefreshingDashboard(true)
+    try {
+      await loadData()
+    } finally {
+      setRefreshingDashboard(false)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  const createPooja = async (event) => {
+    event.preventDefault()
+    await api.post('/poojas', {
+      ...form,
+      packages: [
+        { name: 'Without Samagri', price: Number(form.startPrice), includesSamagri: false },
+        { name: 'With Samagri', price: Math.round(Number(form.startPrice) * 1.35), includesSamagri: true },
+      ],
+    })
+    setForm({ title: '', description: '', image: '', startPrice: 0 })
+    loadData()
+  }
+
+  const updateBookingStatus = async (id, bookingStatus) => {
+    await api.patch(`/bookings/${id}/status`, { bookingStatus })
+    loadData()
+  }
+
+  const deletePooja = async (id) => {
+    await api.delete(`/poojas/${id}`)
+    loadData()
+  }
+
+  const refreshRecentBookings = async () => {
+    setRefreshingRecent(true)
+    try {
+      const recentBookingRes = await api.get('/bookings/admin/recent?limit=10')
+      setRecentBookings(recentBookingRes.data)
+    } finally {
+      setRefreshingRecent(false)
+    }
+  }
+
+  const resendReviewRequest = async (bookingId) => {
+    setReviewRequestMessage('')
+    setReviewRequestLoadingById((prev) => ({ ...prev, [bookingId]: true }))
+    try {
+      await api.post(`/bookings/${bookingId}/resend-review`)
+      setReviewRequestMessage('Review request sent successfully.')
+    } catch (error) {
+      setReviewRequestMessage(error.response?.data?.message || 'Failed to send review request.')
+    } finally {
+      setReviewRequestLoadingById((prev) => ({ ...prev, [bookingId]: false }))
+    }
+  }
+
+  return (
+    <section className="max-w-6xl mx-auto px-4 py-10">
+      <Seo title="Admin Panel | PujaSamrddhi" description="Manage poojas, bookings, enquiries, and payments." />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl sm:text-3xl font-semibold">Admin Dashboard</h1>
+        <button
+          onClick={refreshDashboard}
+          className="px-3.5 py-2 text-sm rounded-lg bg-orange-700 text-white hover:bg-orange-800 disabled:opacity-60"
+          disabled={refreshingDashboard}
+        >
+          {refreshingDashboard ? 'Refreshing Dashboard...' : 'Refresh Dashboard'}
+        </button>
+      </div>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <div className="bg-white p-4 rounded-xl border">Total Bookings: {stats.totalBookings}</div>
+        <div className="bg-white p-4 rounded-xl border">Revenue: ₹{stats.revenue}</div>
+        <div className="bg-white p-4 rounded-xl border">Enquiries: {stats.totalEnquiries}</div>
+        <div className="bg-white p-4 rounded-xl border">Payments: {stats.totalPayments}</div>
+      </div>
+
+      <div className="mt-8 bg-white border rounded-xl p-4">
+        <h2 className="font-semibold">Performance Graph</h2>
+        <div className="mt-4 space-y-4">
+          {graphMetrics.map((metric) => (
+            <div key={metric.label}>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-stone-700">{metric.label}</span>
+                <span className="font-semibold text-stone-900">{metric.value}</span>
+              </div>
+              <div className="mt-1 h-2.5 rounded-full bg-stone-200 overflow-hidden">
+                <div className={`h-full rounded-full ${metric.tone}`} style={{ width: metric.width }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-8 grid lg:grid-cols-2 gap-6">
+        <div className="bg-white border rounded-xl p-4">
+          <h2 className="font-semibold">Add Pooja</h2>
+          <form onSubmit={createPooja} className="mt-3 grid gap-2">
+            <input className="px-3 py-2 border rounded" placeholder="Title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+            <textarea className="px-3 py-2 border rounded" placeholder="Description" required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <input className="px-3 py-2 border rounded" placeholder="Image URL" required value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+            <input className="px-3 py-2 border rounded" placeholder="Starting Price" type="number" required value={form.startPrice} onChange={(e) => setForm({ ...form, startPrice: e.target.value })} />
+            <button className="px-4 py-2 bg-orange-700 text-white rounded">Add Pooja</button>
+          </form>
+        </div>
+        <div className="bg-white border rounded-xl p-4 max-h-72 overflow-auto">
+          <h2 className="font-semibold">Manage Poojas</h2>
+          <div className="mt-3 space-y-2">
+            {poojas.map((pooja) => (
+              <div key={pooja._id} className="flex justify-between items-center border rounded p-2">
+                <span className="text-sm">{pooja.title}</span>
+                <button onClick={() => deletePooja(pooja._id)} className="text-xs px-2 py-1 rounded bg-red-600 text-white">Delete</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 bg-white border rounded-xl p-4 overflow-x-auto">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold">Manage Bookings</h2>
+          <select
+            className="border rounded px-2 py-1.5 text-sm"
+            value={packageFilter}
+            onChange={(e) => setPackageFilter(e.target.value)}
+          >
+            <option value="all">All Packages</option>
+            <option value="Without Samagri">Without Samagri</option>
+            <option value="With Samagri">With Samagri</option>
+          </select>
+        </div>
+        <p className="mt-2 text-xs text-stone-500">Showing {filteredBookings.length} of {bookings.length} bookings</p>
+        {reviewRequestMessage && <p className="mt-2 text-sm text-stone-700">{reviewRequestMessage}</p>}
+        <table className="w-full min-w-190 mt-3 text-sm">
+          <thead>
+            <tr className="text-left border-b">
+              <th className="py-2">User</th>
+              <th>Puja</th>
+              <th>Package Type</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredBookings.map((booking) => (
+              <tr key={booking._id} className="border-b">
+                <td className="py-2">{booking.name}</td>
+                <td>{booking.poojaId?.title}</td>
+                <td>
+                  <span className="inline-block px-2 py-1 text-xs rounded bg-orange-100 text-orange-800">
+                    {booking.package || 'Without Samagri'}
+                  </span>
+                </td>
+                <td>{booking.date}</td>
+                <td>{booking.bookingStatus}</td>
+                <td>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <select
+                      className="border rounded px-2 py-1"
+                      value={booking.bookingStatus}
+                      onChange={(e) => updateBookingStatus(booking._id, e.target.value)}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="confirmed">Confirmed</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                    {booking.bookingStatus === 'completed' && (
+                      <button
+                        onClick={() => resendReviewRequest(booking._id)}
+                        className="px-2 py-1 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
+                        disabled={Boolean(reviewRequestLoadingById[booking._id])}
+                      >
+                        {reviewRequestLoadingById[booking._id] ? 'Sending...' : 'Resend Review'}
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-8 bg-white border rounded-xl p-4 overflow-x-auto">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold">Recent Booking Requests (Last 10)</h2>
+          <div className="flex items-center gap-2">
+            <select
+              className="border rounded px-2 py-1.5 text-sm"
+              value={recentPackageFilter}
+              onChange={(e) => setRecentPackageFilter(e.target.value)}
+            >
+              <option value="all">All Packages</option>
+              <option value="Without Samagri">Without Samagri</option>
+              <option value="With Samagri">With Samagri</option>
+            </select>
+            <button
+              onClick={refreshRecentBookings}
+              className="px-3 py-1.5 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
+              disabled={refreshingRecent}
+            >
+              {refreshingRecent ? 'Refreshing...' : 'Refresh'}
+            </button>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-stone-500">Showing {filteredRecentBookings.length} of {recentBookings.length} recent bookings</p>
+        <table className="w-full min-w-215 mt-3 text-sm">
+          <thead>
+            <tr className="text-left border-b">
+              <th className="py-2">Created</th>
+              <th>User</th>
+              <th>Puja</th>
+              <th>Package</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredRecentBookings.map((booking) => (
+              <tr key={booking._id} className="border-b">
+                <td className="py-2">{new Date(booking.createdAt).toLocaleString()}</td>
+                <td>{booking.name}</td>
+                <td>{booking.poojaId?.title}</td>
+                <td>{booking.package}</td>
+                <td>{booking.bookingStatus}</td>
+                <td>
+                  {booking.bookingStatus === 'pending' && (
+                    <button
+                      onClick={() => updateBookingStatus(booking._id, 'confirmed')}
+                      className="px-2 py-1 text-xs rounded bg-green-600 text-white hover:bg-green-700"
+                    >
+                      Confirm
+                    </button>
+                  )}
+                  {booking.bookingStatus === 'completed' && (
+                    <button
+                      onClick={() => resendReviewRequest(booking._id)}
+                      className="px-2 py-1 text-xs rounded bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-60"
+                      disabled={Boolean(reviewRequestLoadingById[booking._id])}
+                    >
+                      {reviewRequestLoadingById[booking._id] ? 'Sending...' : 'Resend Review'}
+                    </button>
+                  )}
+                  {booking.bookingStatus !== 'pending' && (
+                    booking.bookingStatus !== 'completed' ? <span className="text-stone-400 text-xs">-</span> : null
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-8 grid lg:grid-cols-2 gap-6">
+        <div className="bg-white border rounded-xl p-4">
+          <h2 className="font-semibold">Enquiries</h2>
+          <div className="mt-3 space-y-2 max-h-64 overflow-auto">
+            {enquiries.map((item) => (
+              <div key={item._id} className="border rounded p-2 text-sm">
+                <p className="font-medium">{item.name} ({item.phone})</p>
+                <p>{item.email}</p>
+                <p className="text-stone-600">{item.message}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="bg-white border rounded-xl p-4">
+          <h2 className="font-semibold">Payments</h2>
+          <div className="mt-3 space-y-2 max-h-64 overflow-auto">
+            {payments.map((payment) => (
+              <div key={payment._id} className="border rounded p-2 text-sm">
+                <p>Order: {payment.razorpayOrderId}</p>
+                <p>Amount: ₹{payment.amount}</p>
+                <p>Status: {payment.status}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default AdminPage
