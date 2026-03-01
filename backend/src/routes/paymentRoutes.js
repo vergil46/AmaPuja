@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const Razorpay = require('razorpay');
 const Payment = require('../models/Payment');
 const Booking = require('../models/Booking');
+const Pooja = require('../models/Pooja');
 const { protect, adminOnly } = require('../middleware/auth');
 
 const router = express.Router();
@@ -12,13 +13,138 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET || 'test',
 });
 
+const computePaymentAmount = (price, paymentOption) => {
+  if (paymentOption === 'advance') return Math.round(price * 0.3);
+  if (paymentOption === 'pay-after-pooja') return 0;
+  return price;
+};
+
+const normalizeName = (value) => String(value || '').trim().toLowerCase();
+
+const parseAmount = (value) => {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  const cleaned = String(value || '').replace(/[^\d.-]/g, '');
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const buildUnifiedAddOns = ({ selectedPackage, languagePricing, pooja }) => {
+  const candidates = [
+    ...(Array.isArray(selectedPackage?.addOns) ? selectedPackage.addOns : []),
+    ...(Array.isArray(languagePricing?.addOns) ? languagePricing.addOns : []),
+    ...(Array.isArray(pooja?.addOns) ? pooja.addOns : []),
+  ];
+
+  const byName = new Map();
+  candidates.forEach((addon) => {
+    const name = String(addon?.name || '').trim();
+    const key = normalizeName(name);
+    const price = parseAmount(addon?.price);
+    if (!key) return;
+    if (!byName.has(key)) {
+      byName.set(key, { name, price });
+    }
+  });
+
+  return Array.from(byName.values());
+};
+
+const recalculateBookingAmount = async (booking) => {
+  const pooja = await Pooja.findById(booking.poojaId).lean();
+
+  if (!pooja) {
+    return {
+      finalAmount: parseAmount(booking.finalAmount),
+      paymentAmount: parseAmount(booking.paymentAmount),
+    };
+  }
+
+  const normalizedLanguageKey = String(booking.priestPreference || '').trim().toLowerCase();
+
+  const languagePricing =
+    pooja.pricing &&
+    typeof pooja.pricing === 'object' &&
+    normalizedLanguageKey &&
+    pooja.pricing[normalizedLanguageKey]
+      ? pooja.pricing[normalizedLanguageKey]
+      : null;
+
+  const availablePackages =
+    Array.isArray(languagePricing?.packages) && languagePricing.packages.length > 0
+      ? languagePricing.packages
+      : Array.isArray(pooja.packages)
+      ? pooja.packages
+      : [];
+
+  const selectedPackage = availablePackages.find((pkg) => pkg.name === booking.package);
+
+  if (!selectedPackage) {
+    return {
+      finalAmount: parseAmount(booking.finalAmount),
+      paymentAmount: parseAmount(booking.paymentAmount),
+    };
+  }
+
+  let finalAmount = parseAmount(selectedPackage.price);
+
+  const availableAddOns = buildUnifiedAddOns({
+    selectedPackage,
+    languagePricing,
+    pooja,
+  });
+
+  const selectedAddOns = Array.isArray(booking.selectedAddOns) ? booking.selectedAddOns : [];
+
+  selectedAddOns.forEach((addonName) => {
+    const addonKey = normalizeName(addonName);
+    const matched = availableAddOns.find((addon) => normalizeName(addon.name) === addonKey);
+    if (matched) {
+      finalAmount += parseAmount(matched.price);
+    }
+  });
+
+  if (!Number.isFinite(finalAmount) || finalAmount < 0) {
+    finalAmount = parseAmount(booking.finalAmount);
+  }
+
+  const paymentAmount = computePaymentAmount(finalAmount, booking.paymentOption);
+
+  return { finalAmount, paymentAmount };
+};
+
 router.post('/create-order', protect, async (req, res) => {
   try {
-    const { bookingId } = req.body;
+    const { bookingId, finalAmount: requestedFinalAmount } = req.body;
     const booking = await Booking.findById(bookingId);
 
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    const recalculated = await recalculateBookingAmount(booking);
+
+    const normalizedFinalAmount = parseAmount(recalculated.finalAmount);
+    const normalizedRequestedFinalAmount = parseAmount(requestedFinalAmount);
+    const currentStoredFinalAmount = parseAmount(booking.finalAmount);
+
+    const correctedFinalAmount = Math.max(
+      normalizedFinalAmount,
+      currentStoredFinalAmount,
+      normalizedRequestedFinalAmount
+    );
+
+    const normalizedPaymentAmount = computePaymentAmount(correctedFinalAmount, booking.paymentOption);
+
+    if (
+      correctedFinalAmount !== parseAmount(booking.finalAmount) ||
+      normalizedPaymentAmount !== parseAmount(booking.paymentAmount)
+    ) {
+      booking.finalAmount = correctedFinalAmount;
+      booking.paymentAmount = normalizedPaymentAmount;
+      await booking.save();
     }
 
     if (!['full', 'advance'].includes(booking.paymentOption)) {

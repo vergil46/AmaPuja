@@ -15,6 +15,39 @@ const computePaymentAmount = (price, paymentOption) => {
   return price;
 };
 
+const normalizeName = (value) => String(value || '').trim().toLowerCase();
+
+const parseAmount = (value) => {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  const cleaned = String(value || '').replace(/[^\d.-]/g, '');
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const buildUnifiedAddOns = ({ selectedPackage, languagePricing, pooja }) => {
+  const candidates = [
+    ...(Array.isArray(selectedPackage?.addOns) ? selectedPackage.addOns : []),
+    ...(Array.isArray(languagePricing?.addOns) ? languagePricing.addOns : []),
+    ...(Array.isArray(pooja?.addOns) ? pooja.addOns : []),
+  ];
+
+  const byName = new Map();
+  candidates.forEach((addon) => {
+    const name = String(addon?.name || '').trim();
+    const key = normalizeName(name);
+    const price = parseAmount(addon?.price);
+    if (!key) return;
+    if (!byName.has(key)) {
+      byName.set(key, { name, price });
+    }
+  });
+
+  return Array.from(byName.values());
+};
+
 /**
  * CREATE BOOKING
  */
@@ -82,22 +115,20 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ message: 'Invalid package selected' });
     }
 
-    let baseAmount = Number(selectedPackage.price || 0);
+    let baseAmount = parseAmount(selectedPackage.price);
 
-    const availableAddOns =
-      Array.isArray(selectedPackage.addOns) && selectedPackage.addOns.length > 0
-        ? selectedPackage.addOns
-        : Array.isArray(languagePricing?.addOns) && languagePricing.addOns.length > 0
-          ? languagePricing.addOns
-          : Array.isArray(pooja.addOns)
-          ? pooja.addOns
-          : [];
+    const availableAddOns = buildUnifiedAddOns({
+      selectedPackage,
+      languagePricing,
+      pooja,
+    });
 
     if (Array.isArray(selectedAddOns) && selectedAddOns.length > 0 && availableAddOns.length > 0) {
       selectedAddOns.forEach((addonName) => {
-        const addon = availableAddOns.find((item) => item.name === addonName);
+        const addonKey = normalizeName(addonName);
+        const addon = availableAddOns.find((item) => normalizeName(item.name) === addonKey);
         if (addon) {
-          baseAmount += Number(addon.price || 0);
+          baseAmount += parseAmount(addon.price);
         }
       });
     }

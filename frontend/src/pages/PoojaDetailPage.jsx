@@ -33,6 +33,24 @@ function PoojaDetailPage() {
   const [bookingMessage, setBookingMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const normalizeName = (value) =>
+    String(value || '')
+      .trim()
+      .toLowerCase()
+
+  const parseAmount = (value) => {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : 0
+    }
+
+    const cleaned = String(value || '').replace(
+      /[^\d.-]/g,
+      ''
+    )
+    const parsed = Number(cleaned)
+    return Number.isFinite(parsed) ? parsed : 0
+  }
+
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -158,19 +176,33 @@ function PoojaDetailPage() {
   }, [activePackages, selectedPackage])
 
   const availableAddOns = useMemo(() => {
-    if (
-      selectedPackageData?.addOns?.length > 0
-    ) {
-      return selectedPackageData.addOns
-    }
+    const candidates = [
+      ...(Array.isArray(selectedPackageData?.addOns)
+        ? selectedPackageData.addOns
+        : []),
+      ...(Array.isArray(activeLanguagePricing?.addOns)
+        ? activeLanguagePricing.addOns
+        : []),
+      ...(Array.isArray(pooja?.addOns)
+        ? pooja.addOns
+        : []),
+    ]
 
-    if (
-      activeLanguagePricing?.addOns?.length > 0
-    ) {
-      return activeLanguagePricing.addOns
-    }
+    const byName = new Map()
+    candidates.forEach((addon) => {
+      const name = String(addon?.name || '').trim()
+      const key = normalizeName(name)
+      if (!key) return
 
-    return pooja?.addOns || []
+      if (!byName.has(key)) {
+        byName.set(key, {
+          name,
+          price: parseAmount(addon?.price),
+        })
+      }
+    })
+
+    return Array.from(byName.values())
   }, [pooja, selectedPackageData, activeLanguagePricing])
 
   useEffect(() => {
@@ -181,7 +213,7 @@ function PoojaDetailPage() {
   const packagePrice = useMemo(() => {
     if (!selectedPackageData) return 0
 
-    let total = Number(selectedPackageData?.price || 0)
+    let total = parseAmount(selectedPackageData?.price)
 
     if (
       selectedAddOns.length > 0 &&
@@ -189,9 +221,11 @@ function PoojaDetailPage() {
     ) {
       selectedAddOns.forEach((addonName) => {
         const found = availableAddOns.find(
-          (a) => a.name === addonName
+          (a) =>
+            normalizeName(a.name) ===
+            normalizeName(addonName)
         )
-        if (found) total += found.price
+        if (found) total += parseAmount(found.price)
       })
     }
 
@@ -215,8 +249,8 @@ function PoojaDetailPage() {
     return 'Full Payment'
   }, [form.paymentOption])
 
-  const basePackagePrice = Number(
-    selectedPackageData?.price || 0
+  const basePackagePrice = parseAmount(
+    selectedPackageData?.price
   )
   const addOnTotal = Math.max(
     0,
@@ -276,7 +310,10 @@ function PoojaDetailPage() {
 
       const orderRes = await api.post(
         '/payments/create-order',
-        { bookingId: booking._id }
+        {
+          bookingId: booking._id,
+          finalAmount: packagePrice,
+        }
       )
 
       const { order } = orderRes.data
@@ -422,7 +459,11 @@ function PoojaDetailPage() {
                   <label
                     key={addon.name}
                     className={`mt-2 flex items-center gap-2.5 rounded-lg border px-3 py-2 cursor-pointer transition ${
-                      selectedAddOns.includes(addon.name)
+                      selectedAddOns.some(
+                        (item) =>
+                          normalizeName(item) ===
+                          normalizeName(addon.name)
+                      )
                         ? 'border-orange-300 bg-orange-50'
                         : 'border-stone-200 bg-white hover:border-orange-200'
                     }`}
@@ -430,26 +471,39 @@ function PoojaDetailPage() {
                     <input
                       type="checkbox"
                       className="h-4 w-4 accent-orange-600"
-                      checked={selectedAddOns.includes(
-                        addon.name
+                      checked={selectedAddOns.some(
+                        (item) =>
+                          normalizeName(item) ===
+                          normalizeName(addon.name)
                       )}
                       onChange={() => {
-                        if (
-                          selectedAddOns.includes(
-                            addon.name
+                        const addonName = String(
+                          addon.name || ''
+                        ).trim()
+                        const addonKey = normalizeName(
+                          addonName
+                        )
+
+                        setSelectedAddOns((previous) => {
+                          const exists = previous.some(
+                            (item) =>
+                              normalizeName(item) ===
+                              addonKey
                           )
-                        ) {
-                          setSelectedAddOns(
-                            selectedAddOns.filter(
-                              (a) => a !== addon.name
+
+                          if (exists) {
+                            return previous.filter(
+                              (item) =>
+                                normalizeName(item) !==
+                                addonKey
                             )
-                          )
-                        } else {
-                          setSelectedAddOns([
-                            ...selectedAddOns,
-                            addon.name,
-                          ])
-                        }
+                          }
+
+                          return [
+                            ...previous,
+                            addonName,
+                          ]
+                        })
                       }}
                     />
                     {addon.name}
@@ -517,7 +571,7 @@ function PoojaDetailPage() {
             )}
 
             <div className="mt-4 font-semibold text-green-700">
-              Total: ₹{packagePrice}
+              Total Amount (Price + Add-ons): ₹{packagePrice}
             </div>
           </div>
         </div>
@@ -547,6 +601,9 @@ function PoojaDetailPage() {
             <div className="mt-1 flex items-center justify-between font-semibold text-stone-900">
               <span>Final Amount</span>
               <span>₹{packagePrice}</span>
+            </div>
+            <div className="mt-1 text-[11px] text-stone-600">
+              Total Amount = Package Price + Add-ons
             </div>
           </div>
 
