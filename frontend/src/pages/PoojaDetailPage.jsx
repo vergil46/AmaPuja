@@ -430,7 +430,7 @@ function PoojaDetailPage() {
                         }
                       }}
                     />
-                    {addon.name} +₹{addon.price}
+                    {addon.name}
                   </label>
                 ))}
               </div>

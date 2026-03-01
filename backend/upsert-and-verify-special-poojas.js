@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 const Pooja = require('./src/models/Pooja');
+const structuredPoojasToUpsert = require('./poojas-structured-data');
 
 const DEFAULT_IMAGE =
   'https://images.unsplash.com/photo-1542327897-d73f4005b533?auto=format&fit=crop&w=1200&q=80';
 
-const SUPPORTED_LANGUAGES = ['odia', 'hindi', 'bengali', 'kannada'];
+const DEFAULT_SERVICE_LANGUAGE = 'hindi';
 
 const createServiceKey = (title = '') =>
   String(title)
@@ -15,106 +16,283 @@ const createServiceKey = (title = '') =>
 
 const deepClone = (value) => JSON.parse(JSON.stringify(value));
 
-const ensureLanguageArchitecture = (pooja) => {
-  const serviceKey = pooja.serviceKey || createServiceKey(pooja.title);
+const normalizeText = (value) => (typeof value === 'string' ? value.trim() : '');
 
-  const localizedTitle =
-    pooja.localizedTitle && typeof pooja.localizedTitle === 'object'
-      ? { ...pooja.localizedTitle }
-      : {};
+const normalizeLanguageKey = (value) => normalizeText(value).toLowerCase();
 
-  const localizedDescription =
-    pooja.localizedDescription && typeof pooja.localizedDescription === 'object'
-      ? { ...pooja.localizedDescription }
-      : {};
+const uniqueStrings = (items) =>
+  Array.from(new Set((Array.isArray(items) ? items : []).filter(Boolean)));
 
-  const pricing =
-    pooja.pricing && typeof pooja.pricing === 'object'
-      ? deepClone(pooja.pricing)
-      : {};
+const preferredLanguageFromList = (languages = []) => {
+  if (Array.isArray(languages) && languages.length > 0) {
+    return languages[0];
+  }
 
-  SUPPORTED_LANGUAGES.forEach((languageKey) => {
-    if (!localizedTitle[languageKey]) {
-      localizedTitle[languageKey] = pooja.title;
+  const preferredOrder = ['hindi', 'odia', 'bengali', 'kannada'];
+  for (const languageKey of preferredOrder) {
+    if (languages.includes(languageKey)) {
+      return languageKey;
     }
+  }
+  return languages[0] || DEFAULT_SERVICE_LANGUAGE;
+};
 
-    if (!localizedDescription[languageKey]) {
-      localizedDescription[languageKey] = {
-        short: pooja.description,
-        full: pooja.description,
-      };
-    } else {
-      localizedDescription[languageKey] = {
-        short:
-          localizedDescription[languageKey].short ||
-          pooja.description,
-        full:
-          localizedDescription[languageKey].full ||
-          pooja.description,
-      };
-    }
+const normalizeDescriptionBlock = (value, fallbackText = '') => {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const short = normalizeText(value.short);
+    const full = normalizeText(value.full);
+    const fallback = normalizeText(fallbackText);
+    return {
+      short: short || full || fallback,
+      full: full || short || fallback,
+    };
+  }
 
-    if (!pricing[languageKey]) {
-      pricing[languageKey] = {
-        title: localizedTitle[languageKey],
-        description: deepClone(localizedDescription[languageKey]),
-        packages: deepClone(pooja.packages || []),
-        addOns: deepClone(pooja.addOns || []),
-      };
-    } else {
-      pricing[languageKey] = {
-        ...pricing[languageKey],
-        title:
-          pricing[languageKey].title ||
-          localizedTitle[languageKey],
-        description: {
-          short:
-            pricing[languageKey].description?.short ||
-            localizedDescription[languageKey].short,
-          full:
-            pricing[languageKey].description?.full ||
-            localizedDescription[languageKey].full,
-        },
-        packages:
-          Array.isArray(pricing[languageKey].packages) &&
-          pricing[languageKey].packages.length > 0
-            ? pricing[languageKey].packages
-            : deepClone(pooja.packages || []),
-        addOns:
-          Array.isArray(pricing[languageKey].addOns)
-            ? pricing[languageKey].addOns
-            : deepClone(pooja.addOns || []),
-      };
-    }
-  });
-
-  const availableLanguageSet = new Set(
-    (Array.isArray(pooja.availableLanguages)
-      ? pooja.availableLanguages
-      : [])
-      .map((item) => String(item || '').trim().toLowerCase())
-      .filter(Boolean)
-  );
-
-  Object.keys(pricing).forEach((languageKey) => {
-    availableLanguageSet.add(languageKey);
-  });
-
-  SUPPORTED_LANGUAGES.forEach((languageKey) => {
-    availableLanguageSet.add(languageKey);
-  });
-
+  const text = normalizeText(value) || normalizeText(fallbackText);
   return {
-    ...pooja,
-    serviceKey,
-    availableLanguages: Array.from(availableLanguageSet),
-    localizedTitle,
-    localizedDescription,
-    pricing,
+    short: text,
+    full: text,
   };
 };
 
-const pujasToUpsert = [
+const minPackagePrice = (packages = []) => {
+  const prices = (Array.isArray(packages) ? packages : [])
+    .map((pkg) => Number(pkg?.price))
+    .filter((price) => Number.isFinite(price) && price > 0);
+
+  if (prices.length === 0) {
+    return 0;
+  }
+
+  return Math.min(...prices);
+};
+
+const convertLegacyToStructuredFormat = (rawPooja) => {
+  const legacyTitle = normalizeText(rawPooja?.title);
+  const legacyDescription = normalizeText(rawPooja?.description);
+
+  const localizedTitle =
+    rawPooja?.localizedTitle && typeof rawPooja.localizedTitle === 'object'
+      ? deepClone(rawPooja.localizedTitle)
+      : {};
+
+  const localizedDescription =
+    rawPooja?.localizedDescription && typeof rawPooja.localizedDescription === 'object'
+      ? deepClone(rawPooja.localizedDescription)
+      : {};
+
+  const pricingSource =
+    rawPooja?.pricing && typeof rawPooja.pricing === 'object'
+      ? deepClone(rawPooja.pricing)
+      : {};
+
+  const availableLanguages = uniqueStrings([
+    ...(Array.isArray(rawPooja?.availableLanguages) ? rawPooja.availableLanguages : [])
+      .map(normalizeLanguageKey)
+      .filter(Boolean),
+    ...Object.keys(localizedTitle).map(normalizeLanguageKey).filter(Boolean),
+    ...Object.keys(localizedDescription).map(normalizeLanguageKey).filter(Boolean),
+    ...Object.keys(pricingSource).map(normalizeLanguageKey).filter(Boolean),
+  ]);
+
+  if (availableLanguages.length === 0) {
+    availableLanguages.push(DEFAULT_SERVICE_LANGUAGE);
+  }
+
+  const title = {};
+  const description = {};
+  const pricing = {};
+
+  availableLanguages.forEach((languageKey) => {
+    const languagePricing =
+      pricingSource[languageKey] && typeof pricingSource[languageKey] === 'object'
+        ? pricingSource[languageKey]
+        : {};
+
+    const languageTitle =
+      normalizeText(localizedTitle[languageKey]) ||
+      normalizeText(languagePricing.title) ||
+      legacyTitle;
+
+    const languageDescription = normalizeDescriptionBlock(
+      localizedDescription[languageKey] || languagePricing.description,
+      legacyDescription
+    );
+
+    const languagePackages =
+      Array.isArray(languagePricing.packages) && languagePricing.packages.length > 0
+        ? deepClone(languagePricing.packages)
+        : deepClone(rawPooja?.packages || []);
+
+    const languageAddOns =
+      Array.isArray(languagePricing.addOns)
+        ? deepClone(languagePricing.addOns)
+        : deepClone(rawPooja?.addOns || []);
+
+    title[languageKey] = languageTitle;
+    description[languageKey] = languageDescription;
+    pricing[languageKey] = {
+      packages: languagePackages,
+      addOns: languageAddOns,
+    };
+  });
+
+  return {
+    key: normalizeText(rawPooja?.key || rawPooja?.serviceKey) || createServiceKey(legacyTitle),
+    availableLanguages,
+    title,
+    description,
+    pricing,
+    __legacyTitle: legacyTitle,
+    __legacyDescription: legacyDescription,
+    __legacyStartPrice: Number(rawPooja?.startPrice) || 0,
+  };
+};
+
+const buildPoojaPayloadFromStructured = (structuredPooja) => {
+  const hasMeaningfulLanguageData = (languageKey) => {
+    const title = normalizeText(structuredPooja?.title?.[languageKey]);
+    const descriptionShort = normalizeText(structuredPooja?.description?.[languageKey]?.short);
+    const descriptionFull = normalizeText(structuredPooja?.description?.[languageKey]?.full);
+
+    const packageCount = Array.isArray(structuredPooja?.pricing?.[languageKey]?.packages)
+      ? structuredPooja.pricing[languageKey].packages.length
+      : 0;
+
+    const addOnCount = Array.isArray(structuredPooja?.pricing?.[languageKey]?.addOns)
+      ? structuredPooja.pricing[languageKey].addOns.length
+      : 0;
+
+    return Boolean(title || descriptionShort || descriptionFull || packageCount > 0 || addOnCount > 0);
+  };
+
+  const explicitAvailableLanguages = uniqueStrings(
+    (Array.isArray(structuredPooja?.availableLanguages) ? structuredPooja.availableLanguages : [])
+      .map(normalizeLanguageKey)
+      .filter(Boolean)
+  );
+
+  const inferredLanguageKeys = uniqueStrings([
+    ...Object.keys(structuredPooja?.title || {}).map(normalizeLanguageKey).filter(Boolean),
+    ...Object.keys(structuredPooja?.description || {}).map(normalizeLanguageKey).filter(Boolean),
+    ...Object.keys(structuredPooja?.pricing || {}).map(normalizeLanguageKey).filter(Boolean),
+  ]);
+
+  const meaningfulExplicitLanguages = explicitAvailableLanguages.filter((languageKey) =>
+    hasMeaningfulLanguageData(languageKey)
+  );
+
+  const meaningfulInferredLanguages = inferredLanguageKeys.filter((languageKey) =>
+    hasMeaningfulLanguageData(languageKey)
+  );
+
+  let languageKeys = [];
+
+  if (meaningfulExplicitLanguages.length > 0) {
+    languageKeys = meaningfulExplicitLanguages;
+  } else if (explicitAvailableLanguages.length > 0) {
+    languageKeys = explicitAvailableLanguages;
+  } else if (meaningfulInferredLanguages.length > 0) {
+    languageKeys = meaningfulInferredLanguages;
+  } else {
+    languageKeys = inferredLanguageKeys;
+  }
+
+  if (languageKeys.length === 0) {
+    languageKeys.push(DEFAULT_SERVICE_LANGUAGE);
+  }
+
+  const preferredLanguage = preferredLanguageFromList(languageKeys);
+  const localizedTitle = {};
+  const localizedDescription = {};
+  const pricing = {};
+
+  languageKeys.forEach((languageKey) => {
+    const languageTitle =
+      normalizeText(structuredPooja?.title?.[languageKey]) ||
+      normalizeText(structuredPooja?.__legacyTitle);
+
+    const languageDescription = normalizeDescriptionBlock(
+      structuredPooja?.description?.[languageKey],
+      structuredPooja?.__legacyDescription
+    );
+
+    const languagePackages =
+      Array.isArray(structuredPooja?.pricing?.[languageKey]?.packages)
+        ? deepClone(structuredPooja.pricing[languageKey].packages)
+        : [];
+
+    const languageAddOns =
+      Array.isArray(structuredPooja?.pricing?.[languageKey]?.addOns)
+        ? deepClone(structuredPooja.pricing[languageKey].addOns)
+        : [];
+
+    localizedTitle[languageKey] = languageTitle;
+    localizedDescription[languageKey] = languageDescription;
+    pricing[languageKey] = {
+      title: languageTitle,
+      description: languageDescription,
+      packages: languagePackages,
+      addOns: languageAddOns,
+    };
+  });
+
+  const title =
+    normalizeText(structuredPooja?.__legacyTitle) ||
+    normalizeText(localizedTitle[preferredLanguage]);
+
+  const description =
+    normalizeText(structuredPooja?.__legacyDescription) ||
+    normalizeText(localizedDescription[preferredLanguage]?.full) ||
+    normalizeText(localizedDescription[preferredLanguage]?.short);
+
+  const packages =
+    Array.isArray(pricing[preferredLanguage]?.packages) &&
+    pricing[preferredLanguage].packages.length > 0
+      ? pricing[preferredLanguage].packages
+      : [];
+
+  const addOns =
+    Array.isArray(pricing[preferredLanguage]?.addOns)
+      ? pricing[preferredLanguage].addOns
+      : [];
+
+  const derivedStartPrice = minPackagePrice(packages);
+  const startPrice =
+    Number.isFinite(Number(structuredPooja?.__legacyStartPrice)) && Number(structuredPooja.__legacyStartPrice) > 0
+      ? Number(structuredPooja.__legacyStartPrice)
+      : derivedStartPrice;
+
+  return {
+    serviceKey: normalizeText(structuredPooja?.key) || createServiceKey(title),
+    title,
+    availableLanguages: languageKeys,
+    localizedTitle,
+    localizedDescription,
+    description,
+    startPrice,
+    packages,
+    addOns,
+    pricing,
+    structured: {
+      key: normalizeText(structuredPooja?.key) || createServiceKey(title),
+      availableLanguages: languageKeys,
+      title: localizedTitle,
+      description: localizedDescription,
+      pricing: Object.fromEntries(
+        languageKeys.map((languageKey) => [
+          languageKey,
+          {
+            packages: deepClone(pricing[languageKey]?.packages || []),
+            addOns: deepClone(pricing[languageKey]?.addOns || []),
+          },
+        ])
+      ),
+    },
+  };
+};
+
+const legacyPoojasToUpsert = [
   {
     title: 'Annaprashan Puja',
     description:
@@ -601,7 +779,23 @@ const pujasToUpsert = [
     addOns: [{ name: 'Flowers & Fruits', price: 1000 }],
   },
   {
-    title: 'Office/Shop Opening Puja',
+    serviceKey: 'office_opening_puja',
+    title: 'Office Opening Puja',
+    availableLanguages: ['odia', 'hindi'],
+    localizedTitle: {
+      odia: 'Office Opening Puja',
+      hindi: 'Office/Shop Opening Puja',
+    },
+    localizedDescription: {
+      odia: {
+        short: 'Office Opening Puja for Odia rituals',
+        full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
+      },
+      hindi: {
+        short: 'Office/Shop Opening Puja with Hindi pandits',
+        full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
+      },
+    },
     description:
       'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
     startPrice: 4300,
@@ -610,7 +804,7 @@ const pujasToUpsert = [
         name: 'Standard',
         price: 4300,
         includesSamagri: true,
-        pandits: '1 Panditji + All Pooja Samagries',
+        pandits: '1 Panditji + All Puja Samagries',
         procedure: [
           'Ganapathi Puja',
           'Lakshmi Puja',
@@ -626,11 +820,75 @@ const pujasToUpsert = [
           'Prasad Vitran',
         ],
         inclusions: ['Dakshina', 'All Puja Samagries'],
-        note:
-          'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos etc. You will receive a detailed to-do list after booking.',
       },
     ],
-    addOns: [{ name: 'Flowers & Fruits', price: 1000 }],
+    pricing: {
+      odia: {
+        title: 'Office Opening Puja',
+        description: {
+          short: 'Office Opening Puja for Odia rituals',
+          full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
+        },
+        packages: [
+          {
+            name: 'Standard',
+            price: 4300,
+            includesSamagri: true,
+            pandits: '1 Panditji + All Puja Samagries',
+            procedure: [
+              'Ganapathi Puja',
+              'Lakshmi Puja',
+              'Vastu Puja',
+              'Vishnu Puja',
+              'Navagraha Puja',
+              'Dwarpal Puja',
+              'Dasadikpal Puja',
+              'Havan',
+              'Pushpanjali',
+              'Neivedhya',
+              'Aarti',
+              'Prasad Vitran',
+            ],
+            inclusions: ['Dakshina', 'All Puja Samagries'],
+          },
+        ],
+        addOns: [],
+      },
+      hindi: {
+        title: 'Office/Shop Opening Puja',
+        description: {
+          short: 'Office/Shop Opening Puja with Hindi pandits',
+          full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
+        },
+        packages: [
+          {
+            name: 'Standard',
+            price: 4300,
+            includesSamagri: true,
+            pandits: '1 Panditji + All Puja Samagries',
+            procedure: [
+              'Ganapathi Puja',
+              'Lakshmi Puja',
+              'Vastu Puja',
+              'Vishnu Puja',
+              'Navagraha Puja',
+              'Dwarpal Puja',
+              'Dasadikpal Puja',
+              'Havan',
+              'Pushpanjali',
+              'Neivedhya',
+              'Aarti',
+              'Prasad Vitran',
+            ],
+            inclusions: ['Dakshina', 'All Puja Samagries'],
+            note:
+              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos etc. You will receive a detailed to-do list after booking.',
+          },
+        ],
+        addOns: [{ name: 'Flowers & Fruits', price: 1000 }],
+      },
+    },
+    addOns: [],
   },
   {
     title: 'Saraswati Puja',
@@ -725,6 +983,9 @@ const pujasToUpsert = [
   },
 ];
 
+const pujasToUpsert = structuredPoojasToUpsert
+  .map((item) => buildPoojaPayloadFromStructured(item));
+
 const expectedByTitle = new Map(pujasToUpsert.map((item) => [item.title, item]));
 
 const validatePooja = (doc, expected) => {
@@ -793,9 +1054,10 @@ async function upsertAndVerify() {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
 
+    await Pooja.deleteOne({ title: 'Office/Shop Opening Puja' });
+
     let upserted = 0;
-    for (const rawPooja of pujasToUpsert) {
-      const pooja = ensureLanguageArchitecture(rawPooja);
+    for (const pooja of pujasToUpsert) {
       const primaryNote = pooja.packages?.[0]?.note;
       const updatePayload = {
         $set: {

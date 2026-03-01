@@ -4,7 +4,11 @@ const { protect, adminOnly } = require('../middleware/auth');
 
 const router = express.Router();
 
+const SUPPORTED_LANGUAGE_KEYS = ['odia', 'hindi', 'kannada', 'bengali'];
+
 const normalizeText = (value) => (typeof value === 'string' ? value.trim() : '');
+
+const normalizeLanguageKey = (value) => normalizeText(value).toLowerCase();
 
 const toValidPrice = (value, fallback = 0) => {
   const parsed = Number(value);
@@ -21,6 +25,62 @@ const normalizeStringArray = (items) =>
   (Array.isArray(items) ? items : [])
     .map((item) => normalizeText(item))
     .filter(Boolean);
+
+const uniqueStrings = (items) => Array.from(new Set((Array.isArray(items) ? items : []).filter(Boolean)));
+
+const getPreferredLanguage = (languageKeys = []) => {
+  const preferredOrder = ['hindi', 'odia', 'bengali', 'kannada'];
+  for (const languageKey of preferredOrder) {
+    if (languageKeys.includes(languageKey)) {
+      return languageKey;
+    }
+  }
+  return languageKeys[0] || 'hindi';
+};
+
+const normalizeLocalizedTitleMap = (titleConfig) => {
+  if (!titleConfig || typeof titleConfig !== 'object' || Array.isArray(titleConfig)) {
+    return {};
+  }
+
+  return Object.entries(titleConfig).reduce((accumulator, [languageKey, titleValue]) => {
+    const normalizedLanguageKey = normalizeLanguageKey(languageKey);
+    const normalizedTitle = normalizeText(titleValue);
+    if (!normalizedLanguageKey || !normalizedTitle) {
+      return accumulator;
+    }
+
+    accumulator[normalizedLanguageKey] = normalizedTitle;
+    return accumulator;
+  }, {});
+};
+
+const normalizeLocalizedDescriptionMap = (descriptionConfig) => {
+  if (!descriptionConfig || typeof descriptionConfig !== 'object' || Array.isArray(descriptionConfig)) {
+    return {};
+  }
+
+  return Object.entries(descriptionConfig).reduce((accumulator, [languageKey, descriptionValue]) => {
+    const normalizedLanguageKey = normalizeLanguageKey(languageKey);
+    if (!normalizedLanguageKey || !descriptionValue || typeof descriptionValue !== 'object') {
+      return accumulator;
+    }
+
+    const short = normalizeText(descriptionValue.short);
+    const full = normalizeText(descriptionValue.full);
+
+    if (!short && !full) {
+      return accumulator;
+    }
+
+    accumulator[normalizedLanguageKey] = {
+      short: short || full,
+      full: full || short,
+    };
+
+    return accumulator;
+  }, {});
+};
 
 const normalizeAddOns = (items) =>
   (Array.isArray(items) ? items : [])
@@ -115,8 +175,68 @@ const buildTwoPackages = (packages, startPrice) => {
 };
 
 const normalizePoojaPayload = (input = {}) => {
-  const title = normalizeText(input.title);
+  const structuredTitleMap = normalizeLocalizedTitleMap(
+    input.title && typeof input.title === 'object' ? input.title : {}
+  );
+
+  const legacyLocalizedTitleMap = normalizeLocalizedTitleMap(
+    input.localizedTitle && typeof input.localizedTitle === 'object'
+      ? input.localizedTitle
+      : {}
+  );
+
+  const localizedTitle = {
+    ...legacyLocalizedTitleMap,
+    ...structuredTitleMap,
+  };
+
+  const structuredDescriptionMap = normalizeLocalizedDescriptionMap(
+    input.description && typeof input.description === 'object' ? input.description : {}
+  );
+
+  const legacyLocalizedDescriptionMap = normalizeLocalizedDescriptionMap(
+    input.localizedDescription && typeof input.localizedDescription === 'object'
+      ? input.localizedDescription
+      : {}
+  );
+
+  const localizedDescription = {
+    ...legacyLocalizedDescriptionMap,
+    ...structuredDescriptionMap,
+  };
+
+  const pricing = normalizePricingMap(input.pricing);
+
+  const languageKeysFromPayload = uniqueStrings([
+    ...normalizeStringArray(input.availableLanguages).map(normalizeLanguageKey),
+    ...Object.keys(localizedTitle).map(normalizeLanguageKey),
+    ...Object.keys(localizedDescription).map(normalizeLanguageKey),
+    ...Object.keys(pricing).map(normalizeLanguageKey),
+  ]).filter(Boolean);
+
+  const preferredLanguage = getPreferredLanguage(languageKeysFromPayload);
+
+  const titleFromPayload =
+    typeof input.title === 'string'
+      ? normalizeText(input.title)
+      : normalizeText(localizedTitle[preferredLanguage]);
+
+  const descriptionFromPayload =
+    typeof input.description === 'string'
+      ? normalizeText(input.description)
+      : normalizeText(
+          localizedDescription[preferredLanguage]?.full ||
+            localizedDescription[preferredLanguage]?.short
+        );
+
+  const title = titleFromPayload;
   const startPrice = toValidPrice(input.startPrice, 0);
+
+  const fallbackLanguagePackages =
+    Array.isArray(pricing?.[preferredLanguage]?.packages)
+      ? pricing[preferredLanguage].packages
+      : [];
+
   const normalizedInputPackages = (Array.isArray(input.packages) ? input.packages : [])
     .map((pkg) => normalizePackageItem(pkg, startPrice))
     .filter(Boolean);
@@ -124,25 +244,54 @@ const normalizePoojaPayload = (input = {}) => {
   const packages =
     normalizedInputPackages.length > 0
       ? normalizedInputPackages
-      : buildTwoPackages(input.packages, startPrice);
+      : fallbackLanguagePackages.length > 0
+        ? fallbackLanguagePackages
+        : buildTwoPackages(input.packages, startPrice);
 
   const packagePrices = packages.map((pkg) => toValidPrice(pkg.price, startPrice));
   const normalizedStartPrice = packagePrices.length > 0 ? Math.min(...packagePrices) : startPrice;
 
-  const addOns = normalizeAddOns(input.addOns);
+  const fallbackLanguageAddOns =
+    Array.isArray(pricing?.[preferredLanguage]?.addOns)
+      ? pricing[preferredLanguage].addOns
+      : [];
+
+  const addOns = normalizeAddOns(input.addOns).length > 0
+    ? normalizeAddOns(input.addOns)
+    : normalizeAddOns(fallbackLanguageAddOns);
+
+  const availableLanguages = uniqueStrings(
+    languageKeysFromPayload.length > 0 ? languageKeysFromPayload : [preferredLanguage]
+  ).filter(Boolean);
+
+  const ensuredLocalizedTitle = { ...localizedTitle };
+  const ensuredLocalizedDescription = { ...localizedDescription };
+
+  availableLanguages.forEach((languageKey) => {
+    if (!ensuredLocalizedTitle[languageKey]) {
+      ensuredLocalizedTitle[languageKey] = title;
+    }
+
+    if (!ensuredLocalizedDescription[languageKey]) {
+      ensuredLocalizedDescription[languageKey] = {
+        short: descriptionFromPayload || defaultDescription(title),
+        full: descriptionFromPayload || defaultDescription(title),
+      };
+    }
+  });
 
   return {
-    serviceKey: normalizeText(input.serviceKey),
+    serviceKey: normalizeText(input.key || input.serviceKey),
     title,
-    availableLanguages: normalizeStringArray(input.availableLanguages).map((item) => item.toLowerCase()),
-    localizedTitle: input.localizedTitle && typeof input.localizedTitle === 'object' ? input.localizedTitle : {},
-    localizedDescription: input.localizedDescription && typeof input.localizedDescription === 'object' ? input.localizedDescription : {},
-    description: normalizeText(input.description) || defaultDescription(title),
+    availableLanguages,
+    localizedTitle: ensuredLocalizedTitle,
+    localizedDescription: ensuredLocalizedDescription,
+    description: descriptionFromPayload || defaultDescription(title),
     image: normalizeText(input.image),
     startPrice: normalizedStartPrice,
     packages,
     addOns,
-    pricing: normalizePricingMap(input.pricing),
+    pricing,
     details: input.details,
     maxHours: input.maxHours,
     extraHourCharge: input.extraHourCharge,

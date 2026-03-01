@@ -1,0 +1,82 @@
+{
+  "key": "office_opening_puja",
+  "availableLanguages": ["odia", "hindi"],
+  "title": {
+    "odia": "Office Opening Puja",
+    "hindi": "Office/Shop Opening Puja",
+    "kannada": "",
+    "bengali": ""
+  },
+  "description": {
+    "odia": {
+      "short": "Office Opening Puja for Odia rituals",
+      "full": "In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business."
+    },
+    "hindi": {
+      "short": "Office/Shop Opening Puja with Hindi pandits",
+      "full": "In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business."
+    },
+    "kannada": {
+      "short": "",
+      "full": ""
+    },
+    "bengali": {
+      "short": "",
+      "full": ""
+    }
+  },
+  "pricing": {
+    "odia": {
+      "packages": [
+        {
+          "name": "Standard",
+          "price": 4300,
+          "pandits": "1 Panditji + All Puja Samagries",
+          "procedure": [
+            "Ganapathi Puja",
+            "Lakshmi Puja",
+            "Vastu Puja",
+            "Vishnu Puja",
+            "Navagraha Puja",
+            "Dwarpal Puja",
+            "Dasadikpal Puja",
+            "Havan",
+            "Pushpanjali",
+            "Neivedhya",
+            "Aarti",
+            "Prasad Vitran"
+          ],
+          "inclusions": ["Dakshina", "All Puja Samagries"],
+          "note": ""
+        }
+      ],
+      "addOns": [
+        {
+          "name": "Flowers & Fruits",
+          "price": 1000
+        }
+      ]
+    },
+    "hindi": {
+      "packages": [
+        {
+          "name": "Standard",
+          "price": 4300,
+          "pandits": "1 Panditji + All Puja Samagries",
+          "procedure": [],
+          "inclusions": [],
+          "note": ""
+        }
+      ],
+      "addOns": []
+    },
+    "kannada": {
+      "packages": [],
+      "addOns": []
+    },
+    "bengali": {
+      "packages": [],
+      "addOns": []
+    }
+  }
+}
