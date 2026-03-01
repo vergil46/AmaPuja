@@ -7,9 +7,9 @@ const normalizeTitle = (value) => String(value || '').toLowerCase().replace(/[^a
 
 const defaultPoojas = [
   'Annaprashan Puja',
-  'Engagement Puja – Nirbandha',
+  'Engagement Puja',
   'Ganapathi Puja',
-  'Griha Pravesh (Gruha Pratistha)',
+  'Griha Pravesh',
   'Janma Chuti Poka (Mundan)',
   'Lakshmi Puja',
   'Namkaran Puja (Ekoisia)',
@@ -17,25 +17,126 @@ const defaultPoojas = [
   'Saraswati Puja',
   'Satyanarayan Puja',
   'Vishwakarma Puja',
-].map((title, index) => ({
-  _id: `default-${index + 1}`,
-  title,
-  description: `${title} performed by experienced pandits with authentic rituals and personalized guidance.`,
-  image: 'https://images.unsplash.com/photo-1542327897-d73f4005b533?auto=format&fit=crop&w=1200&q=80',
-  startPrice: 3500 + index * 400,
-  packages: [
-    { name: 'Without Samagri', price: 3500 + index * 400, includesSamagri: false },
-    { name: 'With Samagri', price: Math.round((3500 + index * 400) * 1.35), includesSamagri: true },
-  ],
-}))
+].map((title, index) => {
+  let startPrice = 3500 + index * 400;
+  let packages = [
+    { name: 'Without Samagri', price: startPrice, includesSamagri: false },
+    { name: 'With Samagri', price: Math.round(startPrice * 1.35), includesSamagri: true },
+  ];
+
+  // Special case for Saraswati Puja: custom description, pricing, and packages
+  if (title === 'Saraswati Puja') {
+    return {
+      _id: `default-${index + 1}`,
+      title,
+      description:
+        'Mata Saraswati is the deity of intelligence, wisdom, arts, music, memory power, and other soft skills. This havan relieves people from mental pressure. It improves concentration, memory power, focus, and the ability to understand complex things.',
+      image: 'https://images.unsplash.com/photo-1542327897-d73f4005b533?auto=format&fit=crop&w=1200&q=80',
+      startPrice: 3500,
+      pricing: {
+        odia: {
+          packages: [
+            {
+              name: 'With Samagri',
+              price: 4300,
+              pandits: '1 Panditji + Pooja Samagries',
+              procedure: [
+                'Ghata Sthapana',
+                'Sankalpa',
+                'Ganapathi Puja',
+                'Panchdevata Puja',
+                'Saraswati Devi Avahan',
+                'Bhog Neivedhya',
+                'Aarti',
+                'Pushpanjali',
+                'Prasad Sevan',
+              ],
+              inclusions: ['Dakshina', 'Puja Samagries'],
+            },
+          ],
+          addOns: [
+            { name: 'Flowers & Fruits', price: 1000 },
+            { name: 'Havan', price: 1000 },
+          ],
+        },
+        hindi: {
+          packages: [
+            {
+              name: 'Standard',
+              price: 3500,
+              pandits: '1 Pandit + All Pooja Materials',
+              procedure: [
+                'Swasti vachanam',
+                'Maha Sankalp',
+                'Ganapathi Puja',
+                'Saraswati Puja',
+                'Aarti & Prasad Distribution',
+              ],
+              inclusions: ['Dakshina', 'All Puja Samagries'],
+            },
+            {
+              name: 'Premium',
+              price: 6500,
+              pandits: '2 Panditji + All Puja Samagries',
+              procedure: [
+                'Swasti vachanam',
+                'Maha Sankalp',
+                'Ganapathi Puja',
+                'Punyaha Vachanam',
+                'Saraswati Puja',
+                'Aarti & Prasad Distribution',
+              ],
+              inclusions: ['Dakshina', 'All Puja Samagries'],
+            },
+          ],
+          addOns: [
+            { name: 'Flowers & Fruits', price: 1000 },
+            { name: 'Havan', price: 1000 },
+          ],
+        },
+        bengali: {
+          packages: [
+            {
+              name: 'Standard',
+              price: 4500,
+              pandits: '1 Pandit + All Pooja Materials',
+              procedure: [
+                'Swasti vachanam',
+                'Maha Sankalp',
+                'Ganapathi Puja',
+                'Punyaha Vachanam',
+                'Saraswati Puja',
+                'Aarti & Prasad Distribution',
+              ],
+              inclusions: ['Dakshina', 'All Puja Samagries'],
+            },
+          ],
+          addOns: [
+            { name: 'Flowers & Fruits', price: 1000 },
+            { name: 'Havan', price: 1000 },
+          ],
+        },
+      },
+    };
+  }
+
+  return {
+    _id: `default-${index + 1}`,
+    title,
+    description: `${title} performed by experienced pandits with authentic rituals and personalized guidance.`,
+    image: 'https://images.unsplash.com/photo-1542327897-d73f4005b533?auto=format&fit=crop&w=1200&q=80',
+    startPrice,
+    packages,
+  };
+})
 
 const priestLanguagePoojas = {
   Odia: new Set(
     [
       'Annaprashan Puja',
-      'Engagement Puja – Nirbandha',
+      'Engagement Puja',
       'Ganapathi Puja',
-      'Griha Pravesh (Gruha Pratistha)',
+      'Griha Pravesh',
       'Janma Chuti Poka (Mundan)',
       'Lakshmi Puja',
       'Namkaran Puja (Ekoisia)',

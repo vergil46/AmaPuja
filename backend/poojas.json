@@ -1,0 +1,27 @@
+﻿
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : [{"details":{"standard":{"procedure":[],"inclusions":[]}},"
+                    _id":"69a1e7d223ff346704572b6c","title":"Annaprashan 
+                    Pooja","description":"Annaprashan Pooja performed by 
+                    experienced pandits with authentic ...
+RawContent        : HTTP/1.1 200 OK
+                    Vary: Origin
+                    Access-Control-Allow-Credentials: true
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 47419
+                    Content-Type: application/json; charset=utf-8
+                    Date: Sat, 2...
+Forms             : 
+Headers           : {[Vary, Origin], [Access-Control-Allow-Credentials, true], 
+                    [Connection, keep-alive], [Keep-Alive, timeout=5]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : 
+RawContentLength  : 47419
+
+
+

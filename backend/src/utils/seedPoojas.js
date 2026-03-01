@@ -84,13 +84,102 @@ const seedPoojas = async () => {
 
   const docs = missingTitles.map((title, index) => {
     const basePrice = 3500 + index * 400;
-    return {
-      title,
-      description: `${title} performed by experienced pandits with authentic rituals and personalized guidance for your family traditions.`,
-      image: defaultImage,
-      startPrice: basePrice,
-      packages: buildPackages(basePrice),
-    };
+    let packages = buildPackages(basePrice);
+    // Special case for Saraswati Puja: custom description, pricing, packages, procedures, and addOns
+    if (title === 'Saraswati Puja') {
+      return {
+        title,
+        description:
+          'Mata Saraswati is the deity of intelligence, wisdom, arts, music, memory power, and other soft skills. This havan relieves people from mental pressure. It improves concentration, memory power, focus, and the ability to understand complex things.',
+        image: defaultImage,
+        startPrice: 3500,
+        pricing: {
+          odia: {
+            packages: [
+              {
+                name: 'With Samagri',
+                price: 4300,
+                pandits: '1 Panditji + Pooja Samagries',
+                procedure: [
+                  'Ghata Sthapana',
+                  'Sankalpa',
+                  'Ganapathi Puja',
+                  'Panchdevata Puja',
+                  'Saraswati Devi Avahan',
+                  'Bhog Neivedhya',
+                  'Aarti',
+                  'Pushpanjali',
+                  'Prasad Sevan',
+                ],
+                inclusions: ['Dakshina', 'Puja Samagries'],
+              },
+            ],
+            addOns: [
+              { name: 'Flowers & Fruits', price: 1000 },
+              { name: 'Havan', price: 1000 },
+            ],
+          },
+          hindi: {
+            packages: [
+              {
+                name: 'Standard',
+                price: 3500,
+                pandits: '1 Pandit + All Pooja Materials',
+                procedure: [
+                  'Swasti vachanam',
+                  'Maha Sankalp',
+                  'Ganapathi Puja',
+                  'Saraswati Puja',
+                  'Aarti & Prasad Distribution',
+                ],
+                inclusions: ['Dakshina', 'All Puja Samagries'],
+              },
+              {
+                name: 'Premium',
+                price: 6500,
+                pandits: '2 Panditji + All Puja Samagries',
+                procedure: [
+                  'Swasti vachanam',
+                  'Maha Sankalp',
+                  'Ganapathi Puja',
+                  'Punyaha Vachanam',
+                  'Saraswati Puja',
+                  'Aarti & Prasad Distribution',
+                ],
+                inclusions: ['Dakshina', 'All Puja Samagries'],
+              },
+            ],
+            addOns: [
+              { name: 'Flowers & Fruits', price: 1000 },
+              { name: 'Havan', price: 1000 },
+            ],
+          },
+          bengali: {
+            packages: [
+              {
+                name: 'Standard',
+                price: 4500,
+                pandits: '1 Pandit + All Pooja Materials',
+                procedure: [
+                  'Swasti vachanam',
+                  'Maha Sankalp',
+                  'Ganapathi Puja',
+                  'Punyaha Vachanam',
+                  'Saraswati Puja',
+                  'Aarti & Prasad Distribution',
+                ],
+                inclusions: ['Dakshina', 'All Puja Samagries'],
+              },
+            ],
+            addOns: [
+              { name: 'Flowers & Fruits', price: 1000 },
+              { name: 'Havan', price: 1000 },
+            ],
+          },
+        },
+      };
+    }
+    // ...existing code...
   });
 
   await Pooja.insertMany(docs, { ordered: false });

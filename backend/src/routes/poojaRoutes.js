@@ -17,6 +17,31 @@ const toValidPrice = (value, fallback = 0) => {
 const defaultDescription = (title) =>
   `${title} performed by experienced pandits with authentic rituals and personalized guidance for your family traditions.`;
 
+const normalizeStringArray = (items) =>
+  (Array.isArray(items) ? items : [])
+    .map((item) => normalizeText(item))
+    .filter(Boolean);
+
+const normalizePackageItem = (item, fallbackPrice = 0) => {
+  const name = normalizeText(item?.name);
+  const price = toValidPrice(item?.price, fallbackPrice);
+
+  if (!name) {
+    return null;
+  }
+
+  return {
+    name,
+    price,
+    includesSamagri: Boolean(item?.includesSamagri),
+    pandits: normalizeText(item?.pandits),
+    description: normalizeText(item?.description),
+    procedure: normalizeStringArray(item?.procedure),
+    inclusions: normalizeStringArray(item?.inclusions),
+    note: normalizeText(item?.note),
+  };
+};
+
 const buildTwoPackages = (packages, startPrice) => {
   const list = Array.isArray(packages) ? packages : [];
 
@@ -45,8 +70,24 @@ const buildTwoPackages = (packages, startPrice) => {
 const normalizePoojaPayload = (input = {}) => {
   const title = normalizeText(input.title);
   const startPrice = toValidPrice(input.startPrice, 0);
-  const packages = buildTwoPackages(input.packages, startPrice);
-  const normalizedStartPrice = packages[0]?.price ?? startPrice;
+  const normalizedInputPackages = (Array.isArray(input.packages) ? input.packages : [])
+    .map((pkg) => normalizePackageItem(pkg, startPrice))
+    .filter(Boolean);
+
+  const packages =
+    normalizedInputPackages.length > 0
+      ? normalizedInputPackages
+      : buildTwoPackages(input.packages, startPrice);
+
+  const packagePrices = packages.map((pkg) => toValidPrice(pkg.price, startPrice));
+  const normalizedStartPrice = packagePrices.length > 0 ? Math.min(...packagePrices) : startPrice;
+
+  const addOns = (Array.isArray(input.addOns) ? input.addOns : [])
+    .map((addon) => ({
+      name: normalizeText(addon?.name),
+      price: toValidPrice(addon?.price, 0),
+    }))
+    .filter((addon) => addon.name);
 
   return {
     title,
@@ -54,6 +95,10 @@ const normalizePoojaPayload = (input = {}) => {
     image: normalizeText(input.image),
     startPrice: normalizedStartPrice,
     packages,
+    addOns,
+    details: input.details,
+    maxHours: input.maxHours,
+    extraHourCharge: input.extraHourCharge,
   };
 };
 
@@ -62,41 +107,8 @@ const packagesChanged = (currentPackages, normalizedPackages) =>
 
 router.get('/', async (req, res) => {
   const poojaDocs = await Pooja.find().sort({ createdAt: -1 });
-
-  const normalizedPoojas = poojaDocs.map((doc) => {
-    const source = doc.toObject();
-    const normalized = normalizePoojaPayload(source);
-
-    return {
-      source,
-      data: { ...source, ...normalized },
-      needsUpdate:
-        normalizeText(source.description) !== normalized.description ||
-        Number(source.startPrice) !== normalized.startPrice ||
-        packagesChanged(source.packages, normalized.packages),
-    };
-  });
-
-  const writeOps = normalizedPoojas
-    .filter((item) => item.needsUpdate)
-    .map((item) => ({
-      updateOne: {
-        filter: { _id: item.source._id },
-        update: {
-          $set: {
-            description: item.data.description,
-            startPrice: item.data.startPrice,
-            packages: item.data.packages,
-          },
-        },
-      },
-    }));
-
-  if (writeOps.length > 0) {
-    await Pooja.bulkWrite(writeOps);
-  }
-
-  return res.json(normalizedPoojas.map((item) => item.data));
+  // Return all fields for each pooja, not just normalized
+  return res.json(poojaDocs.map((doc) => doc.toObject()));
 });
 
 router.get('/:id', async (req, res) => {
@@ -104,25 +116,8 @@ router.get('/:id', async (req, res) => {
   if (!poojaDoc) {
     return res.status(404).json({ message: 'Pooja not found' });
   }
-
-  const source = poojaDoc.toObject();
-  const normalized = normalizePoojaPayload(source);
-  const normalizedPooja = { ...source, ...normalized };
-
-  const needsUpdate =
-    normalizeText(source.description) !== normalized.description ||
-    Number(source.startPrice) !== normalized.startPrice ||
-    packagesChanged(source.packages, normalized.packages);
-
-  if (needsUpdate) {
-    await Pooja.findByIdAndUpdate(req.params.id, {
-      description: normalizedPooja.description,
-      startPrice: normalizedPooja.startPrice,
-      packages: normalizedPooja.packages,
-    });
-  }
-
-  return res.json(normalizedPooja);
+  // Return all fields for the pooja
+  return res.json(poojaDoc.toObject());
 });
 
 router.post('/', protect, adminOnly, async (req, res) => {
