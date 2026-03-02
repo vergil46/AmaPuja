@@ -55,6 +55,7 @@ function Footer() {
         <div className="rounded-2xl border border-stone-700/70 bg-stone-900/70 p-5 animate-fade-up" style={{ animationDelay: '0.16s' }}>
           <h4 className="text-base sm:text-lg font-semibold">Quick Links</h4>
           <div className="mt-4 flex flex-col gap-2 text-sm sm:text-base text-stone-300">
+            <Link to="/ratings" className="rounded-lg px-3 py-2 hover:bg-stone-800 transition-colors">Ratings & Reviews</Link>
             <Link to="/refund-policy" className="rounded-lg px-3 py-2 hover:bg-stone-800 transition-colors">Refund Policy</Link>
             <Link to="/privacy-policy" className="rounded-lg px-3 py-2 hover:bg-stone-800 transition-colors">Privacy Policy</Link>
             <Link to="/terms-and-conditions" className="rounded-lg px-3 py-2 hover:bg-stone-800 transition-colors">Terms & Conditions</Link>

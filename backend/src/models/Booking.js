@@ -16,6 +16,18 @@ const bookingSchema = new mongoose.Schema(
     date: { type: String, required: true, trim: true },
     time: { type: String, trim: true, default: '' },
     address: { type: String, required: true, trim: true },
+    addressDetails: {
+      house: { type: String, trim: true, default: '' },
+      street: { type: String, trim: true, default: '' },
+      city: { type: String, trim: true, default: '' },
+      state: { type: String, trim: true, default: '' },
+      pincode: { type: String, trim: true, default: '' },
+      formattedAddress: { type: String, trim: true, default: '' },
+    },
+    coordinates: {
+      latitude: { type: Number, min: -90, max: 90 },
+      longitude: { type: Number, min: -180, max: 180 },
+    },
     specialNotes: { type: String, trim: true, default: '' },
 
     paymentOption: {

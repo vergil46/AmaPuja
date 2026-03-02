@@ -1,7 +1,8 @@
 const express = require('express');
 const Booking = require('../models/Booking');
 const Pooja = require('../models/Pooja');
-const { protect, adminOnly } = require('../middleware/auth');
+const User = require('../models/User');
+const { protect, adminOnly, optionalAuth } = require('../middleware/auth');
 const {
   sendBookingCreatedNotifications,
   sendCompletionReviewNotifications,
@@ -17,6 +18,12 @@ const computePaymentAmount = (price, paymentOption) => {
 
 const normalizeName = (value) => String(value || '').trim().toLowerCase();
 
+const escapeRegex = (value) => String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
+
+const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
+
 const parseAmount = (value) => {
   if (typeof value === 'number') {
     return Number.isFinite(value) ? value : 0;
@@ -25,6 +32,19 @@ const parseAmount = (value) => {
   const cleaned = String(value || '').replace(/[^\d.-]/g, '');
   const parsed = Number(cleaned);
   return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const composeAddress = (addressDetails = {}) => {
+  return [
+    addressDetails.house,
+    addressDetails.street,
+    addressDetails.city,
+    addressDetails.state,
+    addressDetails.pincode,
+  ]
+    .map((value) => String(value || '').trim())
+    .filter(Boolean)
+    .join(', ');
 };
 
 const buildUnifiedAddOns = ({ selectedPackage, languagePricing, pooja }) => {
@@ -48,10 +68,20 @@ const buildUnifiedAddOns = ({ selectedPackage, languagePricing, pooja }) => {
   return Array.from(byName.values());
 };
 
+const withBookingDefaults = (bookingDoc) => {
+  const booking = typeof bookingDoc?.toObject === 'function' ? bookingDoc.toObject() : bookingDoc;
+  return {
+    ...booking,
+    bookingStatus: booking?.bookingStatus || 'pending',
+    paymentStatus: booking?.paymentStatus || 'pending',
+    selectedAddOns: Array.isArray(booking?.selectedAddOns) ? booking.selectedAddOns : [],
+  };
+};
+
 /**
  * CREATE BOOKING
  */
-router.post('/', async (req, res) => {
+router.post('/', optionalAuth, async (req, res) => {
   console.log('REQ BODY:', req.body);
 
   try {
@@ -66,10 +96,43 @@ router.post('/', async (req, res) => {
       date,
       time,
       address,
+      addressDetails = {},
+      coordinates = {},
       specialNotes,
       paymentOption,
       selectedAddOns = [],
     } = req.body;
+
+    const resolvedAddressDetails = {
+      house: String(addressDetails?.house || '').trim(),
+      street: String(addressDetails?.street || '').trim(),
+      city: String(addressDetails?.city || city || '').trim(),
+      state: String(addressDetails?.state || '').trim(),
+      pincode: String(addressDetails?.pincode || '').trim(),
+      formattedAddress: String(addressDetails?.formattedAddress || '').trim(),
+    };
+
+    const composedAddress = composeAddress(resolvedAddressDetails);
+    const resolvedAddress =
+      String(address || '').trim() ||
+      resolvedAddressDetails.formattedAddress ||
+      composedAddress;
+
+    const resolvedCity =
+      String(city || '').trim() ||
+      resolvedAddressDetails.city;
+
+    const latitude = Number(coordinates?.latitude);
+    const longitude = Number(coordinates?.longitude);
+
+    const resolvedCoordinates = {
+      latitude: Number.isFinite(latitude) ? latitude : null,
+      longitude: Number.isFinite(longitude) ? longitude : null,
+    };
+
+    if (!resolvedAddressDetails.formattedAddress) {
+      resolvedAddressDetails.formattedAddress = resolvedAddress;
+    }
 
     if (
       !poojaId ||
@@ -77,9 +140,9 @@ router.post('/', async (req, res) => {
       !name ||
       !phone ||
       !email ||
-      !city ||
+      !resolvedCity ||
       !date ||
-      !address
+      !resolvedAddress
     ) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
@@ -145,11 +208,13 @@ router.post('/', async (req, res) => {
       name,
       phone,
       email,
-      city,
+      city: resolvedCity,
       priestPreference,
       date,
       time,
-      address,
+      address: resolvedAddress,
+      addressDetails: resolvedAddressDetails,
+      coordinates: resolvedCoordinates,
       specialNotes,
       paymentOption,
       finalAmount: baseAmount,
@@ -163,6 +228,17 @@ router.post('/', async (req, res) => {
 
     if (req.user && req.user._id) {
       bookingData.userId = req.user._id;
+    } else {
+      const emailToMatch = normalizeEmail(email);
+      if (emailToMatch) {
+        const existingUser = await User.findOne({
+          email: new RegExp(`^${escapeRegex(emailToMatch)}$`, 'i'),
+        }).select('_id');
+
+        if (existingUser?._id) {
+          bookingData.userId = existingUser._id;
+        }
+      }
     }
 
     const booking = await Booking.create(bookingData);
@@ -190,11 +266,91 @@ router.post('/', async (req, res) => {
  * GET MY BOOKINGS
  */
 router.get('/my', protect, async (req, res) => {
-  const bookings = await Booking.find({ userId: req.user._id })
+  const normalizedUserEmail = normalizeEmail(req.user.email);
+  const normalizedUserPhone = normalizePhone(req.user.phone);
+
+  const linkedBookings = await Booking.find({ userId: req.user._id })
     .populate('poojaId')
     .sort({ createdAt: -1 });
 
-  return res.json(bookings);
+  const legacyCandidates = await Booking.find({
+    $or: [{ userId: { $exists: false } }, { userId: null }],
+  })
+    .populate('poojaId')
+    .sort({ createdAt: -1 });
+
+  const recoveredLegacyBookings = legacyCandidates.filter((booking) => {
+    const bookingEmail = normalizeEmail(booking.email);
+    const bookingPhone = normalizePhone(booking.phone);
+    return (
+      (normalizedUserEmail && bookingEmail === normalizedUserEmail) ||
+      (normalizedUserPhone && bookingPhone && bookingPhone === normalizedUserPhone)
+    );
+  });
+
+  const bookingsMap = new Map();
+  [...linkedBookings, ...recoveredLegacyBookings].forEach((booking) => {
+    bookingsMap.set(String(booking._id), booking);
+  });
+
+  const bookings = Array.from(bookingsMap.values()).sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  const unlinkedBookingIds = bookings
+    .filter((booking) => !booking.userId)
+    .map((booking) => booking._id);
+
+  if (unlinkedBookingIds.length > 0) {
+    await Booking.updateMany(
+      { _id: { $in: unlinkedBookingIds } },
+      { $set: { userId: req.user._id } }
+    );
+  }
+
+  return res.json(bookings.map(withBookingDefaults));
+});
+
+/**
+ * USER: CANCEL OWN BOOKING
+ */
+router.patch('/:id/cancel', protect, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    const isOwnerById = booking.userId && String(booking.userId) === String(req.user._id);
+    const isOwnerByEmail = normalizeEmail(booking.email) === normalizeEmail(req.user.email);
+    const isOwnerByPhone =
+      normalizePhone(req.user.phone) &&
+      normalizePhone(booking.phone) === normalizePhone(req.user.phone);
+
+    if (!isOwnerById && !isOwnerByEmail && !isOwnerByPhone) {
+      return res.status(403).json({ message: 'You can only cancel your own booking' });
+    }
+
+    const currentStatus = String(booking.bookingStatus || 'pending').toLowerCase();
+    if (currentStatus === 'completed') {
+      return res.status(400).json({ message: 'Completed booking cannot be cancelled' });
+    }
+
+    if (currentStatus === 'cancelled') {
+      return res.status(400).json({ message: 'Booking is already cancelled' });
+    }
+
+    booking.bookingStatus = 'cancelled';
+    await booking.save();
+
+    return res.json(withBookingDefaults(booking));
+  } catch (error) {
+    console.error('Cancel booking error:', error);
+    return res
+      .status(500)
+      .json({ message: error.message || 'Failed to cancel booking' });
+  }
 });
 
 /**
@@ -205,7 +361,7 @@ router.get('/admin/all', protect, adminOnly, async (req, res) => {
     .populate('poojaId userId', 'title name email')
     .sort({ createdAt: -1 });
 
-  return res.json(bookings);
+  return res.json(bookings.map(withBookingDefaults));
 });
 
 /**
@@ -222,7 +378,7 @@ router.get('/admin/recent', protect, adminOnly, async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(safeLimit);
 
-  return res.json(bookings);
+  return res.json(bookings.map(withBookingDefaults));
 });
 
 /**

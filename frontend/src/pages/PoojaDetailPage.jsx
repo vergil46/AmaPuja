@@ -32,6 +32,8 @@ function PoojaDetailPage() {
   const [selectedAddOns, setSelectedAddOns] = useState([])
   const [bookingMessage, setBookingMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isFetchingLocation, setIsFetchingLocation] = useState(false)
+  const [locationMessage, setLocationMessage] = useState('')
 
   const normalizeName = (value) =>
     String(value || '')
@@ -56,14 +58,156 @@ function PoojaDetailPage() {
     phone: '',
     email: '',
     city: selectedCityFromServices,
+    state: '',
+    pincode: '',
+    house: '',
+    street: '',
     priestPreference:
       selectedLanguageFromServices,
     date: '',
     time: '',
     address: '',
+    latitude: '',
+    longitude: '',
     specialNotes: '',
     paymentOption: 'full',
   })
+
+  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+
+  const buildAddressFromParts = (values) => {
+    return [
+      values.house,
+      values.street,
+      values.city,
+      values.state,
+      values.pincode,
+    ]
+      .map((value) => String(value || '').trim())
+      .filter(Boolean)
+      .join(', ')
+  }
+
+  const parseGoogleAddress = (geocodeResult) => {
+    const components = Array.isArray(geocodeResult?.address_components)
+      ? geocodeResult.address_components
+      : []
+
+    const readComponent = (types) => {
+      const found = components.find((component) =>
+        Array.isArray(component.types) &&
+        types.every((type) => component.types.includes(type))
+      )
+      return found?.long_name || ''
+    }
+
+    const streetNumber = readComponent(['street_number'])
+    const route = readComponent(['route'])
+    const locality =
+      readComponent(['locality', 'political']) ||
+      readComponent(['sublocality_level_1', 'sublocality', 'political']) ||
+      readComponent(['administrative_area_level_2', 'political'])
+    const state = readComponent(['administrative_area_level_1', 'political'])
+    const postalCode = readComponent(['postal_code'])
+
+    return {
+      house: streetNumber,
+      street: route,
+      city: locality,
+      state,
+      pincode: postalCode,
+      formattedAddress: String(geocodeResult?.formatted_address || '').trim(),
+    }
+  }
+
+  const fetchAddressFromCoordinates = async (
+    latitude,
+    longitude
+  ) => {
+    if (!googleMapsApiKey) {
+      throw new Error(
+        'Google Maps API key is missing. Please set VITE_GOOGLE_MAPS_API_KEY.'
+      )
+    }
+
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleMapsApiKey}`
+    const response = await fetch(url)
+
+    if (!response.ok) {
+      throw new Error('Unable to fetch address from location coordinates.')
+    }
+
+    const payload = await response.json()
+    if (payload.status !== 'OK' || !Array.isArray(payload.results) || payload.results.length === 0) {
+      throw new Error('No address found for your current location.')
+    }
+
+    return parseGoogleAddress(payload.results[0])
+  }
+
+  const handleUseCurrentLocation = async () => {
+    setLocationMessage('')
+    if (!navigator.geolocation) {
+      setLocationMessage('Geolocation is not supported by your browser.')
+      return
+    }
+
+    setIsFetchingLocation(true)
+
+    try {
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0,
+        })
+      })
+
+      const latitude = Number(position.coords.latitude)
+      const longitude = Number(position.coords.longitude)
+
+      const parsedAddress = await fetchAddressFromCoordinates(
+        latitude,
+        longitude
+      )
+
+      setForm((previous) => {
+        const merged = {
+          ...previous,
+          house: parsedAddress.house || previous.house,
+          street: parsedAddress.street || previous.street,
+          city: parsedAddress.city || previous.city,
+          state: parsedAddress.state || previous.state,
+          pincode: parsedAddress.pincode || previous.pincode,
+          latitude: String(latitude),
+          longitude: String(longitude),
+        }
+
+        const autoAddress =
+          parsedAddress.formattedAddress ||
+          buildAddressFromParts(merged)
+
+        return {
+          ...merged,
+          address: autoAddress || previous.address,
+        }
+      })
+
+      setLocationMessage('Location fetched and address auto-filled successfully.')
+    } catch (error) {
+      if (error?.code === 1) {
+        setLocationMessage('Location permission denied. Please enter address manually.')
+      } else if (error?.code === 2) {
+        setLocationMessage('Location unavailable. Please enter address manually.')
+      } else if (error?.code === 3) {
+        setLocationMessage('Location request timed out. Please try again or enter address manually.')
+      } else {
+        setLocationMessage(error?.message || 'Failed to fetch location. Please enter address manually.')
+      }
+    } finally {
+      setIsFetchingLocation(false)
+    }
+  }
 
   useEffect(() => {
     api.get(`/poojas/${id}`).then((res) => {
@@ -310,7 +454,7 @@ function PoojaDetailPage() {
           form.time
             ? `Preferred Time: ${form.time}`
             : '',
-          `Address: ${form.address}`,
+            `Address: ${form.address || buildAddressFromParts(form)}`,
           form.specialNotes
             ? `Requirements: ${form.specialNotes}`
             : '',
@@ -330,11 +474,28 @@ function PoojaDetailPage() {
         return
       }
 
+      const computedAddress =
+        String(form.address || '').trim() ||
+        buildAddressFromParts(form)
+
       const bookingRes = await api.post('/bookings', {
         poojaId: id,
         package: selectedPackage,
         selectedAddOns,
+        addressDetails: {
+          house: form.house,
+          street: form.street,
+          city: form.city,
+          state: form.state,
+          pincode: form.pincode,
+          formattedAddress: computedAddress,
+        },
+        coordinates: {
+          latitude: Number(form.latitude || 0) || null,
+          longitude: Number(form.longitude || 0) || null,
+        },
         ...form,
+        address: computedAddress,
       })
 
       const booking = bookingRes.data
@@ -725,20 +886,89 @@ function PoojaDetailPage() {
               }
             />
 
-            <select
-              className={fieldClass}
-              value={form.city}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  city: e.target.value,
-                })
-              }
+            <button
+              type="button"
+              onClick={handleUseCurrentLocation}
+              disabled={isFetchingLocation}
+              className="w-full rounded-xl border border-orange-300 bg-orange-50 px-3.5 py-2.5 text-sm font-semibold text-orange-800 transition hover:bg-orange-100 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <option value="">Select City</option>
-              <option value="Bangalore">Bangalore</option>
-              <option value="Bhubaneswar">Bhubaneswar</option>
-            </select>
+              {isFetchingLocation
+                ? 'Fetching your location...'
+                : 'Use My Current Location'}
+            </button>
+
+            {locationMessage && (
+              <p className={`text-xs ${locationMessage.toLowerCase().includes('successfully') ? 'text-green-700' : 'text-red-600'}`}>
+                {locationMessage}
+              </p>
+            )}
+
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <input
+                className={fieldClass}
+                placeholder="House / Flat No. *"
+                required
+                value={form.house}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    house: e.target.value,
+                  })
+                }
+              />
+
+              <input
+                className={fieldClass}
+                placeholder="Street / Area *"
+                required
+                value={form.street}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    street: e.target.value,
+                  })
+                }
+              />
+
+              <input
+                className={fieldClass}
+                placeholder="City *"
+                required
+                value={form.city}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    city: e.target.value,
+                  })
+                }
+              />
+
+              <input
+                className={fieldClass}
+                placeholder="State *"
+                required
+                value={form.state}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    state: e.target.value,
+                  })
+                }
+              />
+
+              <input
+                className={fieldClass}
+                placeholder="Pincode *"
+                required
+                value={form.pincode}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    pincode: e.target.value,
+                  })
+                }
+              />
+            </div>
 
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <select
@@ -790,7 +1020,7 @@ function PoojaDetailPage() {
 
             <input
               className={fieldClass}
-              placeholder="Address *"
+              placeholder="Full Address *"
               required
               value={form.address}
               onChange={(e) =>

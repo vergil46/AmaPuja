@@ -5,8 +5,38 @@ const { protect } = require('../middleware/auth');
 
 const router = express.Router();
 
+router.get('/', async (req, res) => {
+  try {
+    const requestedLimit = Number(req.query.limit);
+    const limit = Number.isFinite(requestedLimit)
+      ? Math.min(Math.max(Math.trunc(requestedLimit), 1), 100)
+      : 30;
+
+    const feedbacks = await Feedback.find({})
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate('userId', 'name')
+      .populate('poojaId', 'title');
+
+    const items = feedbacks.map((feedback) => ({
+      _id: feedback._id,
+      rating: feedback.rating,
+      comment: feedback.comment,
+      createdAt: feedback.createdAt,
+      customerName: feedback.userId?.name || 'Verified Customer',
+      poojaTitle: feedback.poojaId?.title || 'Pooja Service',
+    }));
+
+    return res.json(items);
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to load feedbacks' });
+  }
+});
+
 router.get('/my', protect, async (req, res) => {
-  const feedbacks = await Feedback.find({ userId: req.user._id }).sort({ createdAt: -1 });
+  const feedbacks = await Feedback.find({ userId: req.user._id })
+    .sort({ createdAt: -1 })
+    .populate('poojaId', 'title');
   return res.json(feedbacks);
 });
 
@@ -53,7 +83,9 @@ router.post('/', protect, async (req, res) => {
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    return res.status(201).json(feedback);
+    const populatedFeedback = await Feedback.findById(feedback._id).populate('poojaId', 'title');
+
+    return res.status(201).json(populatedFeedback);
   } catch (error) {
     if (error?.code === 11000) {
       return res.status(409).json({ message: 'Feedback already exists for this booking' });

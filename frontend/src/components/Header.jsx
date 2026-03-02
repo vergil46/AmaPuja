@@ -39,6 +39,9 @@ function Header() {
           <NavLink to="/blog" className={navClass}>
             Blog
           </NavLink>
+          <NavLink to="/ratings" className={navClass}>
+            Ratings
+          </NavLink>
           <NavLink to="/contact" className={navClass}>
             {t('contact')}
           </NavLink>
@@ -102,6 +105,9 @@ function Header() {
             </NavLink>
             <NavLink to="/about" className={navClass} onClick={closeMobileMenu}>
               {t('about')}
+            </NavLink>
+            <NavLink to="/ratings" className={navClass} onClick={closeMobileMenu}>
+              Ratings
             </NavLink>
             <NavLink to="/contact" className={navClass} onClick={closeMobileMenu}>
               {t('contact')}

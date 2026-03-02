@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage'
 import PolicyPage from './pages/PolicyPage'
 import PoojaDetailPage from './pages/PoojaDetailPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import RatingsPage from './pages/RatingsPage'
 import ServicesPage from './pages/ServicesPage'
 import SignupPage from './pages/SignupPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
@@ -40,6 +41,7 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/ratings" element={<RatingsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/admin-login" element={<AdminLoginPage />} />
         <Route path="/signup" element={<SignupPage />} />

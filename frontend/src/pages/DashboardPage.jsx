@@ -10,22 +10,45 @@ function DashboardPage() {
   const [feedbacks, setFeedbacks] = useState([])
   const [feedbackForm, setFeedbackForm] = useState({})
   const [feedbackMessage, setFeedbackMessage] = useState('')
+  const [cancelLoadingById, setCancelLoadingById] = useState({})
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     setIsLoading(true)
-    Promise.all([api.get('/bookings/my'), api.get('/feedback/my')])
-      .then(([bookingRes, feedbackRes]) => {
-        setBookings(bookingRes.data)
-        setFeedbacks(feedbackRes.data)
+    Promise.allSettled([api.get('/bookings/my'), api.get('/feedback/my')])
+      .then(([bookingResult, feedbackResult]) => {
+        if (bookingResult.status === 'fulfilled') {
+          setBookings(Array.isArray(bookingResult.value?.data) ? bookingResult.value.data : [])
+        } else {
+          setBookings([])
+        }
+
+        if (feedbackResult.status === 'fulfilled') {
+          setFeedbacks(Array.isArray(feedbackResult.value?.data) ? feedbackResult.value.data : [])
+        } else {
+          setFeedbacks([])
+        }
       })
       .finally(() => setIsLoading(false))
   }, [])
 
   const feedbackByBookingId = Object.fromEntries(feedbacks.map((item) => [item.bookingId, item]))
 
+  const normalizeBookingStatus = (status) => {
+    const normalized = String(status || '').toLowerCase()
+    if (normalized === 'confirmed' || normalized === 'completed' || normalized === 'cancelled') {
+      return normalized
+    }
+    return 'pending'
+  }
+
+  const getStatusLabel = (status) => {
+    const normalized = normalizeBookingStatus(status)
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1)
+  }
+
   const completedBookingsWithoutFeedback = bookings.filter(
-    (booking) => booking.bookingStatus === 'completed' && !feedbackByBookingId[booking._id]
+    (booking) => normalizeBookingStatus(booking.bookingStatus) === 'completed' && !feedbackByBookingId[booking._id]
   )
 
   const reviewBookingId = new URLSearchParams(location.search).get('reviewBooking')
@@ -72,6 +95,27 @@ function DashboardPage() {
     setFeedbackMessage('Thank you! Your feedback has been submitted.')
   }
 
+  const handleCancelBooking = async (bookingId) => {
+    setFeedbackMessage('')
+    setCancelLoadingById((prev) => ({ ...prev, [bookingId]: true }))
+    try {
+      const response = await api.patch(`/bookings/${bookingId}/cancel`)
+      const updatedBooking = response.data
+      setBookings((prev) =>
+        prev.map((booking) =>
+          booking._id === bookingId
+            ? { ...booking, bookingStatus: updatedBooking.bookingStatus || 'cancelled' }
+            : booking
+        )
+      )
+      setFeedbackMessage('Booking cancelled successfully.')
+    } catch (error) {
+      setFeedbackMessage(error?.response?.data?.message || 'Failed to cancel booking.')
+    } finally {
+      setCancelLoadingById((prev) => ({ ...prev, [bookingId]: false }))
+    }
+  }
+
   if (isLoading) {
     return <DashboardSkeleton />
   }
@@ -79,9 +123,9 @@ function DashboardPage() {
   // Calculate stats
   const stats = {
     total: bookings.length,
-    pending: bookings.filter(b => b.bookingStatus === 'pending').length,
-    confirmed: bookings.filter(b => b.bookingStatus === 'confirmed').length,
-    completed: bookings.filter(b => b.bookingStatus === 'completed').length,
+    pending: bookings.filter(b => normalizeBookingStatus(b.bookingStatus) === 'pending').length,
+    confirmed: bookings.filter(b => normalizeBookingStatus(b.bookingStatus) === 'confirmed').length,
+    completed: bookings.filter(b => normalizeBookingStatus(b.bookingStatus) === 'completed').length,
   }
 
   const getStatusColor = (status) => {
@@ -91,7 +135,7 @@ function DashboardPage() {
       completed: 'bg-green-100 text-green-800 border-green-200',
       cancelled: 'bg-red-100 text-red-800 border-red-200',
     }
-    return colors[status] || 'bg-stone-100 text-stone-800 border-stone-200'
+    return colors[normalizeBookingStatus(status)] || 'bg-stone-100 text-stone-800 border-stone-200'
   }
 
   const getPaymentColor = (status) => {
@@ -198,6 +242,7 @@ function DashboardPage() {
                   <th className="px-6 py-3 text-left font-semibold text-stone-700">Package</th>
                   <th className="px-6 py-3 text-left font-semibold text-stone-700">Payment</th>
                   <th className="px-6 py-3 text-left font-semibold text-stone-700">Status</th>
+                  <th className="px-6 py-3 text-left font-semibold text-stone-700">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200">
@@ -219,8 +264,21 @@ function DashboardPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(booking.bookingStatus)}`}>
-                        {booking.bookingStatus}
+                        {getStatusLabel(booking.bookingStatus)}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {['pending', 'confirmed'].includes(normalizeBookingStatus(booking.bookingStatus)) ? (
+                        <button
+                          onClick={() => handleCancelBooking(booking._id)}
+                          disabled={Boolean(cancelLoadingById[booking._id])}
+                          className="px-3 py-1.5 text-xs rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+                        >
+                          {cancelLoadingById[booking._id] ? 'Cancelling...' : 'Cancel'}
+                        </button>
+                      ) : (
+                        <span className="text-xs text-stone-400">-</span>
+                      )}
                     </td>
                   </tr>
                 ))}
