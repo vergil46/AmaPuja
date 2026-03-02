@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import PoojaCard from '../components/PoojaCard'
 import Seo from '../components/Seo'
 import api from '../services/api'
 
 const normalizeTitle = (value) => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+const normalizeLanguageKey = (value) => String(value || '').trim().toLowerCase()
+
+const allowedPriestPreferences = new Set(['Hindi', 'Odia', 'Bengali', 'Kannada'])
+const allowedCities = new Set(['Bangalore', 'Bhubaneswar'])
 
 const defaultPoojas = [
   'Annaprashan Puja',
@@ -273,20 +278,148 @@ const normalizedKannadaAliasCanonicalIndex = Object.entries(kannadaTitleAliases)
   return acc
 }, {})
 
+const bengaliDisplayOrder = [
+  'Bhoomi Puja',
+  'Durga Puja',
+  'Ganesh Puja',
+  'Griho Probesh',
+  'Laxmi Puja',
+  'Onnoprashon (Mukhe Bhaat)',
+  'Saraswati Puja',
+  'Satyanarayan Puja',
+  'Upanayan',
+  'Vivah (Marriage)',
+]
+
+const bengaliTitleAliases = {
+  'Bhoomi Puja': ['Bhoomi Puja'],
+  'Durga Puja': ['Durga Puja'],
+  'Ganesh Puja': ['Ganesh Puja'],
+  'Griho Probesh': ['Griho Probesh', 'Griha Pravesh', 'Griha Pravesh (Gruha Pratistha)'],
+  'Laxmi Puja': ['Laxmi Puja', 'Lakshmi Puja'],
+  'Onnoprashon (Mukhe Bhaat)': ['Onnoprashon (Mukhe Bhaat)', 'Annaprashan Puja'],
+  'Saraswati Puja': ['Saraswati Puja'],
+  'Satyanarayan Puja': ['Satyanarayan Puja'],
+  Upanayan: ['Upanayan', 'Yagnopavit Sanskar (Upanayan Sanskar)', 'Upanayana', 'Yagnopavit Sanskar (Bratabandha)'],
+  'Vivah (Marriage)': ['Vivah (Marriage)', 'Marriage'],
+}
+
+const normalizedBengaliAliasSet = new Set(
+  Object.values(bengaliTitleAliases)
+    .flat()
+    .map(normalizeTitle)
+)
+
+const bengaliDisplayOrderIndex = Object.fromEntries(
+  bengaliDisplayOrder.map((title, index) => [normalizeTitle(title), index])
+)
+
+const normalizedBengaliAliasOrderIndex = Object.entries(bengaliTitleAliases).reduce((acc, [canonicalTitle, aliases]) => {
+  const displayIndex = bengaliDisplayOrderIndex[normalizeTitle(canonicalTitle)]
+  aliases.forEach((aliasTitle, aliasIndex) => {
+    acc[normalizeTitle(aliasTitle)] = {
+      displayIndex,
+      aliasIndex,
+    }
+  })
+  return acc
+}, {})
+
+const normalizedBengaliAliasCanonicalIndex = Object.entries(bengaliTitleAliases).reduce((acc, [canonicalTitle, aliases]) => {
+  const normalizedCanonicalTitle = normalizeTitle(canonicalTitle)
+  aliases.forEach((aliasTitle) => {
+    acc[normalizeTitle(aliasTitle)] = normalizedCanonicalTitle
+  })
+  return acc
+}, {})
+
 function ServicesPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const getInitialPriestPreference = () => {
+    const fromSession = String(sessionStorage.getItem('services_priestPreference') || '').trim()
+    if (allowedPriestPreferences.has(fromSession)) {
+      return fromSession
+    }
+
+    const fromQuery = String(searchParams.get('priest') || '').trim()
+    if (allowedPriestPreferences.has(fromQuery)) {
+      return fromQuery
+    }
+
+    return 'Odia'
+  }
+
+  const getInitialSelectedCity = () => {
+    const fromSession = String(sessionStorage.getItem('services_selectedCity') || '').trim()
+    if (allowedCities.has(fromSession)) {
+      return fromSession
+    }
+
+    const fromQuery = String(searchParams.get('city') || '').trim()
+    if (allowedCities.has(fromQuery)) {
+      return fromQuery
+    }
+
+    return 'Bangalore'
+  }
+
+  const getInitialSearchTerm = () => {
+    const fromSession = String(sessionStorage.getItem('services_searchTerm') || '')
+    if (fromSession) {
+      return fromSession
+    }
+
+    const fromQuery = String(searchParams.get('search') || '')
+    if (fromQuery) {
+      return fromQuery
+    }
+
+    return ''
+  }
+
   const [poojas, setPoojas] = useState([])
-  const [selectedCity, setSelectedCity] = useState('Bangalore')
-  const [priestPreference, setPriestPreference] = useState('Odia')
-  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCity, setSelectedCity] = useState(getInitialSelectedCity)
+  const [priestPreference, setPriestPreference] = useState(getInitialPriestPreference)
+  const [searchTerm, setSearchTerm] = useState(getInitialSearchTerm)
   const [isLoading, setIsLoading] = useState(true)
   const [isUsingFallbackData, setIsUsingFallbackData] = useState(false)
 
-  const selectedLanguageCount = priestLanguagePoojas[priestPreference]?.size
+  const selectedLanguageCount = priestPreference === 'Bengali'
+    ? bengaliDisplayOrder.length
+    : priestLanguagePoojas[priestPreference]?.size
 
   const poojasWithNormalizedTitles = useMemo(
     () => poojas.map((pooja) => ({ ...pooja, normalizedTitle: normalizeTitle(pooja.title) })),
     [poojas]
   )
+
+  useEffect(() => {
+    sessionStorage.setItem('services_selectedCity', selectedCity)
+    sessionStorage.setItem('services_priestPreference', priestPreference)
+    sessionStorage.setItem('services_searchTerm', searchTerm)
+
+    const nextParams = new URLSearchParams()
+
+    if (selectedCity && selectedCity !== 'Bangalore') {
+      nextParams.set('city', selectedCity)
+    }
+
+    if (priestPreference && priestPreference !== 'Odia') {
+      nextParams.set('priest', priestPreference)
+    }
+
+    if (String(searchTerm || '').trim()) {
+      nextParams.set('search', searchTerm)
+    }
+
+    const current = searchParams.toString()
+    const next = nextParams.toString()
+
+    if (current !== next) {
+      setSearchParams(nextParams, { replace: true })
+    }
+  }, [selectedCity, priestPreference, searchTerm, searchParams, setSearchParams])
 
   useEffect(() => {
     const loadPoojas = async () => {
@@ -334,12 +467,69 @@ function ServicesPage() {
       return uniqueKannadaPoojas
     }
 
+    if (priestPreference === 'Bengali') {
+      const matchedBengaliPoojas = poojasWithNormalizedTitles.filter((pooja) =>
+        normalizedBengaliAliasSet.has(pooja.normalizedTitle)
+      )
+
+      const orderedBengaliPoojas = [...matchedBengaliPoojas].sort((first, second) => {
+        const firstMeta = normalizedBengaliAliasOrderIndex[first.normalizedTitle] || {
+          displayIndex: Number.MAX_SAFE_INTEGER,
+          aliasIndex: Number.MAX_SAFE_INTEGER,
+        }
+        const secondMeta = normalizedBengaliAliasOrderIndex[second.normalizedTitle] || {
+          displayIndex: Number.MAX_SAFE_INTEGER,
+          aliasIndex: Number.MAX_SAFE_INTEGER,
+        }
+
+        if (firstMeta.displayIndex !== secondMeta.displayIndex) {
+          return firstMeta.displayIndex - secondMeta.displayIndex
+        }
+
+        return firstMeta.aliasIndex - secondMeta.aliasIndex
+      })
+
+      const uniqueBengaliPoojas = []
+      const seenBengaliCanonicalTitles = new Set()
+
+      orderedBengaliPoojas.forEach((pooja) => {
+        const canonicalTitle = normalizedBengaliAliasCanonicalIndex[pooja.normalizedTitle] || pooja.normalizedTitle
+        if (!seenBengaliCanonicalTitles.has(canonicalTitle)) {
+          seenBengaliCanonicalTitles.add(canonicalTitle)
+          uniqueBengaliPoojas.push(pooja)
+        }
+      })
+
+      return uniqueBengaliPoojas
+    }
+
     const allowedTitles = priestLanguagePoojas[priestPreference]
     if (!allowedTitles) {
       return poojasWithNormalizedTitles
     }
 
-    return poojasWithNormalizedTitles.filter((pooja) => allowedTitles.has(pooja.normalizedTitle))
+    const selectedLanguageKey = normalizeLanguageKey(priestPreference)
+
+    return poojasWithNormalizedTitles.filter((pooja) => {
+      const availableLanguageKeys = Array.isArray(pooja?.availableLanguages)
+        ? pooja.availableLanguages.map(normalizeLanguageKey).filter(Boolean)
+        : []
+
+      const hasLanguageFromAvailability = availableLanguageKeys.includes(selectedLanguageKey)
+      const hasLanguageFromPricing = Boolean(
+        pooja?.pricing &&
+          typeof pooja.pricing === 'object' &&
+          pooja.pricing[selectedLanguageKey] &&
+          Array.isArray(pooja.pricing[selectedLanguageKey].packages) &&
+          pooja.pricing[selectedLanguageKey].packages.length > 0
+      )
+
+      if (hasLanguageFromAvailability || hasLanguageFromPricing) {
+        return true
+      }
+
+      return allowedTitles.has(pooja.normalizedTitle)
+    })
   }, [poojasWithNormalizedTitles, priestPreference])
 
   const filteredPoojas = useMemo(() => {

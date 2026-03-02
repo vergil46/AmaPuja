@@ -271,13 +271,25 @@ function PoojaDetailPage() {
     setBookingMessage('')
     if (isSubmitting) return
 
+    const enquiryTitle =
+      activeLanguagePricing?.title ||
+      pooja?.localizedTitle?.[
+        activeLanguageKey
+      ] ||
+      pooja?.title ||
+      ''
+
+    const isEnquiryOnly =
+      activeLanguageKey === 'bengali' &&
+      /vivah/i.test(String(enquiryTitle || ''))
+
     const requiredFields = [
       form.name,
       form.phone,
       form.email,
       form.city,
-      form.date,
       form.address,
+      ...(isEnquiryOnly ? [] : [form.date]),
     ]
 
     if (requiredFields.some((v) => !String(v || '').trim())) {
@@ -288,6 +300,36 @@ function PoojaDetailPage() {
     setIsSubmitting(true)
 
     try {
+      if (isEnquiryOnly) {
+        const enquiryLines = [
+          `Priest Preference: ${form.priestPreference}`,
+          `City: ${form.city}`,
+          form.date
+            ? `Preferred Date: ${form.date}`
+            : '',
+          form.time
+            ? `Preferred Time: ${form.time}`
+            : '',
+          `Address: ${form.address}`,
+          form.specialNotes
+            ? `Requirements: ${form.specialNotes}`
+            : '',
+        ].filter(Boolean)
+
+        await api.post('/enquiries', {
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          service: enquiryTitle,
+          message: enquiryLines.join('\n'),
+        })
+
+        setBookingMessage(
+          'Enquiry sent successfully. Our team will contact you with quotation details.'
+        )
+        return
+      }
+
       const bookingRes = await api.post('/bookings', {
         poojaId: id,
         package: selectedPackage,
@@ -385,6 +427,10 @@ function PoojaDetailPage() {
   const packageNote =
     selectedPackageData?.note || ''
 
+  const isBengaliVivahEnquiryOnly =
+    activeLanguageKey === 'bengali' &&
+    /vivah/i.test(String(displayTitle || ''))
+
   const fieldClass =
     'w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm text-stone-800 shadow-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100'
 
@@ -415,41 +461,56 @@ function PoojaDetailPage() {
 
           <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-4 sm:p-5 shadow-sm">
             <div className="text-lg font-semibold mb-3 text-stone-900">
-              Select Package
+              {isBengaliVivahEnquiryOnly
+                ? 'Custom Quotation'
+                : 'Select Package'}
             </div>
 
-            {activePackages.map((pkg) => (
-              <label
-                key={pkg.name}
-                className={`block border p-3.5 rounded-xl mb-3 cursor-pointer transition ${
-                  selectedPackage === pkg.name
-                    ? 'border-orange-400 bg-orange-50 ring-2 ring-orange-100'
-                    : 'border-stone-300 bg-white hover:border-orange-300'
-                }`}
-              >
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2.5">
-                    <input
-                      type="radio"
-                      name="package"
-                      className="h-4 w-4 accent-orange-600"
-                      checked={selectedPackage === pkg.name}
-                      onChange={() =>
-                        setSelectedPackage(pkg.name)
-                      }
-                    />
-                    <span className="font-medium text-stone-900">
-                      {pkg.name}
+            {!isBengaliVivahEnquiryOnly &&
+              activePackages.map((pkg) => (
+                <label
+                  key={pkg.name}
+                  className={`block border p-3.5 rounded-xl mb-3 cursor-pointer transition ${
+                    selectedPackage === pkg.name
+                      ? 'border-orange-400 bg-orange-50 ring-2 ring-orange-100'
+                      : 'border-stone-300 bg-white hover:border-orange-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2.5">
+                      <input
+                        type="radio"
+                        name="package"
+                        className="h-4 w-4 accent-orange-600"
+                        checked={selectedPackage === pkg.name}
+                        onChange={() =>
+                          setSelectedPackage(pkg.name)
+                        }
+                      />
+                      <span className="font-medium text-stone-900">
+                        {pkg.name}
+                      </span>
+                    </div>
+                    <span className="font-semibold text-stone-900">
+                      ₹{pkg.price}
                     </span>
                   </div>
-                  <span className="font-semibold text-stone-900">
-                    ₹{pkg.price}
-                  </span>
-                </div>
-              </label>
-            ))}
+                </label>
+              ))}
 
-            {availableAddOns.length > 0 && (
+            {isBengaliVivahEnquiryOnly && (
+              <div className="rounded-xl border border-red-200 bg-linear-to-br from-red-50 to-orange-50 p-4 text-sm text-stone-700 shadow-sm">
+                <p className="font-semibold text-stone-900">
+                  This service is available on custom quotation.
+                </p>
+                <p className="mt-2 leading-relaxed">
+                  Share your requirements and our team will contact you with package details, pandit availability, and final quote.
+                </p>
+              </div>
+            )}
+
+            {!isBengaliVivahEnquiryOnly &&
+              availableAddOns.length > 0 && (
               <div className="mt-4">
                 <div className="font-semibold text-stone-900">
                   Add-ons
@@ -512,7 +573,8 @@ function PoojaDetailPage() {
               </div>
             )}
 
-            {selectedPackageData && (
+            {!isBengaliVivahEnquiryOnly &&
+              selectedPackageData && (
               <div className="mt-5 p-4 border border-stone-200 rounded-xl bg-stone-50">
                 <div className="text-sm text-stone-700 space-y-2.5">
                   {selectedPackageData.pandits && (
@@ -570,42 +632,52 @@ function PoojaDetailPage() {
               </div>
             )}
 
-            <div className="mt-4 font-semibold text-green-700">
-              Total Amount (Price + Add-ons): ₹{packagePrice}
-            </div>
+            {!isBengaliVivahEnquiryOnly && (
+              <div className="mt-4 font-semibold text-green-700">
+                Total Amount (Price + Add-ons): ₹{packagePrice}
+              </div>
+            )}
           </div>
         </div>
 
         <div className="rounded-3xl border border-stone-300 bg-stone-100/95 p-4 sm:p-5 shadow-md lg:sticky lg:top-24">
           <h2 className="text-2xl font-semibold uppercase tracking-wide text-stone-900">
-            Book Now
+            {isBengaliVivahEnquiryOnly
+              ? 'Send Enquiry'
+              : 'Book Now'}
           </h2>
 
           <p className="mt-1 text-sm text-stone-600">
-            Secure your pooja booking in just a few steps
+            {isBengaliVivahEnquiryOnly
+              ? 'Share your event details and get a personalized quote from our team.'
+              : 'Secure your pooja booking in just a few steps'}
           </p>
 
-          <div className="mt-3 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700">
-            Payable Now ({payableLabel}): ₹{payableAmount}
-          </div>
+          {!isBengaliVivahEnquiryOnly && (
+            <div className="mt-3 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700">
+              Payable Now ({payableLabel}): ₹{payableAmount}
+            </div>
+          )}
 
-          <div className="mt-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-xs text-stone-700">
-            <div className="flex items-center justify-between">
-              <span>Package</span>
-              <span>₹{basePackagePrice}</span>
+          {!isBengaliVivahEnquiryOnly && (
+            <div className="mt-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-xs text-stone-700">
+              <div className="flex items-center justify-between">
+                <span>Package</span>
+                <span>₹{basePackagePrice}</span>
+              </div>
+              <div className="mt-1 flex items-center justify-between">
+                <span>Add-ons</span>
+                <span>₹{addOnTotal}</span>
+              </div>
+              <div className="mt-1 flex items-center justify-between font-semibold text-stone-900">
+                <span>Final Amount</span>
+                <span>₹{packagePrice}</span>
+              </div>
+              <div className="mt-1 text-[11px] text-stone-600">
+                Total Amount = Package Price + Add-ons
+              </div>
             </div>
-            <div className="mt-1 flex items-center justify-between">
-              <span>Add-ons</span>
-              <span>₹{addOnTotal}</span>
-            </div>
-            <div className="mt-1 flex items-center justify-between font-semibold text-stone-900">
-              <span>Final Amount</span>
-              <span>₹{packagePrice}</span>
-            </div>
-            <div className="mt-1 text-[11px] text-stone-600">
-              Total Amount = Package Price + Add-ons
-            </div>
-          </div>
+          )}
 
           <form
             onSubmit={handleBook}
@@ -729,26 +801,49 @@ function PoojaDetailPage() {
               }
             />
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <select
-                className={fieldClass}
-                value={form.paymentOption}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    paymentOption: e.target.value,
-                  })
-                }
-              >
-                <option value="full">Full Payment</option>
-                <option value="advance">Advance (30%)</option>
-                <option value="pay-after-pooja">Pay After Pooja</option>
-              </select>
+            <textarea
+              className={fieldClass}
+              rows={3}
+              placeholder="Special requirements (optional)"
+              value={form.specialNotes}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  specialNotes: e.target.value,
+                })
+              }
+            />
 
-              <button className="w-full rounded-xl bg-stone-900 py-2.5 text-sm font-semibold uppercase tracking-wide text-white transition hover:bg-stone-800 disabled:opacity-60 disabled:cursor-not-allowed">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {!isBengaliVivahEnquiryOnly && (
+                <select
+                  className={fieldClass}
+                  value={form.paymentOption}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      paymentOption: e.target.value,
+                    })
+                  }
+                >
+                  <option value="full">Full Payment</option>
+                  <option value="advance">Advance (30%)</option>
+                  <option value="pay-after-pooja">Pay After Pooja</option>
+                </select>
+              )}
+
+              <button className={`w-full rounded-xl py-2.5 text-sm font-semibold uppercase tracking-wide text-white transition disabled:opacity-60 disabled:cursor-not-allowed ${
+                isBengaliVivahEnquiryOnly
+                  ? 'bg-red-600 hover:bg-red-700 sm:col-span-2'
+                  : 'bg-stone-900 hover:bg-stone-800 sm:col-span-1'
+              }`}>
                 {isSubmitting
-                  ? 'Booking...'
-                  : 'Book Now'}
+                  ? isBengaliVivahEnquiryOnly
+                    ? 'Sending Enquiry...'
+                    : 'Booking...'
+                  : isBengaliVivahEnquiryOnly
+                    ? 'Send Enquiry & Get Quote'
+                    : 'Book Now'}
               </button>
             </div>
           </form>

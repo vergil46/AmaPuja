@@ -2,13 +2,14 @@ module.exports = [
   {
     "key": "annaprashan_puja",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "bengali"
     ],
     "title": {
       "odia": "",
       "hindi": "Annaprashan Puja",
       "kannada": "",
-      "bengali": ""
+      "bengali": "Onnoprashon (Mukhe Bhaat)"
     },
     "description": {
       "odia": {
@@ -24,8 +25,8 @@ module.exports = [
         "full": ""
       },
       "bengali": {
-        "short": "",
-        "full": ""
+        "short": "Onnoprashon is the sacred ceremony where a baby is introduced to solid foods, preferably sweet/milk rice, for the first time.",
+        "full": "Onnoprashon is the sacred ceremony where a baby is introduced to solid foods, preferably sweet/milk rice, for the first time. This ritual is performed to bless the child with good health, prosperity, and a happy life."
       }
     },
     "pricing": {
@@ -71,7 +72,38 @@ module.exports = [
         "addOns": []
       },
       "bengali": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4500,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Samagri",
+            "procedure": [
+              "Ganesh Puja",
+              "Sankalpam",
+              "Kalash Puja",
+              "Onnoprashon Puja",
+              "Feeding Rice Ceremony",
+              "Aarti",
+              "Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Materials"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              },
+              {
+                "name": "Havan",
+                "price": 1000
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, etc., will be brought by us.\n\nThe Yajaman (parents/host) must arrange household items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Sweet/Milk Rice, Prasad, and Photos. A detailed preparation checklist will be shared after booking confirmation."
+          }
+        ],
         "addOns": []
       }
     }
@@ -256,8 +288,8 @@ module.exports = [
         "full": ""
       },
       "bengali": {
-        "short": "Griho Probesh puja with Bengali pandits",
-        "full": "Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily."
+        "short": "Perform Griho Probesh Puja before entering your new or renovated home with complete Vedic rituals.",
+        "full": "Perform Griho Probesh Puja before entering your new or renovated home. Our Bengali Pandits follow complete Vedic rituals with all puja samagri. Book now for peace, prosperity, and divine blessings in your new house."
       }
     },
     "pricing": {
@@ -428,84 +460,69 @@ module.exports = [
         "packages": [
           {
             "name": "Economy",
-            "price": 7800,
+            "price": 8500,
             "includesSamagri": true,
             "pandits": "1 Panditji + All Puja Samagries",
-            "description": "Basic Griho Probesh Puja goes on for 1:30-2 hours. Recommended for those looking for simple, short puja or puja for rented home.",
+            "description": "Griha Pravesh with Satyanarayan Katha. Duration: Approx. 2 – 2.5 Hours.",
             "procedure": [
-              "Ghata Sthapana",
-              "Dwarapal Puja",
-              "Surya Puja",
-              "Panchagavya Sinchana",
-              "Ganapati Ghata Puja",
-              "Navagraha Mandal Puja",
-              "Durga Madhava Puja",
-              "Naryana Lakshmivardhani Ghata Puja",
-              "Vrindavati Puja",
-              "Vastu Puja",
+              "Dwar Puja",
               "Havan",
               "Griho Probesh",
-              "Aarti and Pushpanjali"
+              "Boiling Milk in New Vessel",
+              "Ganesh Adi Panchadevata Puja",
+              "Narayan Puja",
+              "Vastu Puja",
+              "Satyanarayan Katha",
+              "Aarti",
+              "Poornahuti",
+              "Pushpanjali",
+              "Shantijal"
             ],
             "inclusions": [
               "Dakshina",
-              "All Puja Samagries"
+              "All Puja Samagri"
             ],
-            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji dan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will receive a detailed to-do list after booking.",
+            "note": "All puja samagri such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalasha, Vastra, Betel Leaves, Betel Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee, etc., will be brought by us.\n\nThe Yajaman must arrange items such as Gas Stove, Shinni Prasad, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos.",
             "addOns": [
               {
                 "name": "Flowers & Fruits",
-                "price": 1500
-              },
-              {
-                "name": "Satyanarayan Katha",
-                "price": 1500
+                "price": 1700
               }
             ]
           },
           {
             "name": "Standard",
-            "price": 11000,
+            "price": 12500,
             "includesSamagri": true,
-            "pandits": "2 Panditjis + All Puja Samagries",
-            "description": "In Standard Griho Probesh Puja, 1 main panditji and 1 assistant panditji perform additional pujas and more mandals. Total puja goes on for 2:30-3:00 hours.",
+            "pandits": "1 Panditji + All Puja Samagri",
+            "description": "Griha Pravesh with Chandi Path & Katha. Duration: Approx. 3 – 3.5 Hours.",
             "procedure": [
-              "Ghata Sthapana",
-              "Dwarapal Puja",
-              "Guru Puja",
-              "Surya Puja",
-              "Matru Pitru Puja",
-              "Purohit Varan",
-              "Saptadhanya Abhimantrita",
-              "Panchagavya Sinchana",
-              "Ganapati Ghata Puja",
-              "Brahma Mandal Puja",
-              "Savitri Puja",
-              "Navagraha Mandal Puja",
-              "Dashadikpal Mandal Puja",
-              "Astadasha Matrika Puja",
-              "Durga Madhava Puja",
-              "Naryana Lakshmivardhani Ghata Puja",
-              "Vrindavati Puja",
-              "Vastu Mandal Puja",
-              "Vishwakarma Puja",
+              "Dwar Puja",
+              "Griha Pravesh",
+              "Boiling Milk in New Vessel",
+              "Vasudhara",
+              "Ganesh Adi Panchadevata Puja",
+              "Narayan Puja",
+              "Chandi Puja",
+              "Chandi Path",
+              "Vastu Puja",
+              "Satyanarayan Katha",
+              "Aarti",
               "Havan",
-              "Griho Probesh",
-              "Aarti and Pushpanjali"
+              "Poornahuti",
+              "Pushpanjali",
+              "Charanamrit Daan",
+              "Shantijal"
             ],
             "inclusions": [
               "Dakshina",
-              "All Puja Samagries"
+              "All Puja Samagri"
             ],
-            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji daan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will receive a detailed to-do list after booking.",
+            "note": "All puja samagri such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalasha, Vastra, Betel Leaves, Betel Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee, etc., will be brought by us.\n\nThe Yajaman must arrange items such as Gas Stove, Shinni Prasad, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos.",
             "addOns": [
               {
                 "name": "Flowers & Fruits",
                 "price": 2000
-              },
-              {
-                "name": "Satyanarayan Katha",
-                "price": 1500
               }
             ]
           }
@@ -596,13 +613,14 @@ module.exports = [
   {
     "key": "lakshmi_puja",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "bengali"
     ],
     "title": {
       "odia": "",
       "hindi": "Lakshmi Puja",
       "kannada": "",
-      "bengali": ""
+      "bengali": "Laxmi Puja"
     },
     "description": {
       "odia": {
@@ -618,8 +636,8 @@ module.exports = [
         "full": ""
       },
       "bengali": {
-        "short": "",
-        "full": ""
+        "short": "Laxmi Puja is performed to gain wealth and financial stability through the blessings of Goddess Laxmi.",
+        "full": "Laxmi Puja is performed to gain wealth, preserve existing wealth, and achieve financial stability by seeking the blessings of Goddess Laxmi, the Goddess of wealth and prosperity."
       }
     },
     "pricing": {
@@ -667,7 +685,33 @@ module.exports = [
         "addOns": []
       },
       "bengali": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 5800,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Samagri",
+            "procedure": [
+              "Swasti Vachanam",
+              "Maha Sankalp",
+              "Ganapathi Puja",
+              "Punyaha Vachanam",
+              "Mahalaxmi Puja",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1500
+              }
+            ],
+            "note": "All puja samagri such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, etc., will be brought by us.\n\nThe Yajaman (host) must arrange household items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, and Photos. A detailed preparation checklist will be shared after booking confirmation."
+          }
+        ],
         "addOns": []
       }
     }
@@ -890,13 +934,14 @@ module.exports = [
   {
     "key": "saraswati_puja",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "bengali"
     ],
     "title": {
       "odia": "",
       "hindi": "Saraswati Puja",
       "kannada": "",
-      "bengali": ""
+      "bengali": "Saraswati Puja"
     },
     "description": {
       "odia": {
@@ -912,8 +957,8 @@ module.exports = [
         "full": ""
       },
       "bengali": {
-        "short": "",
-        "full": ""
+        "short": "Mata Saraswati is the deity of intelligence, wisdom, arts, music, and memory power.",
+        "full": "Mata Saraswati is the deity of intelligence, wisdom, arts, music, memory power, and soft skills. Performing Saraswati Puja relieves mental pressure and improves concentration, focus, memory power, and the ability to understand complex subjects."
       }
     },
     "pricing": {
@@ -988,7 +1033,37 @@ module.exports = [
         "addOns": []
       },
       "bengali": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4800,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Materials",
+            "procedure": [
+              "Swasti Vachanam",
+              "Maha Sankalp",
+              "Ganapathi Puja",
+              "Punyaha Vachanam",
+              "Saraswati Puja",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              },
+              {
+                "name": "Havan",
+                "price": 1000
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, etc., will be brought by us.\n\nThe Yajaman (host) must arrange household items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, and Photos. A detailed preparation checklist will be shared after booking confirmation."
+          }
+        ],
         "addOns": []
       }
     }
@@ -996,13 +1071,14 @@ module.exports = [
   {
     "key": "satyanarayan_puja",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "bengali"
     ],
     "title": {
       "odia": "",
       "hindi": "Satyanarayan Puja",
       "kannada": "",
-      "bengali": ""
+      "bengali": "Satyanarayan Puja"
     },
     "description": {
       "odia": {
@@ -1018,8 +1094,8 @@ module.exports = [
         "full": ""
       },
       "bengali": {
-        "short": "",
-        "full": ""
+        "short": "Satyanarayan Puja is performed to remove obstacles and bring success, prosperity, and harmony into life.",
+        "full": "Satyanarayan Puja is performed to remove obstacles and negative energies and to bring success, prosperity, and harmony into life. This sacred ritual invokes the blessings of Lord Vishnu in the form of Lord Satyanarayan for wealth, peace, and overall well-being of the family."
       }
     },
     "pricing": {
@@ -1115,7 +1191,37 @@ module.exports = [
         "addOns": []
       },
       "bengali": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4500,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + Puja Samagri",
+            "procedure": [
+              "Achaman",
+              "Vishnu Smaran",
+              "Asan, Jal & Pushpa Shuddhi",
+              "Swasti Vachan & Sankalp",
+              "Kalash Puja",
+              "Ganapathi Adi Panchadevata Puja",
+              "Navagraha Puja",
+              "Satyanarayan Puja",
+              "Katha & Havan",
+              "Aarti & Pushpanjali"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1200
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee, etc., will be brought by us.\n\nThe Yajaman (host) must arrange household items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos, and Bhojya Daan items (Raw Rice, Dal, Vegetables, etc.). A detailed preparation checklist will be shared after booking confirmation."
+          }
+        ],
         "addOns": []
       }
     }
@@ -1200,13 +1306,14 @@ module.exports = [
   {
     "key": "bhoomi_puja",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "bengali"
     ],
     "title": {
       "odia": "",
       "hindi": "Bhoomi Puja",
       "kannada": "",
-      "bengali": ""
+      "bengali": "Bhoomi Puja"
     },
     "description": {
       "odia": {
@@ -1222,8 +1329,8 @@ module.exports = [
         "full": ""
       },
       "bengali": {
-        "short": "",
-        "full": ""
+        "short": "Bhoomi Puja is performed to remove negative influences or Vastu dosh in plot or land.",
+        "full": "Bhoomi Puja is performed for Goddess Bhoomi, Vaastu Purush, the deity of directions, and the five elements of nature to remove negative influences or Vastu dosh in the plot or land."
       }
     },
     "pricing": {
@@ -1270,7 +1377,36 @@ module.exports = [
         "addOns": []
       },
       "bengali": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4500,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Samagri",
+            "procedure": [
+              "Swasti Vachanam",
+              "Maha Sankalp",
+              "Ganapathi Puja",
+              "Punyaha Vachanam",
+              "Bhoomi Pujan",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              },
+              {
+                "name": "Havan",
+                "price": 1000
+              }
+            ]
+          }
+        ],
         "addOns": []
       }
     }
@@ -1389,13 +1525,14 @@ module.exports = [
   {
     "key": "durga_puja",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "bengali"
     ],
     "title": {
       "odia": "",
       "hindi": "Durga Puja",
       "kannada": "",
-      "bengali": ""
+      "bengali": "Durga Puja"
     },
     "description": {
       "odia": {
@@ -1411,8 +1548,8 @@ module.exports = [
         "full": ""
       },
       "bengali": {
-        "short": "",
-        "full": ""
+        "short": "Durga Mata protects from troubles and sufferings and blesses life with happiness and positivity.",
+        "full": "Durga Mata is a very powerful deity. Performing this Puja protects people from all troubles and sufferings. A person will be blessed with happiness and positivity in life. This is a 5-day Durga Puja (from Shashti to Dashami) performed by our experienced team from West Bengal."
       }
     },
     "pricing": {
@@ -1463,7 +1600,21 @@ module.exports = [
         "addOns": []
       },
       "bengali": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Economy",
+            "price": 45000,
+            "includesSamagri": false,
+            "pandits": "2 Panditjis Dakshina + Travelling Charges",
+            "description": "Our team from West Bengal will travel to your location and conduct the complete 5-day Durga Puja.",
+            "procedure": [],
+            "inclusions": [
+              "Dakshina",
+              "Travelling Charges"
+            ],
+            "note": "You must arrange accommodation for the Pandits and food during their stay. A complete Puja Samagri list will be shared with you in advance so you can keep everything ready."
+          }
+        ],
         "addOns": []
       }
     }
@@ -1764,13 +1915,14 @@ module.exports = [
   {
     "key": "ganesh_puja",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "bengali"
     ],
     "title": {
       "odia": "",
       "hindi": "Ganesh Puja",
       "kannada": "",
-      "bengali": ""
+      "bengali": "Ganesh Puja"
     },
     "description": {
       "odia": {
@@ -1786,8 +1938,8 @@ module.exports = [
         "full": ""
       },
       "bengali": {
-        "short": "",
-        "full": ""
+        "short": "Ganesh Puja removes obstacles and negative energies and blesses one with success and harmony.",
+        "full": "Ganesh Puja is performed for Lord Ganapathi who removes all obstacles and negative energies. This puja blesses one with victory, brings harmony in the family, and helps one succeed in life."
       }
     },
     "pricing": {
@@ -1835,7 +1987,38 @@ module.exports = [
         "addOns": []
       },
       "bengali": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 5800,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + Puja Samagri",
+            "description": "1 Panditji will come and perform the Ganesh Puja. Duration: Approx. 1 hour. If Havan is added, an additional 30 minutes will be required.",
+            "procedure": [
+              "Kalash Sthapana",
+              "Ganesh Adi Panchdevata Puja",
+              "Ganesh Puja",
+              "Aarti",
+              "Pushpanjali",
+              "Shantijal"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              },
+              {
+                "name": "Havan",
+                "price": 1000
+              }
+            ],
+            "note": "All puja samagri such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Ghee, etc., will be brought by us.\n\nThe Yajaman must arrange household items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, and Photos. A detailed to-do list will be shared after booking."
+          }
+        ],
         "addOns": []
       }
     }
@@ -3603,13 +3786,14 @@ module.exports = [
   {
     "key": "vivah_marriage",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "bengali"
     ],
     "title": {
       "odia": "",
       "hindi": "Vivah (Marriage)",
       "kannada": "",
-      "bengali": ""
+      "bengali": "Vivah (Marriage)"
     },
     "description": {
       "odia": {
@@ -3625,8 +3809,8 @@ module.exports = [
         "full": ""
       },
       "bengali": {
-        "short": "",
-        "full": ""
+        "short": "Marriage Puja is one of the most sacred and important events in life and is performed according to Vedic traditions.",
+        "full": "Marriage Puja or Wedding Ceremony is one of the most sacred and important events in life. Performing Vivah as per Vedic traditions invokes blessings for a prosperous and harmonious married life."
       }
     },
     "pricing": {
@@ -3728,13 +3912,14 @@ module.exports = [
   {
     "key": "yagnopavit_sanskar_upanayan_sanskar",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "bengali"
     ],
     "title": {
       "odia": "",
       "hindi": "Yagnopavit Sanskar (Upanayan Sanskar)",
       "kannada": "",
-      "bengali": ""
+      "bengali": "Upanayan (Yagnopavit Sanskar)"
     },
     "description": {
       "odia": {
@@ -3750,8 +3935,8 @@ module.exports = [
         "full": ""
       },
       "bengali": {
-        "short": "",
-        "full": ""
+        "short": "Upanayan Sanskar marks spiritual rebirth, discipline, and the beginning of formal Vedic learning.",
+        "full": "Yagnopavit Sanskar, also known as Upanayan Sanskar, is performed when a boy traditionally reaches the age of 8. This sacred ceremony marks the beginning of formal spiritual education and makes the child eligible to receive instruction in the Vedas. It symbolizes spiritual rebirth, discipline, responsibility, and a life guided by knowledge and dharma."
       }
     },
     "pricing": {
@@ -3823,7 +4008,58 @@ module.exports = [
         "addOns": []
       },
       "bengali": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 8800,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Samagri",
+            "procedure": [
+              "Gauri Ganesh Puja",
+              "Kalash Navagraha Puja",
+              "Yagnopavit Dharan (Sacred Thread Wearing)",
+              "Gayatri Mantra Upadesh",
+              "Bhikshatan",
+              "Havan",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1500
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, Havan Sticks, Samidha, Havan Kund, etc., will be brought by us.\n\nThe Yajaman must arrange items such as Dhoti for the boy, Bhiksha Patra (alms bowl), Food items, Daan items, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Milk, Curd, and Photos. A detailed preparation checklist will be shared after booking confirmation."
+          },
+          {
+            "name": "Premium",
+            "price": 18800,
+            "includesSamagri": true,
+            "pandits": "3 Panditji + All Puja Samagri",
+            "procedure": [
+              "Gauri Ganesh Puja",
+              "Kalash Navagraha Puja",
+              "Yagnopavit Dharan",
+              "Bhiksha Karyakram",
+              "Aarti & Prasad Distribution"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagri"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 2000
+              }
+            ],
+            "note": "All puja materials such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, Havan Sticks, Samidha, Havan Kund, etc., will be brought by us.\n\nThe Yajaman must arrange items such as Dhoti for the boy, Bhiksha Patra (alms bowl), Food items, Daan items, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Milk, Curd, and Photos. A detailed preparation checklist will be shared after booking confirmation."
+          }
+        ],
         "addOns": []
       }
     }

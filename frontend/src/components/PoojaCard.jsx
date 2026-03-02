@@ -4,6 +4,9 @@ import { getPoojaImage } from '../assets/poojaImageMap'
 function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
   const customImage = getPoojaImage(pooja.title, pooja.image)
   const queryParams = new URLSearchParams()
+  const isBengaliVivahCard =
+    String(selectedLanguage || '').toLowerCase() === 'bengali' &&
+    /vivah/i.test(String(pooja?.title || ''))
 
   if (selectedCity) {
     queryParams.set('city', selectedCity)
@@ -33,7 +36,9 @@ function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
       <div className="p-4 flex flex-col flex-1">
         <h3 className="font-semibold text-base sm:text-lg leading-snug text-stone-900 line-clamp-2">{pooja.title}</h3>
         <p className="mt-2 text-sm leading-relaxed text-stone-600 line-clamp-2">{pooja.description}</p>
-        <p className="mt-3 text-sm sm:text-base text-orange-700 font-semibold">Starting ₹{pooja.startPrice}</p>
+        {!isBengaliVivahCard && (
+          <p className="mt-3 text-sm sm:text-base text-orange-700 font-semibold">Starting ₹{pooja.startPrice}</p>
+        )}
         <Link
           to={`/services/${pooja._id}${cityQuery}`}
           className="inline-block mt-auto pt-4"
