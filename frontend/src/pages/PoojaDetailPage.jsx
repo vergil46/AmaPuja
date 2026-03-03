@@ -1,9 +1,21 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { getPoojaImage } from '../assets/poojaImageMap'
 import Seo from '../components/Seo'
 import api from '../services/api'
 import { PoojaDetailSkeleton } from '../components/LoadingSkeleton'
+
+const FUNNEL_SESSION_KEY = 'pujasamrddhi_funnel_session'
+
+const getFunnelSessionId = () => {
+  if (typeof window === 'undefined') return ''
+  const existing = localStorage.getItem(FUNNEL_SESSION_KEY)
+  if (existing) return existing
+
+  const generated = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
+  localStorage.setItem(FUNNEL_SESSION_KEY, generated)
+  return generated
+}
 
 function PoojaDetailPage() {
   const { id } = useParams()
@@ -34,6 +46,31 @@ function PoojaDetailPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isFetchingLocation, setIsFetchingLocation] = useState(false)
   const [locationMessage, setLocationMessage] = useState('')
+  const bookingPanelRef = useRef(null)
+  const formStartedRef = useRef(false)
+
+  const draftStorageKey = `pooja-booking-draft-${id || 'default'}`
+
+  const trackFunnelEvent = useCallback(async (eventName, metadata = {}) => {
+    try {
+      await api.post('/analytics/track', {
+        eventName,
+        sessionId: getFunnelSessionId(),
+        route: typeof window !== 'undefined' ? window.location.pathname : '',
+        poojaId: id,
+        metadata,
+      })
+    } catch (error) {
+      console.warn('Funnel tracking failed:', error?.message || error)
+    }
+  }, [id])
+
+  const scrollToBookingForm = () => {
+    bookingPanelRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
 
   const normalizeName = (value) =>
     String(value || '')
@@ -268,6 +305,48 @@ function PoojaDetailPage() {
     })
   }, [id])
 
+  useEffect(() => {
+    if (!id) return
+    trackFunnelEvent('service_view', { source: 'pooja_detail' })
+  }, [id, trackFunnelEvent])
+
+  useEffect(() => {
+    if (!id || typeof window === 'undefined') return
+    const raw = localStorage.getItem(draftStorageKey)
+    if (!raw) return
+
+    try {
+      const parsed = JSON.parse(raw)
+      if (!parsed || typeof parsed !== 'object') return
+
+      setForm((previous) => ({
+        ...previous,
+        ...Object.fromEntries(
+          Object.entries(parsed).filter(([, value]) => typeof value === 'string')
+        ),
+      }))
+
+      if (Array.isArray(parsed.selectedAddOns)) {
+        setSelectedAddOns(parsed.selectedAddOns.filter(Boolean))
+      }
+      if (typeof parsed.selectedPackage === 'string' && parsed.selectedPackage.trim()) {
+        setSelectedPackage(parsed.selectedPackage.trim())
+      }
+    } catch (error) {
+      console.warn('Failed to load booking draft:', error)
+    }
+  }, [id, draftStorageKey])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !id) return
+    const draftPayload = {
+      ...form,
+      selectedPackage,
+      selectedAddOns,
+    }
+    localStorage.setItem(draftStorageKey, JSON.stringify(draftPayload))
+  }, [form, selectedPackage, selectedAddOns, draftStorageKey, id])
+
   const activeLanguageKey = useMemo(
     () =>
       String(form.priestPreference || '')
@@ -452,6 +531,36 @@ function PoojaDetailPage() {
     packagePrice - basePackagePrice
   )
 
+  const normalizedPhone = String(form.phone || '').replace(/\D/g, '')
+  const hasValidPhone = normalizedPhone.length >= 10
+  const hasValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(form.email || '').trim())
+  const enquiryFlowTitle =
+    activeLanguagePricing?.title ||
+    pooja?.localizedTitle?.[
+      activeLanguageKey
+    ] ||
+    pooja?.title ||
+    ''
+  const isBengaliVivahEnquiryOnly =
+    activeLanguageKey === 'bengali' &&
+    /vivah/i.test(String(enquiryFlowTitle || ''))
+
+  const quickValidationMessage = useMemo(() => {
+    if (form.phone && !hasValidPhone) return 'Enter a valid 10-digit phone number.'
+    if (form.email && !hasValidEmail) return 'Enter a valid email address.'
+    if (!isBengaliVivahEnquiryOnly && form.date) {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const selected = new Date(form.date)
+      if (!Number.isNaN(selected.getTime()) && selected < today) {
+        return 'Please choose today or a future date.'
+      }
+    }
+    return ''
+  }, [form.phone, form.email, form.date, hasValidPhone, hasValidEmail, isBengaliVivahEnquiryOnly])
+
+  const isPrimaryFormValid = hasValidPhone && hasValidEmail && !quickValidationMessage
+
   const loadRazorpayScript = () =>
     new Promise((resolve) => {
       const script = document.createElement('script')
@@ -465,6 +574,11 @@ function PoojaDetailPage() {
     event.preventDefault()
     setBookingMessage('')
     if (isSubmitting) return
+
+    if (!isPrimaryFormValid) {
+      setBookingMessage(quickValidationMessage || 'Please correct highlighted fields before continuing.')
+      return
+    }
 
     const enquiryTitle =
       activeLanguagePricing?.title ||
@@ -496,6 +610,7 @@ function PoojaDetailPage() {
 
     try {
       if (isEnquiryOnly) {
+        trackFunnelEvent('booking_submitted', { flow: 'enquiry_only' })
         const enquiryLines = [
           `Priest Preference: ${form.priestPreference}`,
           `City: ${form.city}`,
@@ -550,9 +665,18 @@ function PoojaDetailPage() {
       })
 
       const booking = bookingRes.data
+      trackFunnelEvent('booking_submitted', {
+        flow: form.paymentOption,
+        selectedPackage,
+        payableAmount,
+      })
 
       if (form.paymentOption === 'pay-after-pooja') {
         setBookingMessage('Booking placed successfully.')
+        trackFunnelEvent('payment_success', { flow: 'pay-after-pooja' })
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(draftStorageKey)
+        }
         return
       }
 
@@ -584,6 +708,10 @@ function PoojaDetailPage() {
           setBookingMessage(
             'Booking and payment completed successfully.'
           )
+          trackFunnelEvent('payment_success', { flow: form.paymentOption })
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(draftStorageKey)
+          }
         },
         prefill: {
           name: form.name,
@@ -620,11 +748,7 @@ function PoojaDetailPage() {
     ''
 
   const displayTitle =
-    activeLanguagePricing?.title ||
-    pooja?.localizedTitle?.[
-      activeLanguageKey
-    ] ||
-    pooja?.title
+    enquiryFlowTitle || pooja?.title
 
   const displayDescription =
     localizedDescription ||
@@ -638,10 +762,6 @@ function PoojaDetailPage() {
     []
   const packageNote =
     selectedPackageData?.note || ''
-
-  const isBengaliVivahEnquiryOnly =
-    activeLanguageKey === 'bengali' &&
-    /vivah/i.test(String(displayTitle || ''))
 
   const fieldClass =
     'w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm text-stone-800 shadow-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100'
@@ -659,6 +779,9 @@ function PoojaDetailPage() {
             <img
               src={displayImage}
               alt={displayTitle}
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
               className="w-full h-64 sm:h-80 object-cover"
             />
           </div>
@@ -852,7 +975,7 @@ function PoojaDetailPage() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-stone-300 bg-stone-100/95 p-4 sm:p-5 shadow-md lg:sticky lg:top-24">
+        <div ref={bookingPanelRef} className="rounded-3xl border border-stone-300 bg-stone-100/95 p-4 sm:p-5 shadow-md lg:sticky lg:top-24">
           <h2 className="text-2xl font-semibold uppercase tracking-wide text-stone-900">
             {isBengaliVivahEnquiryOnly
               ? 'Send Enquiry'
@@ -864,6 +987,10 @@ function PoojaDetailPage() {
               ? 'Share your event details and get a personalized quote from our team.'
               : 'Secure your pooja booking in just a few steps'}
           </p>
+
+          <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs sm:text-sm text-emerald-800">
+            Verified Priests • 1000+ Rituals Completed • Secure Payment
+          </div>
 
           {!isBengaliVivahEnquiryOnly && (
             <div className="mt-3 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700">
@@ -894,6 +1021,12 @@ function PoojaDetailPage() {
           <form
             onSubmit={handleBook}
             className="mt-3 space-y-3"
+            onFocus={() => {
+              if (!formStartedRef.current) {
+                formStartedRef.current = true
+                trackFunnelEvent('form_started', { source: 'booking_form' })
+              }
+            }}
           >
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <input
@@ -922,6 +1055,10 @@ function PoojaDetailPage() {
                 }
               />
             </div>
+
+            {quickValidationMessage && (
+              <p className="text-xs text-red-600">{quickValidationMessage}</p>
+            )}
 
             <input
               className={fieldClass}
@@ -1117,7 +1254,7 @@ function PoojaDetailPage() {
                 isBengaliVivahEnquiryOnly
                   ? 'bg-red-600 hover:bg-red-700 sm:col-span-2'
                   : 'bg-stone-900 hover:bg-stone-800 sm:col-span-1'
-              }`}>
+              }`} disabled={isSubmitting || !isPrimaryFormValid}>
                 {isSubmitting
                   ? isBengaliVivahEnquiryOnly
                     ? 'Sending Enquiry...'
@@ -1136,6 +1273,16 @@ function PoojaDetailPage() {
           )}
         </div>
       </div>
+
+      <button
+        type="button"
+        onClick={scrollToBookingForm}
+        className="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-sm rounded-2xl bg-stone-900 px-4 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-lg shadow-stone-900/30 transition hover:bg-stone-800"
+      >
+        {isBengaliVivahEnquiryOnly
+          ? 'Send Enquiry'
+          : `Book Now • ₹${payableAmount}`}
+      </button>
     </section>
   )
 }

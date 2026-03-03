@@ -187,6 +187,69 @@ const sendPoojaCompletionReviewEmail = async (booking, pooja, reviewUrl) => {
   }
 };
 
+const sendAdminBookingAlertEmail = async (booking, pooja) => {
+  const transporter = createTransporter();
+  if (!transporter) return false;
+
+  const adminEmail = process.env.ADMIN_ALERT_EMAIL || process.env.SMTP_USER;
+  if (!adminEmail) return false;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      to: adminEmail,
+      subject: `New Booking Alert: ${pooja?.title || booking?.package || 'Service'}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #b45309;">New Booking Received</h2>
+          <p><strong>Customer:</strong> ${booking?.name || '-'}</p>
+          <p><strong>Phone:</strong> ${booking?.phone || '-'}</p>
+          <p><strong>Email:</strong> ${booking?.email || '-'}</p>
+          <p><strong>Puja:</strong> ${pooja?.title || '-'}</p>
+          <p><strong>Date/Time:</strong> ${booking?.date || '-'} ${booking?.time || ''}</p>
+          <p><strong>Package:</strong> ${booking?.package || '-'}</p>
+          <p><strong>Payable:</strong> ₹${booking?.paymentAmount || 0}</p>
+          <p><strong>Address:</strong> ${booking?.address || '-'}</p>
+        </div>
+      `,
+    });
+    return true;
+  } catch (error) {
+    console.error('Error sending admin booking alert email:', error);
+    return false;
+  }
+};
+
+const sendAdminEnquiryAlertEmail = async (enquiry) => {
+  const transporter = createTransporter();
+  if (!transporter) return false;
+
+  const adminEmail = process.env.ADMIN_ALERT_EMAIL || process.env.SMTP_USER;
+  if (!adminEmail) return false;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      to: adminEmail,
+      subject: `New Enquiry Alert: ${enquiry?.service || 'General'}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 620px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #b45309;">New Enquiry Received</h2>
+          <p><strong>Name:</strong> ${enquiry?.name || '-'}</p>
+          <p><strong>Phone:</strong> ${enquiry?.phone || '-'}</p>
+          <p><strong>Email:</strong> ${enquiry?.email || '-'}</p>
+          <p><strong>Service:</strong> ${enquiry?.service || '-'}</p>
+          <p><strong>Message:</strong><br/>${String(enquiry?.message || '-').replace(/\n/g, '<br/>')}</p>
+        </div>
+      `,
+    });
+    return true;
+  } catch (error) {
+    console.error('Error sending admin enquiry alert email:', error);
+    return false;
+  }
+};
+
 // Send password reset email
 const sendPasswordResetEmail = async (user, token) => {
   const transporter = createTransporter();
@@ -229,4 +292,6 @@ module.exports = {
   sendBookingConfirmationEmail,
   sendPoojaCompletionReviewEmail,
   sendPasswordResetEmail,
+  sendAdminBookingAlertEmail,
+  sendAdminEnquiryAlertEmail,
 };

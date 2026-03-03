@@ -1,12 +1,18 @@
 const express = require('express');
 const Enquiry = require('../models/Enquiry');
 const { protect, adminOnly } = require('../middleware/auth');
+const { sendAdminEnquiryAlertEmail } = require('../services/emailService');
 
 const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { name, email, phone, service, message } = req.body;
   const enquiry = await Enquiry.create({ name, email, phone, service, message });
+
+  sendAdminEnquiryAlertEmail(enquiry).catch((error) => {
+    console.error('Admin enquiry alert failed:', error);
+  });
+
   return res.status(201).json(enquiry);
 });
 

@@ -47,6 +47,32 @@ function DashboardPage() {
     return normalized.charAt(0).toUpperCase() + normalized.slice(1)
   }
 
+  const getTimelineStepClass = (step, status) => {
+    const normalized = normalizeBookingStatus(status)
+
+    if (normalized === 'cancelled') {
+      return 'bg-red-100 text-red-700 border-red-200'
+    }
+
+    if (step === 'requested') {
+      return 'bg-orange-100 text-orange-800 border-orange-200'
+    }
+
+    if (step === 'confirmed') {
+      return ['confirmed', 'completed'].includes(normalized)
+        ? 'bg-blue-100 text-blue-800 border-blue-200'
+        : 'bg-stone-100 text-stone-500 border-stone-200'
+    }
+
+    if (step === 'completed') {
+      return normalized === 'completed'
+        ? 'bg-green-100 text-green-800 border-green-200'
+        : 'bg-stone-100 text-stone-500 border-stone-200'
+    }
+
+    return 'bg-stone-100 text-stone-500 border-stone-200'
+  }
+
   const completedBookingsWithoutFeedback = bookings.filter(
     (booking) => normalizeBookingStatus(booking.bookingStatus) === 'completed' && !feedbackByBookingId[booking._id]
   )
@@ -263,9 +289,28 @@ function DashboardPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(booking.bookingStatus)}`}>
-                        {getStatusLabel(booking.bookingStatus)}
-                      </span>
+                      <div className="space-y-2 min-w-57.5">
+                        <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full border ${getStatusColor(booking.bookingStatus)}`}>
+                          {getStatusLabel(booking.bookingStatus)}
+                        </span>
+                        {normalizeBookingStatus(booking.bookingStatus) === 'cancelled' ? (
+                          <p className="text-xs text-red-600">Timeline stopped: booking cancelled</p>
+                        ) : (
+                          <div className="flex items-center gap-1.5 text-[11px]">
+                            <span className={`px-2 py-0.5 rounded-full border ${getTimelineStepClass('requested', booking.bookingStatus)}`}>
+                              Requested
+                            </span>
+                            <span className="text-stone-400">→</span>
+                            <span className={`px-2 py-0.5 rounded-full border ${getTimelineStepClass('confirmed', booking.bookingStatus)}`}>
+                              Confirmed
+                            </span>
+                            <span className="text-stone-400">→</span>
+                            <span className={`px-2 py-0.5 rounded-full border ${getTimelineStepClass('completed', booking.bookingStatus)}`}>
+                              Completed
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       {['pending', 'confirmed'].includes(normalizeBookingStatus(booking.bookingStatus)) ? (

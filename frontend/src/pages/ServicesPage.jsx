@@ -587,6 +587,7 @@ function ServicesPage() {
     })
   }, [filteredPoojas, priestPreference])
 
+
   return (
     <section className="max-w-6xl mx-auto px-4 py-7 sm:py-10">
       <Seo title="PujaSamrddhi Services" description="Explore all available puja services and packages." />
@@ -720,6 +721,7 @@ function ServicesPage() {
           <p className="text-sm text-stone-600 mt-1">Try changing priest preference or clear the search term.</p>
         </div>
       )}
+
     </section>
   )
 }

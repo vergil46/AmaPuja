@@ -24,6 +24,7 @@ const enquiryRoutes = require('./routes/enquiryRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 connectDB().then(seedPoojas);
 
@@ -78,6 +79,7 @@ app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);

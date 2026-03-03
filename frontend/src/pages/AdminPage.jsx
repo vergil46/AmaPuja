@@ -3,7 +3,26 @@ import Seo from '../components/Seo'
 import api from '../services/api'
 
 function AdminPage() {
-  const [stats, setStats] = useState({ totalBookings: 0, revenue: 0, totalEnquiries: 0, totalPayments: 0 })
+  const [stats, setStats] = useState({
+    totalBookings: 0,
+    revenue: 0,
+    totalEnquiries: 0,
+    totalPayments: 0,
+    conversionRate: 0,
+    topServices: [],
+    dropOffStage: { stage: 'Requested → Confirmed', dropped: 0 },
+    funnel: {
+      service_view: 0,
+      form_started: 0,
+      booking_submitted: 0,
+      payment_success: 0,
+    },
+    funnelRates: {
+      formToBooking: 0,
+      bookingToPayment: 0,
+    },
+  })
+  const [analyticsRange, setAnalyticsRange] = useState('30d')
   const [poojas, setPoojas] = useState([])
   const [bookings, setBookings] = useState([])
   const [recentBookings, setRecentBookings] = useState([])
@@ -18,6 +37,7 @@ function AdminPage() {
   const [recentStatusFilter, setRecentStatusFilter] = useState('all')
   const [reviewRequestLoadingById, setReviewRequestLoadingById] = useState({})
   const [reviewRequestMessage, setReviewRequestMessage] = useState('')
+  const [rowDensity, setRowDensity] = useState('comfortable')
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null)
   const [selectedBookingDetails, setSelectedBookingDetails] = useState(null)
   const [detailsBookingStatus, setDetailsBookingStatus] = useState('pending')
@@ -110,16 +130,21 @@ function AdminPage() {
     })
   }, [recentBookings, recentPackageFilter, recentStatusFilter])
 
+  const loadStats = async (range = analyticsRange) => {
+    const statsRes = await api.get('/dashboard/admin/stats', {
+      params: { range },
+    })
+    setStats(statsRes.data)
+  }
+
   const loadData = async () => {
-    const [statsRes, poojaRes, bookingRes, recentBookingRes, enquiryRes, paymentRes] = await Promise.all([
-      api.get('/dashboard/admin/stats'),
+    const [poojaRes, bookingRes, recentBookingRes, enquiryRes, paymentRes] = await Promise.all([
       api.get('/poojas'),
       api.get('/bookings/admin/all'),
       api.get('/bookings/admin/recent?limit=10'),
       api.get('/enquiries'),
       api.get('/payments/admin/all'),
     ])
-    setStats(statsRes.data)
     setPoojas(poojaRes.data)
     setBookings(bookingRes.data)
     setRecentBookings(recentBookingRes.data)
@@ -131,7 +156,7 @@ function AdminPage() {
   const refreshDashboard = async () => {
     setRefreshingDashboard(true)
     try {
-      await loadData()
+      await Promise.all([loadData(), loadStats(analyticsRange)])
     } finally {
       setRefreshingDashboard(false)
     }
@@ -140,6 +165,10 @@ function AdminPage() {
   useEffect(() => {
     loadData()
   }, [])
+
+  useEffect(() => {
+    loadStats(analyticsRange)
+  }, [analyticsRange])
 
   const createPooja = async (event) => {
     event.preventDefault()
@@ -196,6 +225,16 @@ function AdminPage() {
     return 'N/A'
   }
 
+  const analyticsRangeLabel = analyticsRange === '7d'
+    ? 'Last 7 Days'
+    : analyticsRange === '30d'
+      ? 'Last 30 Days'
+      : 'All Time'
+
+  const tableDensityClass = rowDensity === 'compact'
+    ? '[&_thead_th]:!py-2 [&_tbody_td]:!py-1.5'
+    : '[&_thead_th]:!py-2.5 [&_tbody_td]:!py-2.5'
+
   const getPaymentStatusView = (booking) => {
     const normalizedStatus = String(booking.paymentStatus || '').toLowerCase()
     const isPaid = normalizedStatus === 'paid'
@@ -243,6 +282,14 @@ function AdminPage() {
       label: 'Pending',
       badgeClass: 'bg-amber-100 text-amber-800 border-amber-200',
     }
+  }
+
+  const isPendingFollowUp = (booking) => {
+    const status = normalizeBookingStatus(booking?.bookingStatus)
+    if (status !== 'pending') return false
+    const createdAt = new Date(booking?.createdAt)
+    if (Number.isNaN(createdAt.getTime())) return false
+    return Date.now() - createdAt.getTime() >= 24 * 60 * 60 * 1000
   }
 
   const openBookingDetails = (booking) => {
@@ -344,6 +391,27 @@ function AdminPage() {
         <p className="mt-2 text-xs text-stone-500">Last updated: {lastUpdatedAt.toLocaleString()}</p>
       )}
 
+      <div className="mt-3 inline-flex rounded-lg border border-orange-200 bg-orange-50/60 p-1">
+        {[
+          { value: '7d', label: 'Last 7 Days' },
+          { value: '30d', label: 'Last 30 Days' },
+          { value: 'all', label: 'All Time' },
+        ].map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => setAnalyticsRange(option.value)}
+            className={`px-3 py-1.5 text-xs sm:text-sm rounded-md transition-colors ${
+              analyticsRange === option.value
+                ? 'bg-orange-700 text-white shadow-sm'
+                : 'text-stone-700 hover:bg-orange-100'
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
           <p className="text-xs uppercase tracking-wide text-stone-500">Total Bookings</p>
@@ -364,6 +432,60 @@ function AdminPage() {
           <p className="text-xs uppercase tracking-wide text-stone-500">Payment Success</p>
           <p className="text-2xl font-bold text-stone-900 mt-1">{paidBookingRate}%</p>
           <p className="text-xs text-stone-500 mt-1">Bookings marked paid</p>
+        </div>
+      </div>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-stone-500">Conversion Rate</p>
+          <p className="text-2xl font-bold text-stone-900 mt-1">{Number(stats.conversionRate || 0).toFixed(1)}%</p>
+          <p className="text-xs text-stone-500 mt-1">Bookings from enquiries ({analyticsRangeLabel})</p>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-stone-500">Top Services</p>
+          <div className="mt-2 space-y-1.5">
+            {(Array.isArray(stats.topServices) ? stats.topServices : []).slice(0, 3).map((service, index) => (
+              <div key={`${service.service}-${index}`} className="flex items-center justify-between text-sm">
+                <span className="text-stone-700 truncate pr-3">{service.service}</span>
+                <span className="font-semibold text-stone-900">{service.total}</span>
+              </div>
+            ))}
+            {(!Array.isArray(stats.topServices) || stats.topServices.length === 0) && (
+              <p className="text-xs text-stone-500">No bookings yet</p>
+            )}
+          </div>
+          <p className="text-xs text-stone-500 mt-2">Based on {analyticsRangeLabel.toLowerCase()}</p>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-stone-500">Drop-off Stage</p>
+          <p className="text-lg font-semibold text-stone-900 mt-1">{stats.dropOffStage?.stage || 'Requested → Confirmed'}</p>
+          <p className="text-sm text-stone-600 mt-1">{Number(stats.dropOffStage?.dropped || 0)} booking(s) not moving forward</p>
+          <p className="text-xs text-stone-500 mt-1">Across {analyticsRangeLabel.toLowerCase()}</p>
+        </div>
+      </div>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-stone-500">Service Views</p>
+          <p className="text-2xl font-bold text-stone-900 mt-1">{Number(stats.funnel?.service_view || 0)}</p>
+          <p className="text-xs text-stone-500 mt-1">From funnel tracking ({analyticsRangeLabel.toLowerCase()})</p>
+        </div>
+        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-stone-500">Forms Started</p>
+          <p className="text-2xl font-bold text-stone-900 mt-1">{Number(stats.funnel?.form_started || 0)}</p>
+          <p className="text-xs text-stone-500 mt-1">Users who began booking form</p>
+        </div>
+        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-stone-500">Form → Booking</p>
+          <p className="text-2xl font-bold text-stone-900 mt-1">{Number(stats.funnelRates?.formToBooking || 0).toFixed(1)}%</p>
+          <p className="text-xs text-stone-500 mt-1">Booking completion from started forms</p>
+        </div>
+        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
+          <p className="text-xs uppercase tracking-wide text-stone-500">Booking → Payment</p>
+          <p className="text-2xl font-bold text-stone-900 mt-1">{Number(stats.funnelRates?.bookingToPayment || 0).toFixed(1)}%</p>
+          <p className="text-xs text-stone-500 mt-1">Payment conversion after booking</p>
         </div>
       </div>
 
@@ -408,10 +530,34 @@ function AdminPage() {
         </div>
       </div>
 
-      <div className="mt-8 bg-white border border-orange-100 rounded-2xl p-5 overflow-x-auto shadow-sm">
+      <div className="mt-8 bg-white border border-orange-100 rounded-2xl p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-semibold text-stone-900">Manage Bookings</h2>
           <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex rounded-md border border-stone-300 bg-white p-0.5">
+              <button
+                type="button"
+                onClick={() => setRowDensity('comfortable')}
+                className={`px-2.5 py-1 text-xs rounded transition-colors ${
+                  rowDensity === 'comfortable'
+                    ? 'bg-stone-900 text-white'
+                    : 'text-stone-700 hover:bg-stone-100'
+                }`}
+              >
+                Comfortable
+              </button>
+              <button
+                type="button"
+                onClick={() => setRowDensity('compact')}
+                className={`px-2.5 py-1 text-xs rounded transition-colors ${
+                  rowDensity === 'compact'
+                    ? 'bg-stone-900 text-white'
+                    : 'text-stone-700 hover:bg-stone-100'
+                }`}
+              >
+                Compact
+              </button>
+            </div>
             <input
               className="border border-stone-300 rounded px-3 py-1.5 text-sm min-w-56"
               placeholder="Search user, phone, email, puja"
@@ -443,38 +589,39 @@ function AdminPage() {
         </div>
         <p className="mt-2 text-xs text-stone-500">Showing {filteredBookings.length} of {bookings.length} bookings</p>
         {reviewRequestMessage && <p className="mt-2 text-sm text-stone-700">{reviewRequestMessage}</p>}
-        <table className="w-full min-w-240 mt-3 text-sm">
-          <thead className="bg-stone-50">
-            <tr className="text-left border-b border-stone-200">
-              <th className="py-2">User</th>
-              <th>Puja</th>
-              <th>Package Type</th>
-              <th>Add-ons</th>
-              <th>Date</th>
-              <th>Status</th>
-              <th>Payment Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
+        <div className="mt-3 overflow-x-auto rounded-xl border border-stone-200">
+          <table className={`w-full min-w-275 text-sm ${tableDensityClass}`}>
+            <thead className="bg-stone-100/80 sticky top-0 z-10">
+              <tr className="text-left border-b border-stone-200">
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 sticky left-0 z-20 bg-stone-100/95 border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.2)] w-44 min-w-44">User</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 sticky left-44 z-20 bg-stone-100/95 border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.16)] w-56 min-w-56">Puja</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Package Type</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Add-ons</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Date</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Status</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Payment Status</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Action</th>
+              </tr>
+            </thead>
+            <tbody>
             {filteredBookings.map((booking) => (
-              <tr key={booking._id} className="border-b border-stone-100 align-top hover:bg-orange-50/30 transition-colors">
-                <td className="py-2">
+              <tr key={booking._id} className={`border-b border-stone-100 align-top odd:bg-white even:bg-stone-50/40 hover:bg-orange-50/50 transition-colors ${isPendingFollowUp(booking) ? 'ring-1 ring-amber-200 bg-amber-50/50' : ''}`}>
+                <td className="px-3 py-2.5 whitespace-nowrap sticky left-0 z-10 bg-inherit border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.18)] w-44 min-w-44">
                   <button
                     type="button"
                     onClick={() => openBookingDetails(booking)}
-                    className="text-left text-orange-700 font-medium hover:text-orange-800 hover:underline"
+                    className="block max-w-full truncate text-left text-orange-700 font-medium hover:text-orange-800 hover:underline"
                   >
                     {booking.name}
                   </button>
                 </td>
-                <td>{booking.poojaId?.title}</td>
-                <td>
+                <td className="px-3 py-2.5 text-stone-800 font-medium whitespace-nowrap sticky left-44 z-10 bg-inherit border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.14)] w-56 min-w-56 truncate">{booking.poojaId?.title}</td>
+                <td className="px-3 py-2.5 whitespace-nowrap">
                   <span className="inline-block px-2 py-1 text-xs rounded bg-orange-100 text-orange-800">
                     {booking.package || 'Without Samagri'}
                   </span>
                 </td>
-                <td>
+                <td className="px-3 py-2.5 min-w-42.5">
                   {Array.isArray(booking.selectedAddOns) && booking.selectedAddOns.length > 0 ? (
                     <div className="space-y-1">
                       <span className="inline-block px-2 py-1 text-xs rounded border border-emerald-200 bg-emerald-50 text-emerald-700">
@@ -490,18 +637,23 @@ function AdminPage() {
                     </span>
                   )}
                 </td>
-                <td>{booking.date}</td>
-                <td>
+                <td className="px-3 py-2.5 whitespace-nowrap text-stone-700 font-medium">{booking.date}</td>
+                <td className="px-3 py-2.5 whitespace-nowrap">
                   {(() => {
                     const statusView = getBookingStatusView(booking.bookingStatus)
                     return (
-                      <span className={`inline-block px-2 py-1 text-xs rounded border ${statusView.badgeClass}`}>
-                        {statusView.label}
-                      </span>
+                      <div className="space-y-1">
+                        <span className={`inline-block px-2 py-1 text-xs rounded border ${statusView.badgeClass}`}>
+                          {statusView.label}
+                        </span>
+                        {isPendingFollowUp(booking) && (
+                          <p className="text-[11px] font-medium text-amber-700">Follow-up needed (&gt;24h)</p>
+                        )}
+                      </div>
                     )
                   })()}
                 </td>
-                <td>
+                <td className="px-3 py-2.5 min-w-47.5">
                   {(() => {
                     const paymentView = getPaymentStatusView(booking)
                     const isPaid = paymentView.label === 'Paid'
@@ -527,10 +679,10 @@ function AdminPage() {
                     )
                   })()}
                 </td>
-                <td>
+                <td className="px-3 py-2.5 whitespace-nowrap">
                   <div className="flex flex-wrap items-center gap-2">
                     <select
-                      className="border rounded px-2 py-1"
+                      className="border border-stone-300 rounded-md px-2.5 py-1.5 text-sm bg-white"
                       value={normalizeBookingStatus(booking.bookingStatus)}
                       onChange={(e) => updateBookingStatus(booking._id, e.target.value)}
                     >
@@ -552,11 +704,12 @@ function AdminPage() {
                 </td>
               </tr>
             ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div className="mt-8 bg-white border border-orange-100 rounded-2xl p-5 overflow-x-auto shadow-sm">
+      <div className="mt-8 bg-white border border-orange-100 rounded-2xl p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-semibold text-stone-900">Recent Booking Requests (Last 10)</h2>
           <div className="flex items-center gap-2">
@@ -591,35 +744,40 @@ function AdminPage() {
           </div>
         </div>
         <p className="mt-2 text-xs text-stone-500">Showing {filteredRecentBookings.length} of {recentBookings.length} recent bookings</p>
-        <table className="w-full min-w-260 mt-3 text-sm">
-          <thead className="bg-stone-50">
-            <tr className="text-left border-b border-stone-200">
-              <th className="py-2">Created</th>
-              <th>User</th>
-              <th>Puja</th>
-              <th>Package</th>
-              <th>Add-ons</th>
-              <th>Status</th>
-              <th>Payment Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
+        <div className="mt-3 overflow-x-auto rounded-xl border border-stone-200">
+          <table className={`w-full min-w-295 text-sm ${tableDensityClass}`}>
+            <thead className="bg-stone-100/80 sticky top-0 z-10">
+              <tr className="text-left border-b border-stone-200">
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 w-44">Created</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 sticky left-44 z-20 bg-stone-100/95 border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.2)] w-44 min-w-44">User</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 sticky left-88 z-20 bg-stone-100/95 border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.16)] w-56 min-w-56">Puja</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Package</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Add-ons</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Status</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Payment Status</th>
+                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Action</th>
+              </tr>
+            </thead>
+            <tbody>
             {filteredRecentBookings.map((booking) => (
-              <tr key={booking._id} className="border-b border-stone-100 align-top hover:bg-orange-50/30 transition-colors">
-                <td className="py-2">{new Date(booking.createdAt).toLocaleString()}</td>
-                <td>
+              <tr key={booking._id} className="border-b border-stone-100 align-top odd:bg-white even:bg-stone-50/40 hover:bg-orange-50/50 transition-colors">
+                <td className="px-3 py-2.5 whitespace-nowrap text-stone-700 w-44">{new Date(booking.createdAt).toLocaleString()}</td>
+                <td className="px-3 py-2.5 whitespace-nowrap sticky left-44 z-10 bg-inherit border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.18)] w-44 min-w-44">
                   <button
                     type="button"
                     onClick={() => openBookingDetails(booking)}
-                    className="text-left text-orange-700 font-medium hover:text-orange-800 hover:underline"
+                    className="block max-w-full truncate text-left text-orange-700 font-medium hover:text-orange-800 hover:underline"
                   >
                     {booking.name}
                   </button>
                 </td>
-                <td>{booking.poojaId?.title}</td>
-                <td>{booking.package}</td>
-                <td>
+                <td className="px-3 py-2.5 text-stone-800 font-medium whitespace-nowrap sticky left-88 z-10 bg-inherit border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.14)] w-56 min-w-56 truncate">{booking.poojaId?.title}</td>
+                <td className="px-3 py-2.5 whitespace-nowrap">
+                  <span className="inline-block px-2 py-1 text-xs rounded bg-orange-100 text-orange-800">
+                    {booking.package}
+                  </span>
+                </td>
+                <td className="px-3 py-2.5 min-w-42.5">
                   {Array.isArray(booking.selectedAddOns) && booking.selectedAddOns.length > 0 ? (
                     <div className="space-y-1">
                       <span className="inline-block px-2 py-1 text-xs rounded border border-emerald-200 bg-emerald-50 text-emerald-700">
@@ -635,7 +793,7 @@ function AdminPage() {
                     </span>
                   )}
                 </td>
-                <td>
+                <td className="px-3 py-2.5 whitespace-nowrap">
                   {(() => {
                     const statusView = getBookingStatusView(booking.bookingStatus)
                     return (
@@ -645,7 +803,7 @@ function AdminPage() {
                     )
                   })()}
                 </td>
-                <td>
+                <td className="px-3 py-2.5 min-w-47.5">
                   {(() => {
                     const paymentView = getPaymentStatusView(booking)
                     const isPaid = paymentView.label === 'Paid'
@@ -671,7 +829,7 @@ function AdminPage() {
                     )
                   })()}
                 </td>
-                <td>
+                <td className="px-3 py-2.5 whitespace-nowrap">
                   {normalizeBookingStatus(booking.bookingStatus) === 'pending' && (
                     <button
                       onClick={() => updateBookingStatus(booking._id, 'confirmed')}
@@ -695,8 +853,9 @@ function AdminPage() {
                 </td>
               </tr>
             ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {selectedBookingDetails && (

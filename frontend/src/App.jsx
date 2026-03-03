@@ -17,6 +17,7 @@ import RatingsPage from './pages/RatingsPage'
 import ServicesPage from './pages/ServicesPage'
 import SignupPage from './pages/SignupPage'
 import VerifyEmailPage from './pages/VerifyEmailPage'
+import LocalServiceLandingPage from './pages/LocalServiceLandingPage'
 
 function ProtectedRoute({ children }) {
   const { token } = useAuth()
@@ -37,6 +38,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/services" element={<ServicesPage />} />
+        <Route path="/locations/:city/:service" element={<LocalServiceLandingPage />} />
         <Route path="/services/:id" element={<PoojaDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />

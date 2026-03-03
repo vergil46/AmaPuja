@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { getPoojaImage } from '../assets/poojaImageMap'
+import { slugify } from '../utils/slug'
 
 function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
   const customImage = getPoojaImage(pooja.title, pooja.image)
@@ -18,6 +19,8 @@ function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
 
   const queryString = queryParams.toString()
   const cityQuery = queryString ? `?${queryString}` : ''
+  const citySlug = String(selectedCity || '').trim().toLowerCase()
+  const localPageLink = citySlug ? `/locations/${citySlug}/${slugify(pooja.title)}` : ''
 
   return (
     <article className="card group h-full bg-white rounded-2xl overflow-hidden border border-orange-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
@@ -26,6 +29,9 @@ function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
           src={customImage}
           alt={pooja.title}
           loading="lazy"
+          decoding="async"
+          fetchpriority="low"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="h-44 sm:h-44 w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
           onError={(event) => {
             event.currentTarget.src = pooja.image
@@ -47,6 +53,11 @@ function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
             View Details
           </span>
         </Link>
+        {localPageLink && (
+          <Link to={localPageLink} className="mt-2 text-xs text-orange-700 hover:text-orange-800 hover:underline">
+            {pooja.title} in {selectedCity}
+          </Link>
+        )}
       </div>
     </article>
   )

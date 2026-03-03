@@ -85,3 +85,22 @@ Backend API: `http://localhost:5000/api`
 - Current location address autofill works with fallback provider even if `VITE_GOOGLE_MAPS_API_KEY` is not set.
 - Never commit real `.env` files or payment/email secrets.
 - For production, set strict CORS origins and secure cookie/JWT settings.
+
+## Deployment (Vercel + Render)
+
+- Frontend deployment guide: `DEPLOY_VERCEL.md`
+- Frontend (Vercel): `https://<your-vercel-project>.vercel.app`
+- Backend (Render API): `https://<your-render-backend>.onrender.com/api`
+
+### Production Env Checklist
+
+- Vercel project root is `frontend`
+- Vercel env `VITE_API_URL` points to Render `/api`
+- Render env `CLIENT_URL` or `CLIENT_URLS` includes Vercel domain
+- `frontend/vercel.json` rewrite is present for SPA routes
+- Payment keys set:
+	- Backend: `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
+	- Frontend: `VITE_RAZORPAY_KEY_ID`
+- Email alert/notification env is configured:
+	- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+	- Optional: `ADMIN_ALERT_EMAIL`

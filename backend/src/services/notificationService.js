@@ -1,6 +1,7 @@
 const {
   sendBookingConfirmationEmail,
   sendPoojaCompletionReviewEmail,
+  sendAdminBookingAlertEmail,
 } = require('./emailService');
 
 const normalizePhone = (phone) => {
@@ -60,6 +61,7 @@ const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
 
   const [emailSent, smsSent, whatsappSent] = await Promise.all([
     sendBookingConfirmationEmail(booking, pooja),
+    sendAdminBookingAlertEmail(booking, pooja),
     sendTwilioMessage({
       from: process.env.TWILIO_SMS_FROM,
       to: phone,

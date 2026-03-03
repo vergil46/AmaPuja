@@ -4,6 +4,7 @@ const proofVideos = [
 ]
 
 const proofImages = [
+  '/proofs/p.jpeg',
   '/proofs/work1.jpeg',
   '/proofs/work2.jpeg',
   '/proofs/work3.jpeg',
@@ -36,7 +37,7 @@ function WorkProofGallery({
                 className="overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
                 style={{ animationDelay: `${0.3 + index * 0.08}s` }}
               >
-                <video controls preload="metadata" className="h-56 sm:h-64 w-full object-cover bg-black">
+                <video controls preload="none" className="h-56 sm:h-64 w-full object-cover bg-black">
                   <source src={video} />
                   Your browser does not support the video tag.
                 </video>
@@ -46,18 +47,20 @@ function WorkProofGallery({
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 items-start gap-3 sm:gap-4 mt-8">
         {proofImages.map((image, index) => (
           <article
             key={image}
-            className="overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
+            className="self-start overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
             style={{ animationDelay: `${0.26 + index * 0.06}s` }}
           >
             <img
               src={image}
               alt={`PujaSamrddhi work proof ${index + 1}`}
               loading="lazy"
-              className="h-52 sm:h-52 w-full object-cover"
+              decoding="async"
+              fetchpriority="low"
+              className="block h-52 sm:h-52 w-full object-cover"
             />
           </article>
         ))}
