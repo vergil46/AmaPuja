@@ -49,9 +49,7 @@ app.use(
       const isKnownRenderFrontend = /^https:\/\/amapuja-frontend(?:-[a-z0-9-]+)?\.onrender\.com$/i.test(
         normalizedOrigin
       );
-      const isKnownVercelFrontend = /^https:\/\/amapuja(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(
-        normalizedOrigin
-      );
+      const isKnownVercelFrontend = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(normalizedOrigin);
 
       const isConfiguredClient = normalizedConfigured && normalizedOrigin === normalizedConfigured;
       const isConfiguredClientList = normalizedConfiguredList.includes(normalizedOrigin);
