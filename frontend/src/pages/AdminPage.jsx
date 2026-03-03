@@ -1,6 +1,30 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Seo from '../components/Seo'
 import api from '../services/api'
+
+function OverviewMetricCard({ title, value, caption, className = 'rounded-xl border border-orange-100 bg-white p-4 shadow-sm' }) {
+  return (
+    <div className={className}>
+      <p className="text-sm text-stone-600">{title}</p>
+      <p className="mt-1 text-4xl font-bold text-stone-900">{value}</p>
+      <p className="mt-1 text-xs">{caption}</p>
+    </div>
+  )
+}
+
+function DetailFieldCard({
+  label,
+  value,
+  className = 'rounded-xl border border-stone-300 bg-white p-3.5',
+  valueClassName = 'text-2xl font-medium text-stone-900 mt-1',
+}) {
+  return (
+    <div className={className}>
+      <p className="text-xs text-stone-500">{label}</p>
+      <p className={valueClassName}>{value || '-'}</p>
+    </div>
+  )
+}
 
 function AdminPage() {
   const [stats, setStats] = useState({
@@ -43,6 +67,17 @@ function AdminPage() {
   const [detailsBookingStatus, setDetailsBookingStatus] = useState('pending')
   const [updatingDetailsStatus, setUpdatingDetailsStatus] = useState(false)
   const [form, setForm] = useState({ title: '', description: '', image: '', startPrice: 0 })
+  const [activeSidebarSection, setActiveSidebarSection] = useState('dashboard')
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.localStorage.getItem('admin_dark_mode') === 'on'
+  })
+  const dashboardSectionRef = useRef(null)
+  const bookingsSectionRef = useRef(null)
+  const servicesSectionRef = useRef(null)
+  const paymentsSectionRef = useRef(null)
+  const enquiriesSectionRef = useRef(null)
+  const settingsSectionRef = useRef(null)
 
   const normalizeBookingStatus = (status) => {
     const normalized = String(status || '').toLowerCase()
@@ -169,6 +204,11 @@ function AdminPage() {
   useEffect(() => {
     loadStats(analyticsRange)
   }, [analyticsRange])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('admin_dark_mode', isDarkMode ? 'on' : 'off')
+  }, [isDarkMode])
 
   const createPooja = async (event) => {
     event.preventDefault()
@@ -310,6 +350,151 @@ function AdminPage() {
     return date.toLocaleString()
   }
 
+  const escapeCsvCell = (value) => {
+    const normalized = String(value ?? '').replace(/\r?\n|\r/g, ' ').trim()
+    if (normalized.includes('"')) {
+      return `"${normalized.replace(/"/g, '""')}"`
+    }
+    if (/[",]/.test(normalized)) {
+      return `"${normalized}"`
+    }
+    return normalized
+  }
+
+  const downloadCsv = (fileName, headers, rows) => {
+    const csv = [
+      headers.join(','),
+      ...rows.map((row) => headers.map((key) => escapeCsvCell(row[key])).join(',')),
+    ].join('\n')
+
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = fileName
+    document.body.appendChild(anchor)
+    anchor.click()
+    document.body.removeChild(anchor)
+    URL.revokeObjectURL(url)
+  }
+
+  const rangeWindowInMs = useMemo(() => {
+    if (analyticsRange === '7d') return 7 * 24 * 60 * 60 * 1000
+    if (analyticsRange === '30d') return 30 * 24 * 60 * 60 * 1000
+    return null
+  }, [analyticsRange])
+
+  const isWithinSelectedRange = (value) => {
+    if (!rangeWindowInMs) return true
+    const time = new Date(value).getTime()
+    if (Number.isNaN(time)) return false
+    return Date.now() - time <= rangeWindowInMs
+  }
+
+  const filteredBookingsForExport = useMemo(
+    () => filteredBookings.filter((booking) => isWithinSelectedRange(booking.createdAt)),
+    [filteredBookings, rangeWindowInMs]
+  )
+
+  const filteredEnquiriesForExport = useMemo(
+    () => enquiries.filter((item) => isWithinSelectedRange(item.createdAt)),
+    [enquiries, rangeWindowInMs]
+  )
+
+  const filteredPaymentsForExport = useMemo(
+    () => payments.filter((payment) => isWithinSelectedRange(payment.createdAt)),
+    [payments, rangeWindowInMs]
+  )
+
+  const exportBookingsCsv = () => {
+    if (filteredBookingsForExport.length === 0) return
+
+    const headers = [
+      'bookingId',
+      'createdAt',
+      'name',
+      'phone',
+      'email',
+      'poojaTitle',
+      'package',
+      'bookingDate',
+      'bookingTime',
+      'city',
+      'address',
+      'bookingStatus',
+      'paymentStatus',
+      'paymentType',
+      'finalAmount',
+      'paymentAmount',
+      'addOns',
+      'specialNotes',
+    ]
+
+    const rows = filteredBookingsForExport.map((booking) => ({
+      bookingId: booking._id,
+      createdAt: booking.createdAt ? new Date(booking.createdAt).toISOString() : '',
+      name: booking.name,
+      phone: booking.phone,
+      email: booking.email,
+      poojaTitle: booking.poojaId?.title,
+      package: booking.package || 'Without Samagri',
+      bookingDate: booking.date,
+      bookingTime: booking.time,
+      city: booking.city,
+      address: booking.address,
+      bookingStatus: normalizeBookingStatus(booking.bookingStatus),
+      paymentStatus: String(booking.paymentStatus || '').toLowerCase() || 'pending',
+      paymentType: getPaymentTypeLabel(booking.paymentOption),
+      finalAmount: Number(booking.finalAmount || 0),
+      paymentAmount: Number(booking.paymentAmount || 0),
+      addOns: Array.isArray(booking.selectedAddOns) ? booking.selectedAddOns.join(' | ') : '',
+      specialNotes: booking.specialNotes,
+    }))
+
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')
+    const rangeSuffix = analyticsRange === 'all' ? 'all-time' : analyticsRange
+    downloadCsv(`bookings-${rangeSuffix}-${stamp}.csv`, headers, rows)
+  }
+
+  const exportEnquiriesCsv = () => {
+    if (filteredEnquiriesForExport.length === 0) return
+
+    const headers = ['enquiryId', 'createdAt', 'name', 'phone', 'email', 'message']
+
+    const rows = filteredEnquiriesForExport.map((item) => ({
+      enquiryId: item._id,
+      createdAt: item.createdAt ? new Date(item.createdAt).toISOString() : '',
+      name: item.name,
+      phone: item.phone,
+      email: item.email,
+      message: item.message,
+    }))
+
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')
+    const rangeSuffix = analyticsRange === 'all' ? 'all-time' : analyticsRange
+    downloadCsv(`enquiries-${rangeSuffix}-${stamp}.csv`, headers, rows)
+  }
+
+  const exportPaymentsCsv = () => {
+    if (filteredPaymentsForExport.length === 0) return
+
+    const headers = ['paymentId', 'createdAt', 'razorpayOrderId', 'razorpayPaymentId', 'amount', 'status', 'bookingId']
+
+    const rows = filteredPaymentsForExport.map((payment) => ({
+      paymentId: payment._id,
+      createdAt: payment.createdAt ? new Date(payment.createdAt).toISOString() : '',
+      razorpayOrderId: payment.razorpayOrderId,
+      razorpayPaymentId: payment.razorpayPaymentId,
+      amount: Number(payment.amount || 0),
+      status: payment.status,
+      bookingId: payment.bookingId?._id || payment.bookingId || '',
+    }))
+
+    const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')
+    const rangeSuffix = analyticsRange === 'all' ? 'all-time' : analyticsRange
+    downloadCsv(`payments-${rangeSuffix}-${stamp}.csv`, headers, rows)
+  }
+
   const getMapLink = (booking) => {
     const latitude = Number(booking?.coordinates?.latitude)
     const longitude = Number(booking?.coordinates?.longitude)
@@ -371,546 +556,554 @@ function AdminPage() {
     ? Math.round((bookings.filter((booking) => String(booking.paymentStatus || '').toLowerCase() === 'paid').length / bookings.length) * 100)
     : 0
 
+  const navigateToSection = (section) => {
+    setActiveSidebarSection(section)
+
+    const refsBySection = {
+      dashboard: dashboardSectionRef,
+      bookings: bookingsSectionRef,
+      services: servicesSectionRef,
+      payments: paymentsSectionRef,
+      enquiries: enquiriesSectionRef,
+      settings: settingsSectionRef,
+    }
+
+    refsBySection[section]?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const sidebarSections = useMemo(
+    () => [
+      { key: 'dashboard', ref: dashboardSectionRef },
+      { key: 'bookings', ref: bookingsSectionRef },
+      { key: 'services', ref: servicesSectionRef },
+      { key: 'payments', ref: paymentsSectionRef },
+      { key: 'enquiries', ref: enquiriesSectionRef },
+      { key: 'settings', ref: settingsSectionRef },
+    ],
+    []
+  )
+
+  useEffect(() => {
+    const resolveActiveSection = () => {
+      const offset = 180
+      let currentSection = 'dashboard'
+
+      for (const section of sidebarSections) {
+        const element = section.ref.current
+        if (!element) continue
+        const top = element.getBoundingClientRect().top
+        if (top - offset <= 0) {
+          currentSection = section.key
+        }
+      }
+
+      setActiveSidebarSection((prev) => (prev === currentSection ? prev : currentSection))
+    }
+
+    resolveActiveSection()
+
+    let isTicking = false
+    const onScrollOrResize = () => {
+      if (isTicking) return
+      isTicking = true
+      window.requestAnimationFrame(() => {
+        resolveActiveSection()
+        isTicking = false
+      })
+    }
+
+    window.addEventListener('scroll', onScrollOrResize, { passive: true })
+    window.addEventListener('resize', onScrollOrResize)
+
+    return () => {
+      window.removeEventListener('scroll', onScrollOrResize)
+      window.removeEventListener('resize', onScrollOrResize)
+    }
+  }, [sidebarSections])
+
+  const getSidebarButtonClass = (section) => {
+    const base = 'w-full rounded-md px-3 py-2 text-left'
+    const active = activeSidebarSection === section
+
+    if (active) {
+      return `${base} border-l-2 border-orange-600 bg-orange-100 font-medium text-orange-800`
+    }
+
+    return `${base} text-stone-700 hover:bg-orange-50`
+  }
+
   return (
-    <section className="max-w-6xl mx-auto px-4 py-10">
+    <section className={`min-h-screen p-3 sm:p-4 ${isDarkMode ? 'bg-stone-950' : 'bg-orange-50/50'}`}>
       <Seo title="Admin Panel | PujaSamrddhi" description="Manage poojas, bookings, enquiries, and payments." />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-semibold text-stone-900">Admin Dashboard</h1>
-          <p className="text-sm text-stone-600 mt-1">Live control center for bookings, services, enquiries and payments.</p>
-        </div>
-        <button
-          onClick={refreshDashboard}
-          className="px-3.5 py-2 text-sm rounded-lg bg-orange-700 text-white hover:bg-orange-800 disabled:opacity-60 shadow-sm"
-          disabled={refreshingDashboard}
-        >
-          {refreshingDashboard ? 'Refreshing Dashboard...' : 'Refresh Dashboard'}
-        </button>
-      </div>
-      {lastUpdatedAt && (
-        <p className="mt-2 text-xs text-stone-500">Last updated: {lastUpdatedAt.toLocaleString()}</p>
-      )}
 
-      <div className="mt-3 inline-flex rounded-lg border border-orange-200 bg-orange-50/60 p-1">
-        {[
-          { value: '7d', label: 'Last 7 Days' },
-          { value: '30d', label: 'Last 30 Days' },
-          { value: 'all', label: 'All Time' },
-        ].map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => setAnalyticsRange(option.value)}
-            className={`px-3 py-1.5 text-xs sm:text-sm rounded-md transition-colors ${
-              analyticsRange === option.value
-                ? 'bg-orange-700 text-white shadow-sm'
-                : 'text-stone-700 hover:bg-orange-100'
-            }`}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Total Bookings</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{stats.totalBookings}</p>
-          <p className="text-xs text-stone-500 mt-1">Across all services</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Revenue</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{formatCurrency(stats.revenue)}</p>
-          <p className="text-xs text-stone-500 mt-1">Paid transactions</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Completion Rate</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{completionRate}%</p>
-          <p className="text-xs text-stone-500 mt-1">Completed bookings ratio</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Payment Success</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{paidBookingRate}%</p>
-          <p className="text-xs text-stone-500 mt-1">Bookings marked paid</p>
-        </div>
-      </div>
-
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Conversion Rate</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{Number(stats.conversionRate || 0).toFixed(1)}%</p>
-          <p className="text-xs text-stone-500 mt-1">Bookings from enquiries ({analyticsRangeLabel})</p>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Top Services</p>
-          <div className="mt-2 space-y-1.5">
-            {(Array.isArray(stats.topServices) ? stats.topServices : []).slice(0, 3).map((service, index) => (
-              <div key={`${service.service}-${index}`} className="flex items-center justify-between text-sm">
-                <span className="text-stone-700 truncate pr-3">{service.service}</span>
-                <span className="font-semibold text-stone-900">{service.total}</span>
-              </div>
-            ))}
-            {(!Array.isArray(stats.topServices) || stats.topServices.length === 0) && (
-              <p className="text-xs text-stone-500">No bookings yet</p>
-            )}
-          </div>
-          <p className="text-xs text-stone-500 mt-2">Based on {analyticsRangeLabel.toLowerCase()}</p>
-        </div>
-
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Drop-off Stage</p>
-          <p className="text-lg font-semibold text-stone-900 mt-1">{stats.dropOffStage?.stage || 'Requested → Confirmed'}</p>
-          <p className="text-sm text-stone-600 mt-1">{Number(stats.dropOffStage?.dropped || 0)} booking(s) not moving forward</p>
-          <p className="text-xs text-stone-500 mt-1">Across {analyticsRangeLabel.toLowerCase()}</p>
-        </div>
-      </div>
-
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Service Views</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{Number(stats.funnel?.service_view || 0)}</p>
-          <p className="text-xs text-stone-500 mt-1">From funnel tracking ({analyticsRangeLabel.toLowerCase()})</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Forms Started</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{Number(stats.funnel?.form_started || 0)}</p>
-          <p className="text-xs text-stone-500 mt-1">Users who began booking form</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Form → Booking</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{Number(stats.funnelRates?.formToBooking || 0).toFixed(1)}%</p>
-          <p className="text-xs text-stone-500 mt-1">Booking completion from started forms</p>
-        </div>
-        <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
-          <p className="text-xs uppercase tracking-wide text-stone-500">Booking → Payment</p>
-          <p className="text-2xl font-bold text-stone-900 mt-1">{Number(stats.funnelRates?.bookingToPayment || 0).toFixed(1)}%</p>
-          <p className="text-xs text-stone-500 mt-1">Payment conversion after booking</p>
-        </div>
-      </div>
-
-      <div className="mt-8 bg-white border border-orange-100 rounded-2xl p-5 shadow-sm">
-        <h2 className="font-semibold text-stone-900">Performance Graph</h2>
-        <div className="mt-4 space-y-4">
-          {graphMetrics.map((metric) => (
-            <div key={metric.label}>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-stone-700">{metric.label}</span>
-                <span className="font-semibold text-stone-900">{metric.value}</span>
-              </div>
-              <div className="mt-1 h-2.5 rounded-full bg-stone-200 overflow-hidden">
-                <div className={`h-full rounded-full ${metric.tone}`} style={{ width: metric.width }} />
-              </div>
+      <div className={`mx-auto max-w-362.5 rounded-2xl border shadow-md ${isDarkMode ? 'border-stone-700 bg-stone-900 text-stone-100' : 'border-orange-100 bg-white/95'}`}>
+        <div className="grid lg:grid-cols-[230px_minmax(0,1fr)]">
+          <aside className={`hidden lg:flex flex-col border-r p-4 ${isDarkMode ? 'border-stone-700 bg-stone-900' : 'border-orange-100 bg-stone-50/40'}`}>
+            <div className="rounded-lg border border-orange-200 bg-orange-100/70 px-3 py-3 shadow-sm">
+              <p className="text-2xl font-bold text-stone-900">PujaSamrddhi</p>
+              <p className="text-xs text-stone-500">Sacred Rituals</p>
             </div>
-          ))}
-        </div>
-      </div>
 
-      <div className="mt-8 grid lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-orange-100 rounded-2xl p-5 shadow-sm">
-          <h2 className="font-semibold text-stone-900">Add Pooja</h2>
-          <form onSubmit={createPooja} className="mt-3 grid gap-2">
-            <input className="px-3 py-2 border rounded" placeholder="Title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-            <textarea className="px-3 py-2 border rounded" placeholder="Description" required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-            <input className="px-3 py-2 border rounded" placeholder="Image URL" required value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
-            <input className="px-3 py-2 border rounded" placeholder="Starting Price" type="number" required value={form.startPrice} onChange={(e) => setForm({ ...form, startPrice: e.target.value })} />
-            <button className="px-4 py-2 bg-orange-700 text-white rounded">Add Pooja</button>
-          </form>
-        </div>
-        <div className="bg-white border border-orange-100 rounded-2xl p-5 max-h-72 overflow-auto shadow-sm">
-          <h2 className="font-semibold text-stone-900">Manage Poojas</h2>
-          <div className="mt-3 space-y-2">
-            {poojas.map((pooja) => (
-              <div key={pooja._id} className="flex justify-between items-center border border-stone-200 rounded-lg p-2.5">
-                <span className="text-sm">{pooja.title}</span>
-                <button onClick={() => deletePooja(pooja._id)} className="text-xs px-2 py-1 rounded bg-red-600 text-white">Delete</button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+            <nav className="mt-5 space-y-1 text-sm">
+              <button type="button" onClick={() => navigateToSection('dashboard')} className={getSidebarButtonClass('dashboard')}>🏠 Dashboard</button>
+              <button type="button" onClick={() => navigateToSection('bookings')} className={getSidebarButtonClass('bookings')}>📅 Bookings</button>
+              <button type="button" onClick={() => navigateToSection('services')} className={getSidebarButtonClass('services')}>🛕 Services</button>
+              <button type="button" onClick={() => navigateToSection('payments')} className={getSidebarButtonClass('payments')}>💳 Payments</button>
+              <button type="button" onClick={() => navigateToSection('enquiries')} className={getSidebarButtonClass('enquiries')}>💬 Enquiries</button>
+              <button type="button" onClick={() => navigateToSection('settings')} className={getSidebarButtonClass('settings')}>⚙️ Settings</button>
+            </nav>
 
-      <div className="mt-8 bg-white border border-orange-100 rounded-2xl p-5 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-semibold text-stone-900">Manage Bookings</h2>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="inline-flex rounded-md border border-stone-300 bg-white p-0.5">
-              <button
-                type="button"
-                onClick={() => setRowDensity('comfortable')}
-                className={`px-2.5 py-1 text-xs rounded transition-colors ${
-                  rowDensity === 'comfortable'
-                    ? 'bg-stone-900 text-white'
-                    : 'text-stone-700 hover:bg-stone-100'
-                }`}
-              >
-                Comfortable
-              </button>
-              <button
-                type="button"
-                onClick={() => setRowDensity('compact')}
-                className={`px-2.5 py-1 text-xs rounded transition-colors ${
-                  rowDensity === 'compact'
-                    ? 'bg-stone-900 text-white'
-                    : 'text-stone-700 hover:bg-stone-100'
-                }`}
-              >
-                Compact
-              </button>
-            </div>
-            <input
-              className="border border-stone-300 rounded px-3 py-1.5 text-sm min-w-56"
-              placeholder="Search user, phone, email, puja"
-              value={bookingSearch}
-              onChange={(e) => setBookingSearch(e.target.value)}
-            />
-            <select
-              className="border border-stone-300 rounded px-2 py-1.5 text-sm"
-              value={packageFilter}
-              onChange={(e) => setPackageFilter(e.target.value)}
-            >
-              <option value="all">All Packages</option>
-              {packageOptions.map((pkg) => (
-                <option key={pkg} value={pkg}>{pkg}</option>
-              ))}
-            </select>
-            <select
-              className="border border-stone-300 rounded px-2 py-1.5 text-sm"
-              value={bookingStatusFilter}
-              onChange={(e) => setBookingStatusFilter(e.target.value)}
-            >
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-        </div>
-        <p className="mt-2 text-xs text-stone-500">Showing {filteredBookings.length} of {bookings.length} bookings</p>
-        {reviewRequestMessage && <p className="mt-2 text-sm text-stone-700">{reviewRequestMessage}</p>}
-        <div className="mt-3 overflow-x-auto rounded-xl border border-stone-200">
-          <table className={`w-full min-w-275 text-sm ${tableDensityClass}`}>
-            <thead className="bg-stone-100/80 sticky top-0 z-10">
-              <tr className="text-left border-b border-stone-200">
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 sticky left-0 z-20 bg-stone-100/95 border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.2)] w-44 min-w-44">User</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 sticky left-44 z-20 bg-stone-100/95 border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.16)] w-56 min-w-56">Puja</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Package Type</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Add-ons</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Date</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Status</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Payment Status</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-            {filteredBookings.map((booking) => (
-              <tr key={booking._id} className={`border-b border-stone-100 align-top odd:bg-white even:bg-stone-50/40 hover:bg-orange-50/50 transition-colors ${isPendingFollowUp(booking) ? 'ring-1 ring-amber-200 bg-amber-50/50' : ''}`}>
-                <td className="px-3 py-2.5 whitespace-nowrap sticky left-0 z-10 bg-inherit border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.18)] w-44 min-w-44">
-                  <button
-                    type="button"
-                    onClick={() => openBookingDetails(booking)}
-                    className="block max-w-full truncate text-left text-orange-700 font-medium hover:text-orange-800 hover:underline"
-                  >
-                    {booking.name}
-                  </button>
-                </td>
-                <td className="px-3 py-2.5 text-stone-800 font-medium whitespace-nowrap sticky left-44 z-10 bg-inherit border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.14)] w-56 min-w-56 truncate">{booking.poojaId?.title}</td>
-                <td className="px-3 py-2.5 whitespace-nowrap">
-                  <span className="inline-block px-2 py-1 text-xs rounded bg-orange-100 text-orange-800">
-                    {booking.package || 'Without Samagri'}
-                  </span>
-                </td>
-                <td className="px-3 py-2.5 min-w-42.5">
-                  {Array.isArray(booking.selectedAddOns) && booking.selectedAddOns.length > 0 ? (
-                    <div className="space-y-1">
-                      <span className="inline-block px-2 py-1 text-xs rounded border border-emerald-200 bg-emerald-50 text-emerald-700">
-                        Add-ons: Yes
-                      </span>
-                      <p className="text-xs text-stone-600 leading-relaxed">
-                        {booking.selectedAddOns.join(', ')}
-                      </p>
-                    </div>
-                  ) : (
-                    <span className="inline-block px-2 py-1 text-xs rounded border border-stone-200 bg-stone-100 text-stone-700">
-                      Add-ons: No
-                    </span>
-                  )}
-                </td>
-                <td className="px-3 py-2.5 whitespace-nowrap text-stone-700 font-medium">{booking.date}</td>
-                <td className="px-3 py-2.5 whitespace-nowrap">
-                  {(() => {
-                    const statusView = getBookingStatusView(booking.bookingStatus)
-                    return (
-                      <div className="space-y-1">
-                        <span className={`inline-block px-2 py-1 text-xs rounded border ${statusView.badgeClass}`}>
-                          {statusView.label}
-                        </span>
-                        {isPendingFollowUp(booking) && (
-                          <p className="text-[11px] font-medium text-amber-700">Follow-up needed (&gt;24h)</p>
-                        )}
-                      </div>
-                    )
-                  })()}
-                </td>
-                <td className="px-3 py-2.5 min-w-47.5">
-                  {(() => {
-                    const paymentView = getPaymentStatusView(booking)
-                    const isPaid = paymentView.label === 'Paid'
-
-                    return (
-                      <div className="space-y-1">
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded border ${paymentView.badgeClass}`}>
-                          <span>{paymentView.icon}</span>
-                          <span>{paymentView.label}</span>
-                        </span>
-                        {isPaid && (
-                          <>
-                            <p className="text-xs text-stone-700">
-                              Type: <span className="font-medium">{getPaymentTypeLabel(booking.paymentOption)}</span>
-                            </p>
-                            <p className="text-xs text-stone-700">
-                              Amount Paid: <span className="font-medium">{formatCurrency(booking.paymentAmount)}</span>
-                              <span className="text-stone-500"> ({getPaymentTypeLabel(booking.paymentOption)})</span>
-                            </p>
-                          </>
-                        )}
-                      </div>
-                    )
-                  })()}
-                </td>
-                <td className="px-3 py-2.5 whitespace-nowrap">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <select
-                      className="border border-stone-300 rounded-md px-2.5 py-1.5 text-sm bg-white"
-                      value={normalizeBookingStatus(booking.bookingStatus)}
-                      onChange={(e) => updateBookingStatus(booking._id, e.target.value)}
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                    {normalizeBookingStatus(booking.bookingStatus) === 'completed' && (
-                      <button
-                        onClick={() => resendReviewRequest(booking._id)}
-                        className="px-2 py-1 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
-                        disabled={Boolean(reviewRequestLoadingById[booking._id])}
-                      >
-                        {reviewRequestLoadingById[booking._id] ? 'Sending...' : 'Resend Review'}
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="mt-8 bg-white border border-orange-100 rounded-2xl p-5 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-semibold text-stone-900">Recent Booking Requests (Last 10)</h2>
-          <div className="flex items-center gap-2">
-            <select
-              className="border border-stone-300 rounded px-2 py-1.5 text-sm"
-              value={recentPackageFilter}
-              onChange={(e) => setRecentPackageFilter(e.target.value)}
-            >
-              <option value="all">All Packages</option>
-              {recentPackageOptions.map((pkg) => (
-                <option key={pkg} value={pkg}>{pkg}</option>
-              ))}
-            </select>
-            <select
-              className="border border-stone-300 rounded px-2 py-1.5 text-sm"
-              value={recentStatusFilter}
-              onChange={(e) => setRecentStatusFilter(e.target.value)}
-            >
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
             <button
-              onClick={refreshRecentBookings}
-              className="px-3 py-1.5 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
-              disabled={refreshingRecent}
+              ref={settingsSectionRef}
+              type="button"
+              onClick={() => setIsDarkMode((prev) => !prev)}
+              className={`mt-4 w-full rounded-lg border p-3 ${isDarkMode ? 'border-stone-600 bg-stone-800 text-stone-100' : 'border-stone-200 bg-white text-stone-700'}`}
             >
-              {refreshingRecent ? 'Refreshing...' : 'Refresh'}
-            </button>
-          </div>
-        </div>
-        <p className="mt-2 text-xs text-stone-500">Showing {filteredRecentBookings.length} of {recentBookings.length} recent bookings</p>
-        <div className="mt-3 overflow-x-auto rounded-xl border border-stone-200">
-          <table className={`w-full min-w-295 text-sm ${tableDensityClass}`}>
-            <thead className="bg-stone-100/80 sticky top-0 z-10">
-              <tr className="text-left border-b border-stone-200">
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 w-44">Created</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 sticky left-44 z-20 bg-stone-100/95 border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.2)] w-44 min-w-44">User</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 sticky left-88 z-20 bg-stone-100/95 border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.16)] w-56 min-w-56">Puja</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Package</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Add-ons</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Status</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Payment Status</th>
-                <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-            {filteredRecentBookings.map((booking) => (
-              <tr key={booking._id} className="border-b border-stone-100 align-top odd:bg-white even:bg-stone-50/40 hover:bg-orange-50/50 transition-colors">
-                <td className="px-3 py-2.5 whitespace-nowrap text-stone-700 w-44">{new Date(booking.createdAt).toLocaleString()}</td>
-                <td className="px-3 py-2.5 whitespace-nowrap sticky left-44 z-10 bg-inherit border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.18)] w-44 min-w-44">
-                  <button
-                    type="button"
-                    onClick={() => openBookingDetails(booking)}
-                    className="block max-w-full truncate text-left text-orange-700 font-medium hover:text-orange-800 hover:underline"
-                  >
-                    {booking.name}
-                  </button>
-                </td>
-                <td className="px-3 py-2.5 text-stone-800 font-medium whitespace-nowrap sticky left-88 z-10 bg-inherit border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.14)] w-56 min-w-56 truncate">{booking.poojaId?.title}</td>
-                <td className="px-3 py-2.5 whitespace-nowrap">
-                  <span className="inline-block px-2 py-1 text-xs rounded bg-orange-100 text-orange-800">
-                    {booking.package}
+              <div className="flex items-center justify-between text-sm">
+                <span>🌙 Dark Mode</span>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs ${isDarkMode ? 'text-stone-300' : 'text-stone-500'}`}>{isDarkMode ? 'On' : 'Off'}</span>
+                  <span className={`relative h-5 w-9 rounded-full transition-colors ${isDarkMode ? 'bg-orange-600' : 'bg-stone-300'}`}>
+                    <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${isDarkMode ? 'translate-x-4.5' : 'translate-x-0.5'}`} />
                   </span>
-                </td>
-                <td className="px-3 py-2.5 min-w-42.5">
-                  {Array.isArray(booking.selectedAddOns) && booking.selectedAddOns.length > 0 ? (
-                    <div className="space-y-1">
-                      <span className="inline-block px-2 py-1 text-xs rounded border border-emerald-200 bg-emerald-50 text-emerald-700">
-                        Add-ons: Yes
-                      </span>
-                      <p className="text-xs text-stone-600 leading-relaxed">
-                        {booking.selectedAddOns.join(', ')}
-                      </p>
-                    </div>
-                  ) : (
-                    <span className="inline-block px-2 py-1 text-xs rounded border border-stone-200 bg-stone-100 text-stone-700">
-                      Add-ons: No
-                    </span>
-                  )}
-                </td>
-                <td className="px-3 py-2.5 whitespace-nowrap">
-                  {(() => {
-                    const statusView = getBookingStatusView(booking.bookingStatus)
-                    return (
-                      <span className={`inline-block px-2 py-1 text-xs rounded border ${statusView.badgeClass}`}>
-                        {statusView.label}
-                      </span>
-                    )
-                  })()}
-                </td>
-                <td className="px-3 py-2.5 min-w-47.5">
-                  {(() => {
-                    const paymentView = getPaymentStatusView(booking)
-                    const isPaid = paymentView.label === 'Paid'
+                </div>
+              </div>
+            </button>
 
-                    return (
-                      <div className="space-y-1">
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded border ${paymentView.badgeClass}`}>
-                          <span>{paymentView.icon}</span>
-                          <span>{paymentView.label}</span>
-                        </span>
-                        {isPaid && (
-                          <>
-                            <p className="text-xs text-stone-700">
-                              Type: <span className="font-medium">{getPaymentTypeLabel(booking.paymentOption)}</span>
-                            </p>
-                            <p className="text-xs text-stone-700">
-                              Amount Paid: <span className="font-medium">{formatCurrency(booking.paymentAmount)}</span>
-                              <span className="text-stone-500"> ({getPaymentTypeLabel(booking.paymentOption)})</span>
-                            </p>
-                          </>
-                        )}
+            <div className="mt-auto rounded-lg border border-stone-200 bg-white p-3">
+              <p className="text-sm font-semibold text-stone-900">Lokanath Panda</p>
+              <p className="text-xs text-stone-500">lokanathpanda46@gmail.com</p>
+              <button type="button" className="mt-3 w-full rounded-lg border border-stone-200 px-3 py-2 text-left text-sm text-stone-700 hover:bg-stone-50">⏻ Logout</button>
+            </div>
+          </aside>
+
+          <div className="p-4 sm:p-5 lg:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-orange-100 bg-white p-3 shadow-sm">
+              <div className="flex-1 min-w-72 max-w-130">
+                <input
+                  className="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm outline-none focus:border-orange-300"
+                  placeholder="Search user, phone, email, puja..."
+                  value={bookingSearch}
+                  onChange={(e) => setBookingSearch(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <button type="button" className="rounded-full border border-stone-200 bg-white px-2.5 py-2 text-xs text-stone-700">🔔</button>
+                <div className="hidden sm:flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1.5">
+                  <span className="grid h-6 w-6 place-items-center rounded-full bg-orange-100 text-xs">👤</span>
+                  <span className="text-xs text-stone-700">Lokanath Panda</span>
+                </div>
+                <div className="inline-flex rounded-lg border border-orange-200 bg-orange-50/60 p-1">
+                  {[
+                    { value: '7d', label: '7D' },
+                    { value: '30d', label: '30D' },
+                    { value: 'all', label: 'All' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setAnalyticsRange(option.value)}
+                      className={`px-2.5 py-1 text-xs rounded-md transition-colors ${
+                        analyticsRange === option.value
+                          ? 'bg-orange-700 text-white shadow-sm'
+                          : 'text-stone-700 hover:bg-orange-100'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={refreshDashboard}
+                  className="px-3 py-2 text-xs rounded-lg bg-orange-700 text-white hover:bg-orange-800 disabled:opacity-60"
+                  disabled={refreshingDashboard}
+                >
+                  {refreshingDashboard ? 'Refreshing...' : 'Refresh'}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center justify-between rounded-xl border border-orange-100 bg-orange-50/80 px-4 py-3 text-sm shadow-sm">
+              <p className="text-orange-900">⚠️ {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length} bookings are pending action. Review now.</p>
+              <button type="button" className="rounded-md bg-orange-700 px-3 py-1.5 text-xs text-white">Review now</button>
+            </div>
+
+            <div className="mt-5 grid xl:grid-cols-[minmax(0,1fr)_320px] gap-4">
+              <div ref={dashboardSectionRef}>
+                <h1 className="text-4xl font-semibold text-stone-900">Welcome back, Lokanath Panda!</h1>
+                <p className="mt-1 text-base text-stone-600">Here's an overview of your platform performance.</p>
+                {lastUpdatedAt && <p className="mt-1 text-xs text-stone-500">Last updated: {lastUpdatedAt.toLocaleString()}</p>}
+
+                <div className="mt-4 grid sm:grid-cols-3 gap-3">
+                  <OverviewMetricCard
+                    title="Total Bookings"
+                    value={stats.totalBookings}
+                    caption={<span className="text-emerald-700">Across all services</span>}
+                  />
+                  <OverviewMetricCard
+                    title="Pending Bookings"
+                    value={bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length}
+                    caption={<span className="text-orange-800">From {analyticsRangeLabel}</span>}
+                    className="rounded-xl border border-orange-100 bg-orange-50/65 p-4 shadow-sm"
+                  />
+                  <OverviewMetricCard
+                    title="Total Revenue"
+                    value={formatCurrency(stats.revenue)}
+                    caption={<span className="text-stone-500">Paid transactions</span>}
+                  />
+                </div>
+
+                <div className="mt-4 grid md:grid-cols-2 gap-4">
+                  <div className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-2xl font-semibold text-stone-900">Revenue</h2>
+                      <span className="text-xs text-stone-500">{analyticsRangeLabel}</span>
+                    </div>
+                    <p className="mt-2 text-4xl font-bold text-stone-900">{formatCurrency(stats.revenue)}</p>
+                    <div className="mt-4 space-y-3">
+                      {graphMetrics.map((metric) => (
+                        <div key={metric.label}>
+                          <div className="flex items-center justify-between text-xs text-stone-600">
+                            <span>{metric.label}</span>
+                            <span className="font-semibold text-stone-900">{metric.value}</span>
+                          </div>
+                          <div className="mt-1 h-2 rounded-full bg-stone-200">
+                            <div className={`h-full rounded-full ${metric.tone}`} style={{ width: metric.width }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
+                    <h2 className="text-2xl font-semibold text-stone-900">Booking Status</h2>
+                    <div className="mt-4 flex items-center justify-center">
+                      <div
+                        className="relative grid h-40 w-40 place-items-center rounded-full"
+                        style={{
+                          background: `conic-gradient(#f59e0b ${completionRate}%, #e7e5e4 ${completionRate}% 100%)`,
+                        }}
+                      >
+                        <div className="grid h-28 w-28 place-items-center rounded-full bg-white text-center">
+                          <p className="text-3xl font-bold text-stone-900">{completionRate}%</p>
+                          <p className="text-xs text-stone-500">Completed</p>
+                        </div>
                       </div>
-                    )
-                  })()}
-                </td>
-                <td className="px-3 py-2.5 whitespace-nowrap">
-                  {normalizeBookingStatus(booking.bookingStatus) === 'pending' && (
-                    <button
-                      onClick={() => updateBookingStatus(booking._id, 'confirmed')}
-                      className="px-2 py-1 text-xs rounded bg-green-600 text-white hover:bg-green-700"
-                    >
-                      Confirm
-                    </button>
-                  )}
-                  {normalizeBookingStatus(booking.bookingStatus) === 'completed' && (
-                    <button
-                      onClick={() => resendReviewRequest(booking._id)}
-                      className="px-2 py-1 text-xs rounded bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-60"
-                      disabled={Boolean(reviewRequestLoadingById[booking._id])}
-                    >
-                      {reviewRequestLoadingById[booking._id] ? 'Sending...' : 'Resend Review'}
-                    </button>
-                  )}
-                  {normalizeBookingStatus(booking.bookingStatus) !== 'pending' && (
-                    normalizeBookingStatus(booking.bookingStatus) !== 'completed' ? <span className="text-stone-400 text-xs">-</span> : null
-                  )}
-                </td>
-              </tr>
-            ))}
-            </tbody>
-          </table>
+                    </div>
+                    <div className="mt-4 space-y-1.5 text-xs text-stone-600">
+                      <p>Pending: {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length}</p>
+                      <p>Confirmed: {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'confirmed').length}</p>
+                      <p>Completed: {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'completed').length}</p>
+                      <p>Cancelled: {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'cancelled').length}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div ref={bookingsSectionRef} className="mt-4 rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="text-2xl font-semibold text-stone-900">Manage Bookings</h2>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={exportBookingsCsv}
+                        className="px-3 py-1.5 text-xs rounded bg-orange-700 text-white hover:bg-orange-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={filteredBookingsForExport.length === 0}
+                      >
+                        Export CSV ({filteredBookingsForExport.length})
+                      </button>
+                      <div className="inline-flex rounded-md border border-stone-300 bg-white p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setRowDensity('comfortable')}
+                          className={`px-2.5 py-1 text-xs rounded transition-colors ${
+                            rowDensity === 'comfortable'
+                              ? 'bg-stone-900 text-white'
+                              : 'text-stone-700 hover:bg-stone-100'
+                          }`}
+                        >
+                          Comfortable
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setRowDensity('compact')}
+                          className={`px-2.5 py-1 text-xs rounded transition-colors ${
+                            rowDensity === 'compact'
+                              ? 'bg-stone-900 text-white'
+                              : 'text-stone-700 hover:bg-stone-100'
+                          }`}
+                        >
+                          Compact
+                        </button>
+                      </div>
+                      <select
+                        className="border border-stone-300 rounded px-2 py-1.5 text-sm"
+                        value={packageFilter}
+                        onChange={(e) => setPackageFilter(e.target.value)}
+                      >
+                        <option value="all">All Packages</option>
+                        {packageOptions.map((pkg) => (
+                          <option key={pkg} value={pkg}>{pkg}</option>
+                        ))}
+                      </select>
+                      <select
+                        className="border border-stone-300 rounded px-2 py-1.5 text-sm"
+                        value={bookingStatusFilter}
+                        onChange={(e) => setBookingStatusFilter(e.target.value)}
+                      >
+                        <option value="all">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </div>
+                  </div>
+                  <p className="mt-2 text-xs text-stone-500">Showing {filteredBookings.length} of {bookings.length} bookings • Export uses {analyticsRangeLabel}</p>
+                  {reviewRequestMessage && <p className="mt-2 text-sm text-stone-700">{reviewRequestMessage}</p>}
+                  <div className="mt-3 overflow-x-auto rounded-lg border border-stone-200 bg-white">
+                    <table className={`w-full min-w-275 text-sm ${tableDensityClass}`}>
+                      <thead className="bg-stone-100/90">
+                        <tr className="text-left border-b border-stone-200">
+                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 sticky left-0 z-20 bg-stone-100/95 border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.2)] w-44 min-w-44">User</th>
+                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Puja</th>
+                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Package</th>
+                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Add-ons</th>
+                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Date</th>
+                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Status</th>
+                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Payment Status</th>
+                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredBookings.map((booking) => (
+                          <tr key={booking._id} className={`border-b border-stone-100 align-top odd:bg-white even:bg-stone-50/40 hover:bg-orange-50/40 transition-colors ${isPendingFollowUp(booking) ? 'ring-1 ring-amber-200 bg-amber-50/50' : ''}`}>
+                            <td className="px-3 py-2.5 whitespace-nowrap sticky left-0 z-10 bg-inherit border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.18)] w-44 min-w-44">
+                              <button
+                                type="button"
+                                onClick={() => openBookingDetails(booking)}
+                                className="font-medium text-orange-700 hover:text-orange-800 hover:underline"
+                              >
+                                {booking.name}
+                              </button>
+                            </td>
+                            <td className="px-3 py-2.5 text-stone-800 font-medium whitespace-nowrap">{booking.poojaId?.title}</td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              <span className="inline-block px-2 py-1 text-xs rounded bg-orange-100 text-orange-800">
+                                {booking.package || 'Without Samagri'}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2.5 min-w-47.5">
+                              {Array.isArray(booking.selectedAddOns) && booking.selectedAddOns.length > 0 ? (
+                                <div className="space-y-1">
+                                  <span className="inline-block px-2 py-1 text-xs rounded border border-emerald-200 bg-emerald-50 text-emerald-700">
+                                    Yes
+                                  </span>
+                                  <p className="text-xs text-stone-600 leading-relaxed">
+                                    {booking.selectedAddOns.join(', ')}
+                                  </p>
+                                </div>
+                              ) : (
+                                <span className="inline-block px-2 py-1 text-xs rounded border border-stone-200 bg-stone-100 text-stone-700">
+                                  No
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap text-stone-700 font-medium">{booking.date}</td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              {(() => {
+                                const statusView = getBookingStatusView(booking.bookingStatus)
+                                return (
+                                  <span className={`inline-block px-2 py-1 text-xs rounded border ${statusView.badgeClass}`}>
+                                    {statusView.label}
+                                  </span>
+                                )
+                              })()}
+                            </td>
+                            <td className="px-3 py-2.5 min-w-47.5">
+                              {(() => {
+                                const paymentView = getPaymentStatusView(booking)
+                                return (
+                                  <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded border ${paymentView.badgeClass}`}>
+                                    <span>{paymentView.icon}</span>
+                                    <span>{paymentView.label}</span>
+                                  </span>
+                                )
+                              })()}
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <select
+                                  className="border border-stone-300 rounded-md px-2.5 py-1.5 text-sm bg-white"
+                                  value={normalizeBookingStatus(booking.bookingStatus)}
+                                  onChange={(e) => updateBookingStatus(booking._id, e.target.value)}
+                                >
+                                  <option value="pending">Pending</option>
+                                  <option value="confirmed">Confirmed</option>
+                                  <option value="completed">Completed</option>
+                                  <option value="cancelled">Cancelled</option>
+                                </select>
+                                {normalizeBookingStatus(booking.bookingStatus) === 'completed' && (
+                                  <button
+                                    onClick={() => resendReviewRequest(booking._id)}
+                                    className="px-2 py-1 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
+                                    disabled={Boolean(reviewRequestLoadingById[booking._id])}
+                                  >
+                                    {reviewRequestLoadingById[booking._id] ? 'Sending...' : 'Resend Review'}
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="mt-4 grid lg:grid-cols-2 gap-4">
+                  <div ref={servicesSectionRef} className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-semibold text-stone-900">Recent Booking Requests</h2>
+                      <button
+                        onClick={refreshRecentBookings}
+                        className="px-3 py-1.5 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
+                        disabled={refreshingRecent}
+                      >
+                        {refreshingRecent ? 'Refreshing...' : 'Refresh'}
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs text-stone-500">Showing {filteredRecentBookings.length} of {recentBookings.length}</p>
+                    <div className="mt-3 space-y-2 max-h-72 overflow-auto">
+                      {filteredRecentBookings.map((booking) => (
+                        <div key={booking._id} className="rounded-lg border border-stone-200 p-3 bg-stone-50/60">
+                          <div className="flex items-center justify-between gap-2">
+                            <button type="button" onClick={() => openBookingDetails(booking)} className="font-medium text-orange-700 hover:underline">
+                              {booking.name}
+                            </button>
+                            <span className="text-xs text-stone-500">{new Date(booking.createdAt).toLocaleDateString()}</span>
+                          </div>
+                          <p className="text-sm text-stone-700 mt-1">{booking.poojaId?.title}</p>
+                          <p className="text-xs text-stone-500 mt-1">{booking.package || 'Without Samagri'} • {normalizeBookingStatus(booking.bookingStatus)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
+                    <h2 className="text-xl font-semibold text-stone-900">Services</h2>
+                    <form onSubmit={createPooja} className="mt-3 grid gap-2">
+                      <input className="px-3 py-2 border rounded" placeholder="Title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+                      <textarea className="px-3 py-2 border rounded" placeholder="Description" required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                      <input className="px-3 py-2 border rounded" placeholder="Image URL" required value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
+                      <input className="px-3 py-2 border rounded" placeholder="Starting Price" type="number" required value={form.startPrice} onChange={(e) => setForm({ ...form, startPrice: e.target.value })} />
+                      <button className="px-4 py-2 bg-orange-700 text-white rounded">Add Pooja</button>
+                    </form>
+                    <div className="mt-3 space-y-2 max-h-36 overflow-auto">
+                      {poojas.map((pooja) => (
+                        <div key={pooja._id} className="flex items-center justify-between rounded-lg border border-stone-200 p-2">
+                          <p className="text-sm text-stone-800 truncate pr-2">{pooja.title}</p>
+                          <button onClick={() => deletePooja(pooja._id)} className="rounded bg-red-600 px-2 py-1 text-xs text-white">Delete</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div ref={paymentsSectionRef} className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-2xl font-semibold text-stone-900">Payments</h2>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-stone-500">View All</span>
+                      <button
+                        type="button"
+                        onClick={exportPaymentsCsv}
+                        className="px-3 py-1.5 text-xs rounded bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={filteredPaymentsForExport.length === 0}
+                      >
+                        Export CSV ({filteredPaymentsForExport.length})
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-3 space-y-2 max-h-88 overflow-auto">
+                    {filteredPaymentsForExport.map((payment) => (
+                      <div key={payment._id} className="rounded-lg border border-stone-200 bg-stone-50/60 p-3 text-sm">
+                        <p className="text-stone-700">Order: {payment.razorpayOrderId}</p>
+                        <p className="mt-1 text-3xl font-semibold text-stone-900">₹{payment.amount}</p>
+                        <p className="mt-1 inline-block rounded-md bg-orange-100 px-2 py-1 text-xs font-medium text-orange-800">{String(payment.status || 'pending')}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div ref={enquiriesSectionRef} className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-2xl font-semibold text-stone-900">Enquiries</h2>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-stone-500">View All</span>
+                      <button
+                        type="button"
+                        onClick={exportEnquiriesCsv}
+                        className="px-3 py-1.5 text-xs rounded bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={filteredEnquiriesForExport.length === 0}
+                      >
+                        Export CSV ({filteredEnquiriesForExport.length})
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-3 space-y-2 max-h-88 overflow-auto">
+                    {filteredEnquiriesForExport.map((item) => (
+                      <div key={item._id} className="rounded-lg border border-stone-200 bg-stone-50/60 p-3 text-sm">
+                        <p className="font-semibold text-stone-900">{item.name} ({item.phone})</p>
+                        <p className="mt-1 text-stone-600">{item.email}</p>
+                        <p className="mt-1 text-stone-700">{item.message}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {selectedBookingDetails && (
-        <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-[1px] flex items-center justify-center p-4">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-auto bg-white rounded-2xl border border-orange-100 shadow-xl">
-            <div className="sticky top-0 bg-white border-b border-stone-200 px-5 py-4 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-stone-900/45 flex items-center justify-center p-2 sm:p-4">
+          <div className="w-full max-w-5xl max-h-[94vh] overflow-auto rounded-xl border border-stone-300 bg-stone-100 shadow-2xl">
+            <div className="sticky top-0 z-10 bg-stone-100 border-b border-stone-300 px-5 py-4 flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-stone-900">Booking Details</h3>
-                <p className="text-xs text-stone-500 mt-1">Booking ID: {selectedBookingDetails._id}</p>
+                <h3 className="text-3xl font-semibold text-stone-900">Booking Details</h3>
+                <p className="text-base text-stone-600 mt-1">Booking ID: {selectedBookingDetails._id}</p>
               </div>
               <button
                 type="button"
                 onClick={closeBookingDetails}
-                className="px-3 py-1.5 text-sm rounded-lg border border-stone-300 text-stone-700 hover:bg-stone-50"
+                className="px-5 py-2 text-base rounded-xl border border-stone-300 text-stone-700 bg-white hover:bg-stone-50"
               >
                 Close
               </button>
             </div>
 
-            <div className="px-5 py-4 space-y-5 text-sm">
+            <div className="px-4 sm:px-5 py-4 space-y-4 text-sm">
               <div className="grid sm:grid-cols-2 gap-3">
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">User Name</p>
-                  <p className="font-medium text-stone-900 mt-1">{selectedBookingDetails.name || '-'}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Puja</p>
-                  <p className="font-medium text-stone-900 mt-1">{selectedBookingDetails.poojaId?.title || '-'}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Phone</p>
-                  <p className="font-medium text-stone-900 mt-1">{selectedBookingDetails.phone || '-'}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Email</p>
-                  <p className="font-medium text-stone-900 mt-1 break-all">{selectedBookingDetails.email || '-'}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">City</p>
-                  <p className="font-medium text-stone-900 mt-1">{selectedBookingDetails.city || '-'}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Priest Preference</p>
-                  <p className="font-medium text-stone-900 mt-1">{selectedBookingDetails.priestPreference || '-'}</p>
-                </div>
+                <DetailFieldCard label="User Name" value={selectedBookingDetails.name} />
+                <DetailFieldCard label="Puja" value={selectedBookingDetails.poojaId?.title} />
+                <DetailFieldCard label="Phone" value={selectedBookingDetails.phone} />
+                <DetailFieldCard
+                  label="Email"
+                  value={selectedBookingDetails.email}
+                  valueClassName="text-2xl font-medium text-stone-900 mt-1 break-all"
+                />
+                <DetailFieldCard label="City" value={selectedBookingDetails.city} />
+                <DetailFieldCard label="Priest Preference" value={selectedBookingDetails.priestPreference} />
               </div>
 
-              <div className="rounded-lg border border-stone-200 p-3">
-                <p className="text-xs text-stone-500">Address</p>
-                <p className="font-medium text-stone-900 mt-1">{selectedBookingDetails.address || '-'}</p>
-              </div>
+              <DetailFieldCard label="Address" value={selectedBookingDetails.address} />
 
-              <div className="rounded-lg border border-stone-200 p-3">
+              <div className="rounded-xl border border-stone-300 bg-white p-3.5">
                 <p className="text-xs text-stone-500">Location Details</p>
-                <div className="mt-2 grid sm:grid-cols-2 gap-2 text-sm text-stone-800">
+                <div className="mt-2 grid sm:grid-cols-2 gap-2 text-lg text-stone-800">
                   <p><span className="text-stone-500">House:</span> {selectedBookingDetails.addressDetails?.house || '-'}</p>
                   <p><span className="text-stone-500">Street:</span> {selectedBookingDetails.addressDetails?.street || '-'}</p>
                   <p><span className="text-stone-500">City:</span> {selectedBookingDetails.addressDetails?.city || selectedBookingDetails.city || '-'}</p>
@@ -924,7 +1117,7 @@ function AdminPage() {
                     href={getMapLink(selectedBookingDetails)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-block mt-3 text-sm font-medium text-orange-700 hover:text-orange-800 hover:underline"
+                    className="inline-block mt-3 text-base font-medium text-orange-700 hover:text-orange-800 hover:underline"
                   >
                     View on Google Maps
                   </a>
@@ -932,73 +1125,50 @@ function AdminPage() {
               </div>
 
               <div className="grid sm:grid-cols-2 gap-3">
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Date</p>
-                  <p className="font-medium text-stone-900 mt-1">{selectedBookingDetails.date || '-'}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Time</p>
-                  <p className="font-medium text-stone-900 mt-1">{selectedBookingDetails.time || '-'}</p>
-                </div>
+                <DetailFieldCard label="Date" value={selectedBookingDetails.date} />
+                <DetailFieldCard label="Time" value={selectedBookingDetails.time} />
               </div>
 
               <div className="grid sm:grid-cols-2 gap-3">
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Package</p>
-                  <p className="font-medium text-stone-900 mt-1">{selectedBookingDetails.package || '-'}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Payment Type</p>
-                  <p className="font-medium text-stone-900 mt-1">{getPaymentTypeLabel(selectedBookingDetails.paymentOption)}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Final Amount</p>
-                  <p className="font-medium text-stone-900 mt-1">{formatCurrency(selectedBookingDetails.finalAmount)}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Paid Amount</p>
-                  <p className="font-medium text-stone-900 mt-1">{formatCurrency(selectedBookingDetails.paymentAmount)}</p>
-                </div>
+                <DetailFieldCard label="Package" value={selectedBookingDetails.package} />
+                <DetailFieldCard label="Payment Type" value={getPaymentTypeLabel(selectedBookingDetails.paymentOption)} />
+                <DetailFieldCard label="Final Amount" value={formatCurrency(selectedBookingDetails.finalAmount)} />
+                <DetailFieldCard label="Paid Amount" value={formatCurrency(selectedBookingDetails.paymentAmount)} />
               </div>
 
-              <div className="rounded-lg border border-stone-200 p-3">
+              <div className="rounded-xl border border-stone-300 bg-white p-3.5">
                 <p className="text-xs text-stone-500">Selected Add-ons</p>
                 {Array.isArray(selectedBookingDetails.selectedAddOns) && selectedBookingDetails.selectedAddOns.length > 0 ? (
-                  <ul className="mt-2 list-disc list-inside text-stone-800 space-y-1">
+                  <ul className="mt-2 list-disc list-inside text-2xl text-stone-800 space-y-1">
                     {selectedBookingDetails.selectedAddOns.map((addon) => (
                       <li key={addon}>{addon}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="font-medium text-stone-900 mt-1">No add-ons selected</p>
+                  <p className="text-2xl font-medium text-stone-900 mt-1">No add-ons selected</p>
                 )}
               </div>
 
-              <div className="rounded-lg border border-stone-200 p-3">
+              <div className="rounded-xl border border-stone-300 bg-white p-3.5">
                 <p className="text-xs text-stone-500">Special Notes</p>
-                <p className="font-medium text-stone-900 mt-1">{selectedBookingDetails.specialNotes || '-'}</p>
+                <p className="text-2xl font-medium text-stone-900 mt-1">{selectedBookingDetails.specialNotes || '-'}</p>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-3">
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Booking Status</p>
-                  <p className="font-medium text-stone-900 mt-1">{getBookingStatusView(selectedBookingDetails.bookingStatus).label}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3">
-                  <p className="text-xs text-stone-500">Payment Status</p>
-                  <p className="font-medium text-stone-900 mt-1">{getPaymentStatusView(selectedBookingDetails).label}</p>
-                </div>
-                <div className="rounded-lg border border-stone-200 p-3 sm:col-span-2">
-                  <p className="text-xs text-stone-500">Created At</p>
-                  <p className="font-medium text-stone-900 mt-1">{formatDateTime(selectedBookingDetails.createdAt)}</p>
-                </div>
+                <DetailFieldCard label="Booking Status" value={getBookingStatusView(selectedBookingDetails.bookingStatus).label} />
+                <DetailFieldCard label="Payment Status" value={getPaymentStatusView(selectedBookingDetails).label} />
+                <DetailFieldCard
+                  label="Created At"
+                  value={formatDateTime(selectedBookingDetails.createdAt)}
+                  className="rounded-xl border border-stone-300 bg-white p-3.5 sm:col-span-2"
+                />
               </div>
 
-              <div className="rounded-lg border border-orange-100 bg-orange-50/40 p-3">
+              <div className="rounded-xl border border-orange-200 bg-orange-50/40 p-3.5">
                 <p className="text-xs text-stone-500">Update Booking Status</p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <select
-                    className="border border-stone-300 rounded px-2 py-1.5 text-sm"
+                    className="border border-stone-300 rounded-xl px-3 py-2 text-base"
                     value={detailsBookingStatus}
                     onChange={(e) => setDetailsBookingStatus(e.target.value)}
                     disabled={updatingDetailsStatus}
@@ -1012,7 +1182,7 @@ function AdminPage() {
                     type="button"
                     onClick={saveDetailsStatus}
                     disabled={updatingDetailsStatus || detailsBookingStatus === normalizeBookingStatus(selectedBookingDetails.bookingStatus)}
-                    className="px-3 py-1.5 text-sm rounded-lg bg-orange-700 text-white hover:bg-orange-800 disabled:opacity-60"
+                    className="px-4 py-2 text-base rounded-xl bg-orange-700 text-white hover:bg-orange-800 disabled:opacity-60"
                   >
                     {updatingDetailsStatus ? 'Saving...' : 'Save Status'}
                   </button>
@@ -1022,33 +1192,6 @@ function AdminPage() {
           </div>
         </div>
       )}
-
-      <div className="mt-8 grid lg:grid-cols-2 gap-6">
-        <div className="bg-white border border-orange-100 rounded-2xl p-5 shadow-sm">
-          <h2 className="font-semibold text-stone-900">Enquiries</h2>
-          <div className="mt-3 space-y-2 max-h-64 overflow-auto">
-            {enquiries.map((item) => (
-              <div key={item._id} className="border border-stone-200 rounded-lg p-2.5 text-sm bg-stone-50/60">
-                <p className="font-medium">{item.name} ({item.phone})</p>
-                <p>{item.email}</p>
-                <p className="text-stone-600">{item.message}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="bg-white border border-orange-100 rounded-2xl p-5 shadow-sm">
-          <h2 className="font-semibold text-stone-900">Payments</h2>
-          <div className="mt-3 space-y-2 max-h-64 overflow-auto">
-            {payments.map((payment) => (
-              <div key={payment._id} className="border border-stone-200 rounded-lg p-2.5 text-sm bg-stone-50/60">
-                <p>Order: {payment.razorpayOrderId}</p>
-                <p>Amount: ₹{payment.amount}</p>
-                <p>Status: {payment.status}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </section>
   )
 }
