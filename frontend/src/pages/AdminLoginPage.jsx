@@ -32,7 +32,13 @@ function AdminLoginPage() {
       login(res.data)
       navigate('/admin')
     } catch (err) {
-      setError(err.response?.data?.message || 'Admin login failed')
+      if (err?.code === 'ECONNABORTED') {
+        setError('Server is taking too long to respond. Please try again in a few seconds.')
+      } else if (!err?.response) {
+        setError('Unable to reach server. Check internet connection or backend/CORS settings.')
+      } else {
+        setError(err.response?.data?.message || 'Admin login failed')
+      }
     } finally {
       setIsSubmitting(false)
     }

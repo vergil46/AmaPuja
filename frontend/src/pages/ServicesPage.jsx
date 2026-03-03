@@ -6,8 +6,9 @@ import api from '../services/api'
 
 const normalizeTitle = (value) => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 const normalizeLanguageKey = (value) => String(value || '').trim().toLowerCase()
+const normalizedHindiExcludedTitles = new Set(['Engagement Puja'].map(normalizeTitle))
 
-const allowedPriestPreferences = new Set(['Hindi', 'Odia', 'Bengali', 'Kannada'])
+const allowedPriestPreferences = new Set(['Hindi', 'Odia', 'Bengali'])
 const allowedCities = new Set(['Bangalore', 'Bhubaneswar'])
 
 const defaultPoojas = [
@@ -534,9 +535,14 @@ function ServicesPage() {
 
   const filteredPoojas = useMemo(() => {
     const normalizedSearch = normalizeTitle(searchTerm)
+    const languageAdjustedPoojas =
+      priestPreference === 'Hindi'
+        ? languageMatchedPoojas.filter((pooja) => !normalizedHindiExcludedTitles.has(pooja.normalizedTitle))
+        : languageMatchedPoojas
+
     const searchedPoojas = !normalizedSearch
-      ? languageMatchedPoojas
-      : languageMatchedPoojas.filter((pooja) => pooja.normalizedTitle.includes(normalizedSearch))
+      ? languageAdjustedPoojas
+      : languageAdjustedPoojas.filter((pooja) => pooja.normalizedTitle.includes(normalizedSearch))
 
     const uniquePoojas = []
     const seenTitles = new Set()
@@ -548,12 +554,18 @@ function ServicesPage() {
     })
 
     return uniquePoojas
-  }, [languageMatchedPoojas, searchTerm])
+  }, [languageMatchedPoojas, priestPreference, searchTerm])
 
   const displayPoojas = useMemo(() => {
     const selectedLanguageKey = String(priestPreference || '').toLowerCase()
+    const sortedPoojas = [...filteredPoojas].sort((first, second) =>
+      String(first?.title || '').localeCompare(String(second?.title || ''), undefined, {
+        sensitivity: 'base',
+        numeric: true,
+      })
+    )
 
-    return filteredPoojas.map((pooja) => {
+    return sortedPoojas.map((pooja) => {
       const languagePackages =
         Array.isArray(pooja?.pricing?.[selectedLanguageKey]?.packages)
           ? pooja.pricing[selectedLanguageKey].packages
@@ -619,7 +631,6 @@ function ServicesPage() {
                 <option value="Hindi">Hindi</option>
                 <option value="Odia">Odia</option>
                 <option value="Bengali">Bengali</option>
-                <option value="Kannada">Kannada</option>
               </select>
             </div>
 

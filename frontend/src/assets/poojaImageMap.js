@@ -3,7 +3,7 @@ import bhoomiPujaImg from './poojas/Bhoomi Puja.jpeg'
 import brihaspatiVratImg from './poojas/Brihaspati Vrat Udyapan Puja.jpeg'
 import durgaPujaImg from './poojas/Durga Puja.jpeg'
 import ekadasiVratImg from './poojas/Ekadashi Vrat Udyapan Puja.jpeg'
-import engagementImg from './poojas/engagement-puja-optimized.webp'
+import engagementImg from './poojas/engagement-puja.png'
 import fixMuhuratImg from './poojas/Fix Your Muhurat.png'
 import gandMoolImg from './poojas/Gand Mool Nakshatra Shanti Puja.jpeg'
 import ganapathiImg from './poojas/ganapathi-puja.jpg'
@@ -61,8 +61,10 @@ const poojaImageMap = {
   'Ekadashi Vrat Udyapan': ekadasiVratImg,
   'Ekadashi Vrat Udyapan Puja': ekadasiVratImg,
   // Engagement
+  'Engagement Puja': engagementImg,
   'Engagement Puja – Nirbandha': engagementImg,
   'Engagement Puja - Nirbandha': engagementImg,
+  'Engagement Puja – Sagai': engagementImg,
   'Engagement Puja - Sagai': engagementImg,
   // Fix Muhurat
   'Fix Your Muhurat': fixMuhuratImg,
@@ -102,11 +104,13 @@ const poojaImageMap = {
   'Mahalaxmi Puja': lakshmiImg,
   // Lalitha Sahasranam
   'Lalitha Sahasranam Puja': lalithaSahasranamImg,
+  'Lalitha Sahasranamam Puja': lalithaSahasranamImg,
   // Marriage
   Marriage: vivahImg,
   // Murti Pran Pratishta
   'Murti Pran Pratishta': murtiPranPratishta,
   'Murti Pran Pratishta At Home': murtiPranPratishta,
+  'Murti Pran Pratistha At Home': murtiPranPratishta,
   // Namkaran / Namakarana
   'Namkaran (Ekoisia)': namkaranImg,
   'Namkaran Puja (Ekoisia)': namkaranImg,
@@ -159,6 +163,7 @@ const poojaImageMap = {
   'Vivah (Marriage)': vivahImg,
   // Yagnopavit
   'Yagnopavit Sanskar (Bratabandha)': yagnopavitImg,
+  'Yagnopavit Sanskar (Upanayan Sanskar)': yagnopavitImg,
   'Yagnopavit Sanskar': yagnopavitImg,
 }
 

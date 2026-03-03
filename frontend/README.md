@@ -14,3 +14,17 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Environment Variables
+
+Create a `.env` file in `frontend/` with:
+
+```
+VITE_API_URL=http://localhost:5000/api
+VITE_RAZORPAY_KEY_ID=rzp_test_xxxxx
+VITE_GOOGLE_MAPS_API_KEY=
+```
+
+- `VITE_API_URL` is required for frontend API calls.
+- `VITE_RAZORPAY_KEY_ID` is required for payments.
+- `VITE_GOOGLE_MAPS_API_KEY` is optional. If not set, location autofill uses a fallback reverse-geocoding provider.

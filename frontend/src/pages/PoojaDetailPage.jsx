@@ -120,29 +120,80 @@ function PoojaDetailPage() {
     }
   }
 
+  const parseFallbackAddress = (payload) => {
+    const address = payload?.localityInfo?.administrative || {}
+
+    const city =
+      String(payload?.city || '').trim() ||
+      String(payload?.locality || '').trim() ||
+      String(payload?.principalSubdivision || '').trim() ||
+      String(address?.city || '').trim()
+
+    const state =
+      String(payload?.principalSubdivision || '').trim() ||
+      String(address?.principalSubdivision || '').trim() ||
+      String(address?.state || '').trim()
+
+    return {
+      house: '',
+      street: String(payload?.locality || '').trim(),
+      city,
+      state,
+      pincode: String(payload?.postcode || '').trim(),
+      formattedAddress: String(payload?.locality || '').trim(),
+    }
+  }
+
+  const fetchAddressFromFallback = async (
+    latitude,
+    longitude
+  ) => {
+    const fallbackUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+    const fallbackResponse = await fetch(fallbackUrl)
+
+    if (!fallbackResponse.ok) {
+      throw new Error('Unable to fetch address from location coordinates.')
+    }
+
+    const fallbackPayload = await fallbackResponse.json()
+    const parsedFallbackAddress = parseFallbackAddress(
+      fallbackPayload
+    )
+
+    if (
+      !parsedFallbackAddress.formattedAddress &&
+      !parsedFallbackAddress.city &&
+      !parsedFallbackAddress.state
+    ) {
+      throw new Error('No address found for your current location.')
+    }
+
+    return parsedFallbackAddress
+  }
+
   const fetchAddressFromCoordinates = async (
     latitude,
     longitude
   ) => {
-    if (!googleMapsApiKey) {
-      throw new Error(
-        'Google Maps API key is missing. Please set VITE_GOOGLE_MAPS_API_KEY.'
-      )
+    if (googleMapsApiKey) {
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleMapsApiKey}`
+      const response = await fetch(url)
+
+      if (!response.ok) {
+        throw new Error('Unable to fetch address from location coordinates.')
+      }
+
+      const payload = await response.json()
+      if (
+        payload.status === 'OK' &&
+        Array.isArray(payload.results) &&
+        payload.results.length > 0
+      ) {
+        return parseGoogleAddress(payload.results[0])
+      }
     }
 
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleMapsApiKey}`
-    const response = await fetch(url)
-
-    if (!response.ok) {
-      throw new Error('Unable to fetch address from location coordinates.')
-    }
-
-    const payload = await response.json()
-    if (payload.status !== 'OK' || !Array.isArray(payload.results) || payload.results.length === 0) {
-      throw new Error('No address found for your current location.')
-    }
-
-    return parseGoogleAddress(payload.results[0])
+    return fetchAddressFromFallback(latitude, longitude)
   }
 
   const handleUseCurrentLocation = async () => {

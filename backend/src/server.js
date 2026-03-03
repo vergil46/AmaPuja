@@ -45,12 +45,15 @@ app.use(
       const normalizedOrigin = normalizeOrigin(origin);
       const normalizedConfigured = configuredClientUrl ? normalizeOrigin(configuredClientUrl) : null;
       const normalizedConfiguredList = configuredClientUrls.map(normalizeOrigin);
+      const isKnownRenderFrontend = /^https:\/\/amapuja-frontend(?:-[a-z0-9-]+)?\.onrender\.com$/i.test(
+        normalizedOrigin
+      );
 
       const isConfiguredClient = normalizedConfigured && normalizedOrigin === normalizedConfigured;
       const isConfiguredClientList = normalizedConfiguredList.includes(normalizedOrigin);
       const isLocalhostVitePort = /^http:\/\/localhost:\d+$/.test(origin);
 
-      if (isConfiguredClient || isConfiguredClientList || isLocalhostVitePort) {
+      if (isConfiguredClient || isConfiguredClientList || isLocalhostVitePort || isKnownRenderFrontend) {
         return callback(null, true);
       }
 

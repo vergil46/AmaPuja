@@ -36,6 +36,9 @@ cd frontend
 npm run dev
 ```
 
+Optional (for Google Maps reverse geocoding): add `VITE_GOOGLE_MAPS_API_KEY` in `frontend/.env`.
+If not set, current-location address autofill still works using a fallback provider.
+
 **You'll see**:
 ```
 VITE ready in XXX ms

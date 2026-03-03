@@ -1,33 +1,18 @@
-const proofImageModules = import.meta.glob('../../public/proofs/*.{jpg,jpeg,png,webp,avif,gif}', {
-  eager: true,
-  import: 'default',
-  query: '?url',
-})
+const proofVideos = [
+  '/proofs/Videos/proofvideo.mp4',
+  '/proofs/Videos/workvideo2.mp4',
+]
 
-const proofVideoModules = import.meta.glob('../../public/proofs/**/*.{mp4,webm,ogg,mov,m4v}', {
-  eager: true,
-  import: 'default',
-  query: '?url',
-})
-
-const autoDetectedProofImages = Object.values(proofImageModules).sort((firstImage, secondImage) =>
-  firstImage.localeCompare(secondImage, undefined, { numeric: true })
-)
-
-const autoDetectedProofVideos = Object.values(proofVideoModules).sort((firstVideo, secondVideo) =>
-  secondVideo.localeCompare(firstVideo, undefined, { numeric: true })
-)
-
-const fallbackProofImages = [
+const proofImages = [
   '/proofs/work1.jpeg',
   '/proofs/work2.jpeg',
   '/proofs/work3.jpeg',
   '/proofs/work4.jpeg',
   '/proofs/work5.jpeg',
   '/proofs/work6.jpeg',
+  '/proofs/work7.jpeg',
+  '/proofs/work8.jpeg',
 ]
-
-const proofImages = autoDetectedProofImages.length > 0 ? autoDetectedProofImages : fallbackProofImages
 
 function WorkProofGallery({
   title = 'Our Work',
@@ -41,11 +26,11 @@ function WorkProofGallery({
         <p className="mt-2 text-sm leading-relaxed text-stone-600">{description}</p>
       </div>
 
-      {autoDetectedProofVideos.length > 0 && (
+      {proofVideos.length > 0 && (
         <div className="mt-6">
           <h3 className="text-base sm:text-xl font-semibold text-stone-800">Work Videos</h3>
           <div className="grid md:grid-cols-2 gap-3 sm:gap-4 mt-4">
-            {autoDetectedProofVideos.map((video, index) => (
+            {proofVideos.map((video, index) => (
               <article
                 key={video}
                 className="overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"

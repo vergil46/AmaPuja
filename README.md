@@ -37,9 +37,14 @@ Copy from `backend/.env.example` and set:
 - `MONGO_URI`
 - `JWT_SECRET`
 - `CLIENT_URL`
+- `CLIENT_URLS` (optional, comma-separated allowed origins)
 - `RAZORPAY_KEY_ID`
 - `RAZORPAY_KEY_SECRET`
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+
+Example:
+
+`CLIENT_URLS=https://amapuja-frontend.onrender.com,https://amapuja-frontend-pr-12.onrender.com`
 
 ### Frontend (`frontend/.env`)
 
@@ -47,6 +52,7 @@ Copy from `frontend/.env.example` and set:
 
 - `VITE_API_URL`
 - `VITE_RAZORPAY_KEY_ID`
+- `VITE_GOOGLE_MAPS_API_KEY` (optional; used for Google reverse geocoding)
 
 ## Run Locally
 
@@ -76,5 +82,6 @@ Backend API: `http://localhost:5000/api`
 - Default pooja services are auto-seeded on first backend run when DB is empty.
 - Create one admin user manually in MongoDB by setting `role: "admin"` for that user document.
 - Razorpay checkout opens only when `VITE_RAZORPAY_KEY_ID` is set.
+- Current location address autofill works with fallback provider even if `VITE_GOOGLE_MAPS_API_KEY` is not set.
 - Never commit real `.env` files or payment/email secrets.
 - For production, set strict CORS origins and secure cookie/JWT settings.
