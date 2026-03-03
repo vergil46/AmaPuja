@@ -36,11 +36,11 @@ This guide is for this project structure:
 
 In Render backend Environment variables, set one of:
 
-- `CLIENT_URL=https://<your-vercel-domain>.vercel.app`
+- `CLIENT_URL=https://pujasmarddhi.vercel.app`
 
 or (recommended for multiple domains):
 
-- `CLIENT_URLS=https://<your-vercel-domain>.vercel.app,https://www.<your-domain>.com`
+- `CLIENT_URLS=https://pujasmarddhi.vercel.app,https://www.<your-domain>.com`
 
 Then redeploy backend on Render.
 
@@ -59,6 +59,12 @@ If API fails, check browser network tab and confirm requests go to Render backen
 Also verify backend health endpoint directly:
 
 - `https://amapuja-backend-lokanath.onrender.com/api/health`
+
+Then verify auth from your Vercel frontend:
+
+- Open `https://pujasmarddhi.vercel.app/login`
+- Login and confirm dashboard loads without CORS errors
+- In browser network tab, confirm requests go to `https://amapuja-backend-lokanath.onrender.com/api`
 
 ---
 
@@ -106,6 +112,7 @@ Then include that domain in Render `CLIENT_URLS`.
 
 - [ ] `VITE_API_URL` set on Vercel
 - [ ] Render CORS includes Vercel domain
+- [ ] Login works on `https://pujasmarddhi.vercel.app/login`
 - [ ] Direct route refresh works (`/services/:id`)
 - [ ] Booking create works
 - [ ] Payment flow works

@@ -153,8 +153,13 @@ npm run dev
 **Fix checklist**:
 - [ ] In Vercel, set `VITE_API_URL=https://amapuja-backend-lokanath.onrender.com/api`
 - [ ] Do **not** use `https://amapuja-backend.onrender.com` (inactive/wrong service)
-- [ ] In Render backend env, set `CLIENT_URL` or `CLIENT_URLS` to include your Vercel domain
+- [ ] In Render backend env, set `CLIENT_URL=https://pujasmarddhi.vercel.app` (or include it in `CLIENT_URLS`)
 - [ ] Redeploy backend (Render) and frontend (Vercel)
+
+**Post-deploy verification**:
+- [ ] Open `https://pujasmarddhi.vercel.app/login` and login successfully
+- [ ] Confirm dashboard opens from Vercel frontend
+- [ ] In browser network tab, confirm API calls go to `https://amapuja-backend-lokanath.onrender.com/api`
 
 ### Problem: "SMTP credentials not configured" warning
 **Solution**: This is normal! The app works without emails. To enable emails, follow Step 3 above.
