@@ -49,12 +49,21 @@ app.use(
       const isKnownRenderFrontend = /^https:\/\/amapuja-frontend(?:-[a-z0-9-]+)?\.onrender\.com$/i.test(
         normalizedOrigin
       );
+      const isKnownVercelFrontend = /^https:\/\/amapuja(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(
+        normalizedOrigin
+      );
 
       const isConfiguredClient = normalizedConfigured && normalizedOrigin === normalizedConfigured;
       const isConfiguredClientList = normalizedConfiguredList.includes(normalizedOrigin);
       const isLocalhostVitePort = /^http:\/\/localhost:\d+$/.test(origin);
 
-      if (isConfiguredClient || isConfiguredClientList || isLocalhostVitePort || isKnownRenderFrontend) {
+      if (
+        isConfiguredClient ||
+        isConfiguredClientList ||
+        isLocalhostVitePort ||
+        isKnownRenderFrontend ||
+        isKnownVercelFrontend
+      ) {
         return callback(null, true);
       }
 

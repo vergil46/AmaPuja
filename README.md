@@ -90,7 +90,7 @@ Backend API: `http://localhost:5000/api`
 
 - Frontend deployment guide: `DEPLOY_VERCEL.md`
 - Frontend (Vercel): `https://<your-vercel-project>.vercel.app`
-- Backend (Render API): `https://<your-render-backend>.onrender.com/api`
+- Backend (Render API): `https://amapuja-backend-lokanath.onrender.com/api`
 
 ### Production Env Checklist
 

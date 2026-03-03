@@ -145,6 +145,17 @@ npm run dev
 
 ## 🛠️ Troubleshooting
 
+### Problem: Backend not found on Render / dashboard not loading on Vercel
+**Use these exact production URLs**:
+- Backend API base: `https://amapuja-backend-lokanath.onrender.com/api`
+- Backend health: `https://amapuja-backend-lokanath.onrender.com/api/health`
+
+**Fix checklist**:
+- [ ] In Vercel, set `VITE_API_URL=https://amapuja-backend-lokanath.onrender.com/api`
+- [ ] Do **not** use `https://amapuja-backend.onrender.com` (inactive/wrong service)
+- [ ] In Render backend env, set `CLIENT_URL` or `CLIENT_URLS` to include your Vercel domain
+- [ ] Redeploy backend (Render) and frontend (Vercel)
+
 ### Problem: "SMTP credentials not configured" warning
 **Solution**: This is normal! The app works without emails. To enable emails, follow Step 3 above.
 

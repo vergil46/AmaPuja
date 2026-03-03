@@ -26,7 +26,7 @@ This guide is for this project structure:
 
 4. Add Environment Variable:
    - **Key**: `VITE_API_URL`
-   - **Value**: `https://<your-render-backend>.onrender.com/api`
+   - **Value**: `https://amapuja-backend-lokanath.onrender.com/api`
 
 5. Click **Deploy**
 
@@ -56,6 +56,9 @@ Open these in browser:
 - Refresh service detail page (must not show 404)
 
 If API fails, check browser network tab and confirm requests go to Render backend URL.
+Also verify backend health endpoint directly:
+
+- `https://amapuja-backend-lokanath.onrender.com/api/health`
 
 ---
 
@@ -83,6 +86,11 @@ Then include that domain in Render `CLIENT_URLS`.
 
 ### D) API timeout
 - Render free tier may sleep; first request can be slow
+
+### E) Backend URL wrong / backend not found
+- Use: `https://amapuja-backend-lokanath.onrender.com/api`
+- Do not use: `https://amapuja-backend.onrender.com` (wrong/inactive service)
+- Verify health: `https://amapuja-backend-lokanath.onrender.com/api/health`
 
 ---
 
