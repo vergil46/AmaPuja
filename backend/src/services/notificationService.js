@@ -18,6 +18,13 @@ const sendTwilioMessage = async ({ from, to, body }) => {
   const authToken = process.env.TWILIO_AUTH_TOKEN;
 
   if (!accountSid || !authToken || !from || !to || !body) {
+    console.warn('Twilio message skipped due to missing config/params', {
+      hasAccountSid: Boolean(accountSid),
+      hasAuthToken: Boolean(authToken),
+      hasFrom: Boolean(from),
+      hasTo: Boolean(to),
+      hasBody: Boolean(body),
+    });
     return false;
   }
 
@@ -53,6 +60,50 @@ const sendTwilioMessage = async ({ from, to, body }) => {
   }
 };
 
+const getAdminWhatsAppTo = () => {
+  const configured = String(process.env.ADMIN_WHATSAPP_TO || '').trim();
+  if (!configured) return '';
+
+  if (configured.startsWith('whatsapp:')) {
+    return configured;
+  }
+
+  const normalized = normalizePhone(configured);
+  if (!normalized) return '';
+
+  return `whatsapp:${normalized}`;
+};
+
+const sendOwnerLeadWhatsAppAlert = async ({ type, name, phone, email, service, details }) => {
+  const from = process.env.TWILIO_WHATSAPP_FROM;
+  const to = getAdminWhatsAppTo();
+
+  if (!from || !to) {
+    console.warn('Owner WhatsApp alert skipped due to missing WhatsApp route config', {
+      hasTwilioWhatsAppFrom: Boolean(from),
+      hasAdminWhatsAppTo: Boolean(to),
+    });
+    return false;
+  }
+
+  const lines = [
+    '🔔 New Lead Alert - Ama Puja',
+    `Type: ${String(type || 'Lead')}`,
+    `Name: ${String(name || '-').trim() || '-'}`,
+    `Phone: ${String(phone || '-').trim() || '-'}`,
+    `Email: ${String(email || '-').trim() || '-'}`,
+    `Service: ${String(service || '-').trim() || '-'}`,
+    details ? `Details: ${String(details).trim()}` : '',
+    `Time: ${new Date().toLocaleString('en-IN')}`,
+  ].filter(Boolean);
+
+  return sendTwilioMessage({
+    from,
+    to,
+    body: lines.join('\n'),
+  });
+};
+
 const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
   const phone = normalizePhone(booking.phone);
   const reviewUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/dashboard`;
@@ -60,7 +111,7 @@ const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
   const smsBody = `Ama Puja: Booking received for ${pooja.title} on ${booking.date} at ${booking.time}. Amount: Rs ${booking.paymentAmount}.`; 
   const whatsappBody = `Namaste ${booking.name}, your booking for ${pooja.title} is received on Ama Puja. Date: ${booking.date}, Time: ${booking.time}. Track details in your dashboard.`;
 
-  const [emailSent, adminAlertSent, smsSent, whatsappSent] = await Promise.all([
+  const [emailSent, adminAlertSent, smsSent, whatsappSent, ownerLeadWhatsAppSent] = await Promise.all([
     sendBookingConfirmationEmail(booking, pooja),
     sendAdminBookingAlertEmail(booking, pooja),
     sendTwilioMessage({
@@ -72,6 +123,14 @@ const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
       from: process.env.TWILIO_WHATSAPP_FROM,
       to: `whatsapp:${phone}`,
       body: whatsappBody,
+    }),
+    sendOwnerLeadWhatsAppAlert({
+      type: 'Booking',
+      name: booking?.name,
+      phone: booking?.phone,
+      email: booking?.email,
+      service: pooja?.title || booking?.package,
+      details: `${booking?.date || '-'} ${booking?.time || ''} | ${booking?.city || '-'}`.trim(),
     }),
   ]);
 
@@ -88,7 +147,22 @@ const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
     });
   }
 
-  return { emailSent, adminAlertSent, smsSent, whatsappSent, reviewUrl };
+  return { emailSent, adminAlertSent, smsSent, whatsappSent, ownerLeadWhatsAppSent, reviewUrl };
+};
+
+const sendEnquiryCreatedNotifications = async (enquiry) => {
+  const ownerLeadWhatsAppSent = await sendOwnerLeadWhatsAppAlert({
+    type: 'Enquiry',
+    name: enquiry?.name,
+    phone: enquiry?.phone,
+    email: enquiry?.email,
+    service: enquiry?.service,
+    details: enquiry?.message,
+  });
+
+  return {
+    ownerLeadWhatsAppSent,
+  };
 };
 
 const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
@@ -132,4 +206,5 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
 module.exports = {
   sendBookingCreatedNotifications,
   sendCompletionReviewNotifications,
+  sendEnquiryCreatedNotifications,
 };

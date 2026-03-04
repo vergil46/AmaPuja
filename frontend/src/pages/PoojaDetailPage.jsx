@@ -63,6 +63,8 @@ function PoojaDetailPage() {
     kannada: 'Kannada',
   }[languageQuery] || 'Odia'
 
+  const hasLanguageFromServicesQuery = ['odia', 'hindi', 'bengali', 'kannada'].includes(languageQuery)
+
   const selectedCityFromServices =
     searchParams.get('city') === 'Bhubaneswar'
       ? 'Bhubaneswar'
@@ -348,12 +350,18 @@ function PoojaDetailPage() {
       const parsed = JSON.parse(raw)
       if (!parsed || typeof parsed !== 'object') return
 
-      setForm((previous) => ({
-        ...previous,
-        ...Object.fromEntries(
+      setForm((previous) => {
+        const draftValues = Object.fromEntries(
           Object.entries(parsed).filter(([, value]) => typeof value === 'string')
-        ),
-      }))
+        )
+
+        return {
+          ...previous,
+          ...draftValues,
+          city: selectedCityFromServices,
+          priestPreference: selectedLanguageFromServices,
+        }
+      })
 
       if (Array.isArray(parsed.selectedAddOns)) {
         setSelectedAddOns(parsed.selectedAddOns.filter(Boolean))
@@ -364,7 +372,7 @@ function PoojaDetailPage() {
     } catch (error) {
       console.warn('Failed to load booking draft:', error)
     }
-  }, [id, draftStorageKey])
+  }, [id, draftStorageKey, selectedCityFromServices, selectedLanguageFromServices])
 
   useEffect(() => {
     if (typeof window === 'undefined' || !id) return
@@ -412,7 +420,7 @@ function PoojaDetailPage() {
       ]
     }
 
-    return available.map((item) => {
+    const normalizedAvailable = available.map((item) => {
       const value = String(item || '').trim()
       if (!value) return ''
       return (
@@ -420,7 +428,36 @@ function PoojaDetailPage() {
         value.slice(1).toLowerCase()
       )
     }).filter(Boolean)
-  }, [pooja])
+
+    if (
+      hasLanguageFromServicesQuery &&
+      !normalizedAvailable.some(
+        (option) => option.toLowerCase() === selectedLanguageFromServices.toLowerCase()
+      )
+    ) {
+      return [selectedLanguageFromServices, ...normalizedAvailable]
+    }
+
+    return normalizedAvailable
+  }, [pooja, hasLanguageFromServicesQuery, selectedLanguageFromServices])
+
+  useEffect(() => {
+    if (!hasLanguageFromServicesQuery) return
+
+    setForm((previous) => {
+      if (
+        String(previous.priestPreference || '').toLowerCase() ===
+        selectedLanguageFromServices.toLowerCase()
+      ) {
+        return previous
+      }
+
+      return {
+        ...previous,
+        priestPreference: selectedLanguageFromServices,
+      }
+    })
+  }, [hasLanguageFromServicesQuery, selectedLanguageFromServices])
 
   useEffect(() => {
     if (languageOptions.length === 0) return

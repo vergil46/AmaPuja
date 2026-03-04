@@ -36,6 +36,8 @@ services:
         sync: false
       - key: ADMIN_ALERT_EMAIL
         sync: false
+      - key: ADMIN_WHATSAPP_TO
+        sync: false
       - key: SENTRY_DSN
         sync: false
       - key: SENTRY_TRACES_SAMPLE_RATE

@@ -2,6 +2,7 @@ const express = require('express');
 const Enquiry = require('../models/Enquiry');
 const { protect, adminOnly } = require('../middleware/auth');
 const { sendAdminEnquiryAlertEmail } = require('../services/emailService');
+const { sendEnquiryCreatedNotifications } = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -12,6 +13,17 @@ router.post('/', async (req, res) => {
   sendAdminEnquiryAlertEmail(enquiry).catch((error) => {
     console.error('Admin enquiry alert failed:', error);
   });
+
+  sendEnquiryCreatedNotifications(enquiry)
+    .then((result) => {
+      console.log('Enquiry lead notification result:', result);
+      if (!result?.ownerLeadWhatsAppSent) {
+        console.warn('Owner WhatsApp enquiry alert not delivered. Check Twilio/WhatsApp config and sandbox status.');
+      }
+    })
+    .catch((error) => {
+      console.error('Owner WhatsApp enquiry alert failed:', error);
+    });
 
   return res.status(201).json(enquiry);
 });
