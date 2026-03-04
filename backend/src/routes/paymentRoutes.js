@@ -5,6 +5,7 @@ const Payment = require('../models/Payment');
 const Booking = require('../models/Booking');
 const Pooja = require('../models/Pooja');
 const { protect, adminOnly } = require('../middleware/auth');
+const { alertCriticalIssue } = require('../services/monitoringService');
 
 const router = express.Router();
 
@@ -170,6 +171,16 @@ router.post('/create-order', protect, async (req, res) => {
 
     return res.json({ order, payment });
   } catch (error) {
+    await alertCriticalIssue({
+      type: 'payment_order_creation_failed',
+      title: 'Payment order creation failed',
+      message: error?.message || 'Failed to create Razorpay order',
+      metadata: {
+        route: '/api/payments/create-order',
+        bookingId: req?.body?.bookingId,
+      },
+      error,
+    });
     return res.status(500).json({ message: 'Failed to create Razorpay order' });
   }
 });
@@ -184,6 +195,21 @@ router.post('/verify', protect, async (req, res) => {
       .digest('hex');
 
     if (generatedSignature !== razorpay_signature) {
+      await Payment.findOneAndUpdate(
+        { razorpayOrderId: razorpay_order_id },
+        { status: 'failed' }
+      );
+
+      await alertCriticalIssue({
+        type: 'payment_verification_failed',
+        title: 'Payment verification failed (signature mismatch)',
+        message: 'Razorpay signature mismatch during payment verification',
+        metadata: {
+          route: '/api/payments/verify',
+          razorpayOrderId: razorpay_order_id,
+          razorpayPaymentId: razorpay_payment_id,
+        },
+      });
       return res.status(400).json({ message: 'Payment verification failed' });
     }
 
@@ -194,6 +220,16 @@ router.post('/verify', protect, async (req, res) => {
     );
 
     if (!payment) {
+      await alertCriticalIssue({
+        type: 'payment_verification_failed',
+        title: 'Payment verification failed (missing record)',
+        message: 'Payment record not found for verified Razorpay order',
+        metadata: {
+          route: '/api/payments/verify',
+          razorpayOrderId: razorpay_order_id,
+          razorpayPaymentId: razorpay_payment_id,
+        },
+      });
       return res.status(404).json({ message: 'Payment record not found' });
     }
 
@@ -204,6 +240,22 @@ router.post('/verify', protect, async (req, res) => {
 
     return res.json({ message: 'Payment verified', payment });
   } catch (error) {
+    await Payment.findOneAndUpdate(
+      { razorpayOrderId: req?.body?.razorpay_order_id },
+      { status: 'failed' }
+    );
+
+    await alertCriticalIssue({
+      type: 'payment_verification_failed',
+      title: 'Payment verification failed (exception)',
+      message: error?.message || 'Payment verification failed with server exception',
+      metadata: {
+        route: '/api/payments/verify',
+        razorpayOrderId: req?.body?.razorpay_order_id,
+        razorpayPaymentId: req?.body?.razorpay_payment_id,
+      },
+      error,
+    });
     return res.status(500).json({ message: 'Payment verification failed' });
   }
 });

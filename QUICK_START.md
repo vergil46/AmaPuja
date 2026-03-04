@@ -161,6 +161,22 @@ npm run dev
 - [ ] Confirm dashboard opens from Vercel frontend
 - [ ] In browser network tab, confirm API calls go to `https://amapuja-backend-lokanath.onrender.com/api`
 
+### Production Monitoring & Alerts (Recommended)
+
+Set these before go-live:
+
+- Render backend env:
+   - `SENTRY_DSN`, `SENTRY_TRACES_SAMPLE_RATE`
+   - `ADMIN_ALERT_EMAIL`
+   - `DAILY_SUMMARY_HOUR_UTC`, `DAILY_SUMMARY_MINUTE_UTC`, `DAILY_SUMMARY_CHECK_MS`
+- Vercel frontend env:
+   - `VITE_SENTRY_DSN`, `VITE_SENTRY_TRACES_SAMPLE_RATE`
+
+Health checks to verify:
+
+- Backend: `https://amapuja-backend-lokanath.onrender.com/api/health`
+- Frontend: `https://pujasmarddhi.vercel.app/health`
+
 ### Problem: "SMTP credentials not configured" warning
 **Solution**: This is normal! The app works without emails. To enable emails, follow Step 3 above.
 

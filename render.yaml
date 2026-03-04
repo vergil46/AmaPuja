@@ -34,6 +34,18 @@ services:
         sync: false
       - key: SMTP_FROM
         sync: false
+      - key: ADMIN_ALERT_EMAIL
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        sync: false
+      - key: DAILY_SUMMARY_HOUR_UTC
+        sync: false
+      - key: DAILY_SUMMARY_MINUTE_UTC
+        sync: false
+      - key: DAILY_SUMMARY_CHECK_MS
+        sync: false
 
   - type: static
     name: amapuja-frontend
@@ -49,6 +61,10 @@ services:
       - key: VITE_RAZORPAY_KEY_ID
         sync: false
       - key: VITE_GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: VITE_SENTRY_DSN
+        sync: false
+      - key: VITE_SENTRY_TRACES_SAMPLE_RATE
         sync: false
     routes:
       - type: rewrite

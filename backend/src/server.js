@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const Sentry = require('@sentry/node');
 
 const envFilePath = path.resolve(__dirname, '../.env');
 dotenv.config({
@@ -16,6 +17,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 const connectDB = require('./config/db');
 const seedPoojas = require('./utils/seedPoojas');
+const { getApiHealthStatus, startDailyBusinessSummaryJob, captureIfSentryEnabled } = require('./services/monitoringService');
 
 const authRoutes = require('./routes/authRoutes');
 const poojaRoutes = require('./routes/poojaRoutes');
@@ -29,6 +31,15 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 connectDB().then(seedPoojas);
 
 const app = express();
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || 'development',
+    tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || 0.2),
+  });
+  app.use(Sentry.Handlers.requestHandler());
+}
 
 app.use(
   cors({
@@ -76,7 +87,9 @@ app.use(cookieParser());
 app.use(morgan('dev'));
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', app: 'Ama Puja API' });
+  const health = getApiHealthStatus();
+  const code = health.status === 'ok' ? 200 : 503;
+  res.status(code).json(health);
 });
 
 app.use('/api/auth', authRoutes);
@@ -88,10 +101,24 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
+if (process.env.SENTRY_DSN) {
+  app.use(Sentry.Handlers.errorHandler());
+}
+
 app.use((err, req, res, next) => {
   console.error(err);
+  captureIfSentryEnabled(err, {
+    tags: { layer: 'express_error_middleware' },
+    extra: {
+      path: req?.originalUrl,
+      method: req?.method,
+    },
+  });
   res.status(500).json({ message: 'Server error' });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log("Server running"));
+app.listen(PORT, () => {
+  console.log('Server running');
+  startDailyBusinessSummaryJob();
+});

@@ -250,6 +250,75 @@ const sendAdminEnquiryAlertEmail = async (enquiry) => {
   }
 };
 
+const sendOpsAlertEmail = async ({ title, message, metadata = {} }) => {
+  const transporter = createTransporter();
+  if (!transporter) return false;
+
+  const adminEmail = process.env.ADMIN_ALERT_EMAIL || process.env.SMTP_USER;
+  if (!adminEmail) return false;
+
+  const safeMetadata = Object.entries(metadata || {})
+    .map(([key, value]) => `<li><strong>${key}:</strong> ${String(value ?? '-')}</li>`)
+    .join('');
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      to: adminEmail,
+      subject: `[CRITICAL] ${title}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #b91c1c; margin-bottom: 8px;">Critical Platform Alert</h2>
+          <p style="color: #374151;"><strong>${title}</strong></p>
+          <p style="color: #111827; white-space: pre-wrap;">${String(message || '').trim()}</p>
+          <ul style="color: #374151;">${safeMetadata}</ul>
+          <p style="color: #6b7280; font-size: 12px;">Time: ${new Date().toISOString()}</p>
+        </div>
+      `,
+    });
+    return true;
+  } catch (error) {
+    console.error('Error sending ops alert email:', error);
+    return false;
+  }
+};
+
+const sendDailyOpsSummaryEmail = async (summary) => {
+  const transporter = createTransporter();
+  if (!transporter) return false;
+
+  const adminEmail = process.env.ADMIN_ALERT_EMAIL || process.env.SMTP_USER;
+  if (!adminEmail) return false;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      to: adminEmail,
+      subject: `Daily Business Summary - ${summary?.dateLabel || 'Ama Puja'}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #b45309; margin-bottom: 12px;">Daily Business Summary</h2>
+          <p style="margin: 6px 0;"><strong>Window:</strong> ${summary?.windowStart || '-'} to ${summary?.windowEnd || '-'}</p>
+          <p style="margin: 6px 0;"><strong>Total Bookings:</strong> ${summary?.totalBookings ?? 0}</p>
+          <p style="margin: 6px 0;"><strong>Successful Payments:</strong> ${summary?.paymentPaid ?? 0}</p>
+          <p style="margin: 6px 0;"><strong>Payment Failures:</strong> ${summary?.paymentFailed ?? 0}</p>
+          <p style="margin: 6px 0;"><strong>Failed Attempts (Ops):</strong> ${summary?.failedAttempts ?? 0}</p>
+          <h3 style="margin-top: 18px; color: #374151;">Failure Breakdown</h3>
+          <ul style="color: #374151;">
+            <li><strong>Booking Create Failed:</strong> ${summary?.breakdown?.bookingCreateFailed ?? 0}</li>
+            <li><strong>Payment Verification Failed:</strong> ${summary?.breakdown?.paymentVerificationFailed ?? 0}</li>
+            <li><strong>Email Send Failed:</strong> ${summary?.breakdown?.emailSendFailed ?? 0}</li>
+          </ul>
+        </div>
+      `,
+    });
+    return true;
+  } catch (error) {
+    console.error('Error sending daily ops summary email:', error);
+    return false;
+  }
+};
+
 // Send password reset email
 const sendPasswordResetEmail = async (user, token) => {
   const transporter = createTransporter();
@@ -294,4 +363,6 @@ module.exports = {
   sendPasswordResetEmail,
   sendAdminBookingAlertEmail,
   sendAdminEnquiryAlertEmail,
+  sendOpsAlertEmail,
+  sendDailyOpsSummaryEmail,
 };

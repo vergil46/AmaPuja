@@ -100,7 +100,34 @@ Then include that domain in Render `CLIENT_URLS`.
 
 ---
 
-## 7) Redeploy Flow (Fast)
+## 7) Monitoring & Alerts Env Vars
+
+Set these before go-live to enable Sentry + instant ops alerts + daily business summary.
+
+### Render (Backend)
+
+- `ADMIN_ALERT_EMAIL=ops@your-domain.com`
+- `SENTRY_DSN=<backend sentry dsn>`
+- `SENTRY_TRACES_SAMPLE_RATE=0.2`
+- `DAILY_SUMMARY_HOUR_UTC=18`
+- `DAILY_SUMMARY_MINUTE_UTC=0`
+- `DAILY_SUMMARY_CHECK_MS=900000`
+
+Also ensure SMTP is configured (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`) so alert and summary emails can be delivered.
+
+### Vercel (Frontend)
+
+- `VITE_SENTRY_DSN=<frontend sentry dsn>`
+- `VITE_SENTRY_TRACES_SAMPLE_RATE=0.2`
+
+### Health URLs to monitor
+
+- Backend: `https://amapuja-backend-lokanath.onrender.com/api/health`
+- Frontend: `https://<vercel-domain>/health`
+
+---
+
+## 8) Redeploy Flow (Fast)
 
 1. Push code to GitHub
 2. Vercel auto-deploys frontend
@@ -108,7 +135,7 @@ Then include that domain in Render `CLIENT_URLS`.
 
 ---
 
-## 8) Production Checklist
+## 9) Production Checklist
 
 - [ ] `VITE_API_URL` set on Vercel
 - [ ] Render CORS includes Vercel domain

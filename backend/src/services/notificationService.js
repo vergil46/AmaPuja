@@ -3,6 +3,7 @@ const {
   sendPoojaCompletionReviewEmail,
   sendAdminBookingAlertEmail,
 } = require('./emailService');
+const { alertCriticalIssue } = require('./monitoringService');
 
 const normalizePhone = (phone) => {
   if (!phone) return '';
@@ -59,7 +60,7 @@ const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
   const smsBody = `Ama Puja: Booking received for ${pooja.title} on ${booking.date} at ${booking.time}. Amount: Rs ${booking.paymentAmount}.`; 
   const whatsappBody = `Namaste ${booking.name}, your booking for ${pooja.title} is received on Ama Puja. Date: ${booking.date}, Time: ${booking.time}. Track details in your dashboard.`;
 
-  const [emailSent, smsSent, whatsappSent] = await Promise.all([
+  const [emailSent, adminAlertSent, smsSent, whatsappSent] = await Promise.all([
     sendBookingConfirmationEmail(booking, pooja),
     sendAdminBookingAlertEmail(booking, pooja),
     sendTwilioMessage({
@@ -74,7 +75,20 @@ const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
     }),
   ]);
 
-  return { emailSent, smsSent, whatsappSent, reviewUrl };
+  if (!emailSent) {
+    await alertCriticalIssue({
+      type: 'email_send_failed',
+      title: 'Booking confirmation email failed',
+      message: 'Customer booking confirmation email could not be sent',
+      metadata: {
+        bookingId: booking?._id,
+        bookingEmail: booking?.email,
+        poojaTitle: pooja?.title,
+      },
+    });
+  }
+
+  return { emailSent, adminAlertSent, smsSent, whatsappSent, reviewUrl };
 };
 
 const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
@@ -98,6 +112,19 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
       body: whatsappBody,
     }),
   ]);
+
+  if (!emailSent) {
+    await alertCriticalIssue({
+      type: 'email_send_failed',
+      title: 'Completion review email failed',
+      message: 'Review request email could not be sent after pooja completion',
+      metadata: {
+        bookingId: booking?._id,
+        bookingEmail: booking?.email,
+        poojaTitle,
+      },
+    });
+  }
 
   return { emailSent, smsSent, whatsappSent };
 };

@@ -291,6 +291,31 @@ npm run dev
 
 ## 💡 Additional Notes
 
+### Production Monitoring & Alerts
+
+Implemented for business-grade deploy readiness:
+
+- Backend Sentry integration for API error capture
+- Frontend Sentry integration for client runtime error capture
+- Critical failure alerts for:
+   - Booking creation failures
+   - Payment order/verification failures
+   - Booking/review email send failures
+- Daily business summary email job with booking/payment/failure counts
+- Health endpoints for uptime checks:
+   - Backend: `/api/health`
+   - Frontend: `/health`
+
+Required production env variables:
+
+- Backend:
+   - `ADMIN_ALERT_EMAIL`
+   - `SENTRY_DSN`, `SENTRY_TRACES_SAMPLE_RATE`
+   - `DAILY_SUMMARY_HOUR_UTC`, `DAILY_SUMMARY_MINUTE_UTC`, `DAILY_SUMMARY_CHECK_MS`
+   - SMTP vars: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+- Frontend:
+   - `VITE_SENTRY_DSN`, `VITE_SENTRY_TRACES_SAMPLE_RATE`
+
 ### Email Service Features
 - **Graceful Degradation**: App works without SMTP config
 - **Async Processing**: Emails don't block API responses

@@ -7,6 +7,7 @@ const {
   sendBookingCreatedNotifications,
   sendCompletionReviewNotifications,
 } = require('../services/notificationService');
+const { alertCriticalIssue } = require('../services/monitoringService');
 
 const router = express.Router();
 
@@ -318,6 +319,19 @@ router.post('/', optionalAuth, async (req, res) => {
 
   } catch (error) {
     console.error('Create booking error:', error);
+    await alertCriticalIssue({
+      type: 'booking_create_failed',
+      title: 'Booking creation failed',
+      message: error?.message || 'Booking creation failed due to server error',
+      metadata: {
+        route: '/api/bookings',
+        name: req?.body?.name,
+        email: req?.body?.email,
+        phone: req?.body?.phone,
+        poojaId: req?.body?.poojaId,
+      },
+      error,
+    });
     return res
       .status(500)
       .json({ message: error.message || 'Failed to create booking' });

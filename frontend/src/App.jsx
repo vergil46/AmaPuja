@@ -20,6 +20,7 @@ const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 const PolicyPage = lazy(() => import('./pages/PolicyPage'))
+const HealthPage = lazy(() => import('./pages/HealthPage'))
 
 function RouteFallback() {
   return (
@@ -83,6 +84,7 @@ function App() {
           <Route path="/refund-policy" element={<PolicyPage type="refund" />} />
           <Route path="/privacy-policy" element={<PolicyPage type="privacy" />} />
           <Route path="/terms-and-conditions" element={<PolicyPage type="terms" />} />
+          <Route path="/health" element={<HealthPage />} />
         </Routes>
       </Suspense>
     </Layout>

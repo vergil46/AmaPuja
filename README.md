@@ -107,3 +107,15 @@ Backend API: `http://localhost:5000/api`
 - Email alert/notification env is configured:
 	- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
 	- Optional: `ADMIN_ALERT_EMAIL`
+
+### Monitoring & Alerts Checklist
+
+- Backend monitoring env configured:
+	- `SENTRY_DSN`, `SENTRY_TRACES_SAMPLE_RATE`
+	- `ADMIN_ALERT_EMAIL`
+	- `DAILY_SUMMARY_HOUR_UTC`, `DAILY_SUMMARY_MINUTE_UTC`, `DAILY_SUMMARY_CHECK_MS`
+- Frontend monitoring env configured:
+	- `VITE_SENTRY_DSN`, `VITE_SENTRY_TRACES_SAMPLE_RATE`
+- Health endpoints available:
+	- Backend: `https://amapuja-backend-lokanath.onrender.com/api/health`
+	- Frontend: `https://<your-vercel-project>.vercel.app/health`
