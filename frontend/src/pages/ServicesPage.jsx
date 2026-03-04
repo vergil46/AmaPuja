@@ -589,43 +589,43 @@ function ServicesPage() {
 
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-7 sm:py-10">
+    <section className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
       <Seo title="PujaSamrddhi Services" description="Explore all available puja services and packages." />
 
-      <div className="rounded-3xl overflow-hidden border border-orange-100 bg-linear-to-br from-white via-orange-50/40 to-amber-50/60 shadow-sm">
+      <div className="overflow-hidden rounded-3xl border border-orange-100 bg-linear-to-br from-white via-orange-50/40 to-amber-50/60 shadow-sm">
         <div className="px-5 py-7 sm:px-7 sm:py-8">
-          <p className="text-xs tracking-widest uppercase text-orange-700 font-medium">Sacred Services</p>
-          <h1 className="mt-2 text-xl sm:text-4xl font-semibold text-stone-900 leading-tight">Find the Right Puja in Seconds</h1>
-          <p className="mt-3 text-sm sm:text-base leading-relaxed text-stone-600 max-w-2xl">
+          <p className="text-xs font-medium uppercase tracking-widest text-orange-700">Sacred Services</p>
+          <h1 className="mt-2 text-2xl font-semibold leading-tight text-stone-900 sm:text-4xl">Find the Right Puja in Seconds</h1>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-stone-600">
             Modern booking experience with verified priests, language preference, and city-wise availability.
           </p>
 
-          <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3">
+          <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
               <p className="text-xs text-stone-500">Available Services</p>
-              <p className="mt-1 text-base sm:text-lg font-semibold text-stone-900">{isLoading ? '...' : displayPoojas.length}</p>
+              <p className="mt-1 text-lg font-semibold text-stone-900">{isLoading ? '...' : displayPoojas.length}</p>
             </div>
-            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3">
+            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
               <p className="text-xs text-stone-500">Selected City</p>
-              <p className="mt-1 text-base sm:text-lg font-semibold text-stone-900">{selectedCity}</p>
+              <p className="mt-1 text-lg font-semibold text-stone-900">{selectedCity}</p>
             </div>
-            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3">
+            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
               <p className="text-xs text-stone-500">Priest Language</p>
-              <p className="mt-1 text-base sm:text-lg font-semibold text-stone-900">{priestPreference}</p>
+              <p className="mt-1 text-lg font-semibold text-stone-900">{priestPreference}</p>
             </div>
-            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3">
+            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
               <p className="text-xs text-stone-500">Coverage</p>
-              <p className="mt-1 text-base sm:text-lg font-semibold text-stone-900">{selectedLanguageCount || 'All'} Poojas</p>
+              <p className="mt-1 text-lg font-semibold text-stone-900">{selectedLanguageCount || 'All'} Poojas</p>
             </div>
           </div>
         </div>
 
         <div className="border-t border-orange-100 bg-white/85 px-5 py-5 sm:px-7">
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-3">
             <div>
               <label className="text-sm font-medium text-stone-700">Priest Preference</label>
               <select
-                className="mt-1 w-full min-h-11 px-3 py-2 rounded-lg border border-stone-300 bg-white shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="mt-1 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                 value={priestPreference}
                 onChange={(event) => setPriestPreference(event.target.value)}
               >
@@ -638,7 +638,7 @@ function ServicesPage() {
             <div>
               <label className="text-sm font-medium text-stone-700">Select City</label>
               <select
-                className="mt-1 w-full min-h-11 px-3 py-2 rounded-lg border border-stone-300 bg-white shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="mt-1 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                 value={selectedCity}
                 onChange={(event) => setSelectedCity(event.target.value)}
               >
@@ -650,7 +650,7 @@ function ServicesPage() {
             <div>
               <label className="text-sm font-medium text-stone-700">Search Pooja</label>
               <input
-                className="mt-1 w-full min-h-11 px-3 py-2 rounded-lg border border-stone-300 bg-white shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="mt-1 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
                 placeholder="Type pooja name"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
@@ -686,12 +686,12 @@ function ServicesPage() {
       )}
 
       <div className="mt-8 flex items-center justify-between gap-3">
-        <h2 className="text-base sm:text-xl font-semibold text-stone-900">Available Pooja Services</h2>
+        <h2 className="text-lg font-semibold text-stone-900 sm:text-2xl">Available Pooja Services</h2>
         <span className="text-sm text-stone-500">{isLoading ? 'Loading services...' : `${displayPoojas.length} found`}</span>
       </div>
 
       {isLoading ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className="bg-white rounded-2xl border border-orange-100 p-4 animate-pulse shadow-sm">
               <div className="h-44 rounded bg-stone-200" />
@@ -703,7 +703,7 @@ function ServicesPage() {
           ))}
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+        <div className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {displayPoojas.map((pooja) => (
             <PoojaCard
               key={pooja._id}

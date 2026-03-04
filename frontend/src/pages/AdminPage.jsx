@@ -61,6 +61,8 @@ function AdminPage() {
   const [recentStatusFilter, setRecentStatusFilter] = useState('all')
   const [reviewRequestLoadingById, setReviewRequestLoadingById] = useState({})
   const [reviewRequestMessage, setReviewRequestMessage] = useState('')
+  const [panditMessageLoadingById, setPanditMessageLoadingById] = useState({})
+  const [panditMessageStatus, setPanditMessageStatus] = useState('')
   const [rowDensity, setRowDensity] = useState('comfortable')
   const [lastUpdatedAt, setLastUpdatedAt] = useState(null)
   const [selectedBookingDetails, setSelectedBookingDetails] = useState(null)
@@ -253,6 +255,136 @@ function AdminPage() {
       setReviewRequestMessage(error.response?.data?.message || 'Failed to send review request.')
     } finally {
       setReviewRequestLoadingById((prev) => ({ ...prev, [bookingId]: false }))
+    }
+  }
+
+  const buildPanditMessageFromBooking = (booking) => {
+    const poojaName = String(booking?.poojaId?.title || 'Pooja Service').trim()
+    const bookingId = String(booking?._id || '').trim()
+    const customerName = String(booking?.name || '').trim() || 'N/A'
+    const customerPhone = String(booking?.phone || '').trim() || 'N/A'
+    const poojaDate = String(booking?.date || '').trim() || 'N/A'
+    const poojaTime = String(booking?.time || '').trim() || 'N/A'
+    const address = String(booking?.address || '').trim() || 'N/A'
+    const selectedPackage = String(booking?.package || '').trim() || 'N/A'
+    const addOns =
+      Array.isArray(booking?.selectedAddOns) && booking.selectedAddOns.length > 0
+        ? booking.selectedAddOns.join(', ')
+        : 'None'
+    const specialNotes = String(booking?.specialNotes || '').trim()
+
+    const lines = [
+      '📿 New Puja Booking',
+      '',
+      `Booking ID: ${bookingId}`,
+      '',
+      `Puja: ${poojaName}`,
+      `Date: ${poojaDate}`,
+      `Time: ${poojaTime}`,
+      '',
+      `Customer Name: ${customerName}`,
+      `Phone: ${customerPhone}`,
+      `Location: ${address}`,
+      '',
+      `Package: ${selectedPackage}`,
+      `Add-ons: ${addOns}`,
+    ]
+
+    if (specialNotes) {
+      lines.push(`Special Notes: ${specialNotes}`)
+    }
+
+    lines.push('', 'Please confirm your availability for this booking.', 'Thank you 🙏')
+    return lines.join('\n')
+  }
+
+  const copyPanditBookingMessage = async (booking) => {
+    const bookingId = booking?._id
+    if (!bookingId) {
+      setPanditMessageStatus('Booking details not available.')
+      return
+    }
+
+    setPanditMessageStatus('')
+    setPanditMessageLoadingById((prev) => ({ ...prev, [bookingId]: true }))
+
+    try {
+      const message = buildPanditMessageFromBooking(booking)
+
+      if (!message) {
+        setPanditMessageStatus('No message generated for this booking.')
+        return
+      }
+
+      let copied = false
+
+      if (navigator?.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(message)
+          copied = true
+        } catch {
+          copied = false
+        }
+      }
+
+      if (!copied) {
+        const textArea = document.createElement('textarea')
+        textArea.value = message
+        textArea.setAttribute('readonly', '')
+        textArea.style.position = 'fixed'
+        textArea.style.top = '0'
+        textArea.style.left = '-9999px'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+
+        try {
+          copied = Boolean(document.execCommand('copy'))
+        } catch {
+          copied = false
+        }
+
+        document.body.removeChild(textArea)
+      }
+
+      if (copied) {
+        setPanditMessageStatus('Pandit WhatsApp message copied.')
+      } else {
+        window.prompt('Copy message manually:', message)
+        setPanditMessageStatus('Clipboard blocked. Message opened for manual copy.')
+      }
+    } catch (error) {
+      setPanditMessageStatus(error.response?.data?.message || 'Failed to generate message.')
+    } finally {
+      setPanditMessageLoadingById((prev) => ({ ...prev, [bookingId]: false }))
+    }
+  }
+
+  const openPanditWhatsApp = async (booking) => {
+    const bookingId = booking?._id
+    if (!bookingId) {
+      setPanditMessageStatus('Booking details not available.')
+      return
+    }
+
+    setPanditMessageStatus('')
+    setPanditMessageLoadingById((prev) => ({ ...prev, [bookingId]: true }))
+
+    try {
+      const message = buildPanditMessageFromBooking(booking)
+      const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
+
+      if (!whatsappShareUrl) {
+        setPanditMessageStatus('WhatsApp link could not be generated.')
+        return
+      }
+
+      window.open(whatsappShareUrl, '_blank', 'noopener,noreferrer')
+      setPanditMessageStatus('Opened WhatsApp message.')
+    } catch (error) {
+      setPanditMessageStatus(error.response?.data?.message || 'Failed to open WhatsApp message.')
+    } finally {
+      setPanditMessageLoadingById((prev) => ({ ...prev, [bookingId]: false }))
     }
   }
 
@@ -860,6 +992,7 @@ function AdminPage() {
                   </div>
                   <p className="mt-2 text-xs text-stone-500">Showing {filteredBookings.length} of {bookings.length} bookings • Export uses {analyticsRangeLabel}</p>
                   {reviewRequestMessage && <p className="mt-2 text-sm text-stone-700">{reviewRequestMessage}</p>}
+                  {panditMessageStatus && <p className="mt-1 text-sm text-stone-700">{panditMessageStatus}</p>}
                   <div className="mt-3 overflow-x-auto rounded-lg border border-stone-200 bg-white">
                     <table className={`w-full min-w-275 text-sm ${tableDensityClass}`}>
                       <thead className="bg-stone-100/90">
@@ -942,6 +1075,20 @@ function AdminPage() {
                                   <option value="completed">Completed</option>
                                   <option value="cancelled">Cancelled</option>
                                 </select>
+                                <button
+                                  onClick={() => copyPanditBookingMessage(booking)}
+                                  className="px-2 py-1 text-xs rounded border border-stone-300 bg-white text-stone-700 hover:bg-stone-100 disabled:opacity-60"
+                                  disabled={Boolean(panditMessageLoadingById[booking._id])}
+                                >
+                                  {panditMessageLoadingById[booking._id] ? 'Preparing...' : 'Copy Pandit Msg'}
+                                </button>
+                                <button
+                                  onClick={() => openPanditWhatsApp(booking)}
+                                  className="px-2 py-1 text-xs rounded bg-emerald-700 text-white hover:bg-emerald-800 disabled:opacity-60"
+                                  disabled={Boolean(panditMessageLoadingById[booking._id])}
+                                >
+                                  {panditMessageLoadingById[booking._id] ? 'Preparing...' : 'Open WhatsApp'}
+                                </button>
                                 {normalizeBookingStatus(booking.bookingStatus) === 'completed' && (
                                   <button
                                     onClick={() => resendReviewRequest(booking._id)}

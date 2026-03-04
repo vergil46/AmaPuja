@@ -47,6 +47,68 @@ const composeAddress = (addressDetails = {}) => {
     .join(', ');
 };
 
+const formatDateForPanditMessage = (value) => {
+  const raw = String(value || '').trim();
+  if (!raw) return 'N/A';
+
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return raw;
+
+  return parsed.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+const buildPanditWhatsAppMessage = (booking) => {
+  const poojaName = String(booking?.poojaId?.title || 'Pooja Service').trim();
+  const bookingId = String(booking?._id || '').trim();
+  const customerName = String(booking?.name || '').trim() || 'N/A';
+  const customerPhone = String(booking?.phone || '').trim() || 'N/A';
+  const poojaDate = formatDateForPanditMessage(booking?.date);
+  const poojaTime = String(booking?.time || '').trim() || 'N/A';
+
+  const addressFromParts = composeAddress(booking?.addressDetails || {});
+  const location =
+    String(booking?.address || '').trim() ||
+    String(booking?.addressDetails?.formattedAddress || '').trim() ||
+    addressFromParts ||
+    'N/A';
+
+  const selectedPackage = String(booking?.package || '').trim() || 'N/A';
+  const addOns =
+    Array.isArray(booking?.selectedAddOns) && booking.selectedAddOns.length > 0
+      ? booking.selectedAddOns.filter(Boolean).join(', ')
+      : 'None';
+  const specialNotes = String(booking?.specialNotes || '').trim();
+
+  const lines = [
+    '📿 New Puja Booking',
+    '',
+    `Booking ID: ${bookingId}`,
+    '',
+    `Puja: ${poojaName}`,
+    `Date: ${poojaDate}`,
+    `Time: ${poojaTime}`,
+    '',
+    `Customer Name: ${customerName}`,
+    `Phone: ${customerPhone}`,
+    `Location: ${location}`,
+    '',
+    `Package: ${selectedPackage}`,
+    `Add-ons: ${addOns}`,
+  ];
+
+  if (specialNotes) {
+    lines.push(`Special Notes: ${specialNotes}`);
+  }
+
+  lines.push('', 'Please confirm your availability for this booking.', 'Thank you 🙏');
+
+  return lines.join('\n');
+};
+
 const buildUnifiedAddOns = ({ selectedPackage, languagePricing, pooja }) => {
   const candidates = [
     ...(Array.isArray(selectedPackage?.addOns) ? selectedPackage.addOns : []),
@@ -405,6 +467,33 @@ router.patch('/:id/status', protect, adminOnly, async (req, res) => {
     return res
       .status(500)
       .json({ message: error.message || 'Failed to update booking status' });
+  }
+});
+
+/**
+ * ADMIN: GET PANDIT WHATSAPP MESSAGE
+ */
+router.get('/:id/pandit-message', protect, adminOnly, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate('poojaId', 'title');
+
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    const message = buildPanditWhatsAppMessage(booking);
+
+    return res.json({
+      bookingId: String(booking._id),
+      message,
+      whatsappShareUrl: `https://wa.me/?text=${encodeURIComponent(message)}`,
+    });
+  } catch (error) {
+    console.error('Get pandit message error:', error);
+    return res
+      .status(500)
+      .json({ message: error.message || 'Failed to generate pandit message' });
   }
 });
 

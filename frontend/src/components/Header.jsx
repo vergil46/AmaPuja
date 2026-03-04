@@ -3,14 +3,12 @@ import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '../context/LanguageContext'
-import logoImage from '../assets/footer-logo.png'
 import Logo from './Logo'
 
 function Header() {
   const { user, logout } = useAuth()
   const { t } = useLanguage()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [logoFailed, setLogoFailed] = useState(false)
 
   const navClass = ({ isActive }) =>
     `text-sm md:text-[15px] font-medium px-2.5 py-1.5 rounded-md transition-colors ${
@@ -33,16 +31,7 @@ function Header() {
       </div>
       <div className="max-w-6xl mx-auto px-3.5 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3">
         <Link to="/" onClick={closeMobileMenu} className="shrink-0 flex items-center">
-          {logoFailed ? (
-            <Logo variant="default" className="scale-95 origin-left" />
-          ) : (
-            <img
-              src={logoImage}
-              alt="Pujasamrddhi"
-              className="h-10 sm:h-11 w-auto object-contain"
-              onError={() => setLogoFailed(true)}
-            />
-          )}
+          <Logo variant="default" className="scale-95 origin-left" />
         </Link>
         <nav className="hidden lg:flex items-center gap-3 rounded-full border border-orange-100 bg-white px-3 py-2 shadow-sm">
           <NavLink to="/" className={navClass}>

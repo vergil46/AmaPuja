@@ -83,6 +83,9 @@ Backend API: `http://localhost:5000/api`
 - Create one admin user manually in MongoDB by setting `role: "admin"` for that user document.
 - Razorpay checkout opens only when `VITE_RAZORPAY_KEY_ID` is set.
 - Current location address autofill works with fallback provider even if `VITE_GOOGLE_MAPS_API_KEY` is not set.
+- Optimize new frontend images before commit:
+	- `cd frontend && npm run optimize:images`
+	- Example: `npm run optimize:images -- --dir src/assets/poojas --quality 78`
 - Never commit real `.env` files or payment/email secrets.
 - For production, set strict CORS origins and secure cookie/JWT settings.
 

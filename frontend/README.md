@@ -28,3 +28,23 @@ VITE_GOOGLE_MAPS_API_KEY=
 - `VITE_API_URL` is required for frontend API calls.
 - `VITE_RAZORPAY_KEY_ID` is required for payments.
 - `VITE_GOOGLE_MAPS_API_KEY` is optional. If not set, location autofill uses a fallback reverse-geocoding provider.
+
+## Image Optimization Workflow
+
+Use the built-in optimizer before committing new image assets:
+
+```bash
+npm run optimize:images
+```
+
+Optional flags:
+
+- `--quality 78` to control WebP quality.
+- `--dir src/assets/poojas` to target a specific folder.
+- `--delete-original` to remove original `.png/.jpg/.jpeg` files after conversion.
+
+Example:
+
+```bash
+npm run optimize:images -- --dir src/assets/poojas --quality 78
+```

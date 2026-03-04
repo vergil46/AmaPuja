@@ -1,13 +1,11 @@
 import { Link } from 'react-router-dom'
 import api from '../services/api'
 import { useState } from 'react'
-import footerLogo from '../assets/footer-logo.png'
 import Logo from './Logo'
 
 function Footer() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [message, setMessage] = useState('')
-  const [footerLogoFailed, setFooterLogoFailed] = useState(false)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -21,16 +19,7 @@ function Footer() {
       <div className="max-w-6xl mx-auto px-3.5 sm:px-4 py-8 sm:py-12 grid md:grid-cols-3 gap-4 sm:gap-6">
         <div className="order-2 md:order-1 rounded-2xl border border-orange-400/25 bg-linear-to-br from-stone-900/90 to-orange-950/50 p-4 sm:p-5 animate-fade-up shadow-lg shadow-orange-900/20 backdrop-blur-sm" style={{ animationDelay: '0.08s' }}>
           <div className="mb-2 sm:mb-3">
-            {footerLogoFailed ? (
-              <Logo variant="default" className="[&_path]:fill-orange-400 [&_circle]:fill-orange-300 [&_span]:text-orange-100" />
-            ) : (
-              <img
-                src={footerLogo}
-                alt="Pujasamrddhi footer logo"
-                className="h-12 sm:h-14 w-auto object-contain opacity-95"
-                onError={() => setFooterLogoFailed(true)}
-              />
-            )}
+            <Logo variant="default" className="[&_path]:fill-orange-400 [&_circle]:fill-orange-300 [&_span]:text-orange-100" />
           </div>
           <p className="text-sm sm:text-base text-stone-300 leading-relaxed">
             Trusted priests, transparent packages, and smooth ritual booking for families.

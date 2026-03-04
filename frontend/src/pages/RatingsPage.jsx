@@ -131,41 +131,45 @@ function RatingsPage() {
     ? (publicFeedbacks.reduce((sum, feedback) => sum + Number(feedback.rating || 0), 0) / feedbackCount).toFixed(1)
     : '0.0'
 
+  const inputClass =
+    'w-full rounded-xl border border-stone-300 bg-white px-3.5 py-3 text-base text-stone-800 shadow-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100'
+
   return (
-    <section className="max-w-6xl mx-auto px-4 py-10 space-y-8">
+    <section className="mx-auto max-w-6xl space-y-8 px-4 py-10">
       <Seo title="Ratings & Reviews | PujaSamrddhi" description="Share feedback for your completed pooja bookings." />
 
-      <div className="rounded-2xl border border-orange-100 bg-white/90 p-6 shadow-sm">
-        <h1 className="text-3xl font-bold text-stone-800">Ratings & Reviews</h1>
-        <p className="text-stone-600 mt-2">
+      <div className="rounded-3xl border border-orange-100 bg-white/90 p-6 shadow-sm sm:p-7">
+        <p className="text-xs font-medium uppercase tracking-widest text-orange-700">Customer Trust</p>
+        <h1 className="mt-2 text-3xl font-semibold text-stone-800 sm:text-4xl">Ratings & Reviews</h1>
+        <p className="mt-3 text-base leading-relaxed text-stone-600">
           Share your experience and help us improve our puja service quality.
         </p>
       </div>
 
       {!token ? (
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-stone-800">Login required to submit a review</h2>
-          <p className="text-stone-600 mt-2">
+        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-7">
+          <h2 className="text-xl font-semibold text-stone-800 sm:text-2xl">Login required to submit a review</h2>
+          <p className="mt-2 text-base leading-relaxed text-stone-600">
             You can add a rating after completing a booking from your account dashboard.
           </p>
-          <div className="mt-4 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap gap-3">
             <Link
               to="/login"
-              className="px-4 py-2 rounded-xl bg-linear-to-r from-orange-600 to-amber-600 text-white text-sm font-medium"
+              className="rounded-xl bg-linear-to-r from-orange-600 to-amber-600 px-4 py-2.5 text-sm font-semibold text-white"
             >
               Login
             </Link>
-            <Link to="/signup" className="px-4 py-2 rounded-xl border border-stone-300 text-stone-700 text-sm font-medium">
+            <Link to="/signup" className="rounded-xl border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-700">
               Create Account
             </Link>
           </div>
         </div>
       ) : (
         <>
-          <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <h2 className="text-xl font-semibold text-stone-800">Pending reviews</h2>
-              <span className="text-sm px-3 py-1 rounded-full bg-orange-50 text-orange-700 border border-orange-100">
+          <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-7">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-xl font-semibold text-stone-800 sm:text-2xl">📝 Pending reviews</h2>
+              <span className="rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-sm text-orange-700">
                 {completedBookingsWithoutFeedback.length} pending
               </span>
             </div>
@@ -175,7 +179,7 @@ function RatingsPage() {
             ) : completedBookingsWithoutFeedback.length === 0 ? (
               <p className="mt-4 text-sm text-stone-600">No completed booking pending feedback.</p>
             ) : (
-              <div className="mt-4 space-y-4">
+              <div className="mt-5 space-y-4">
                 {completedBookingsWithoutFeedback.map((booking) => (
                   <div
                     id={`rating-booking-${booking._id}`}
@@ -184,14 +188,14 @@ function RatingsPage() {
                       reviewBookingId === booking._id ? 'border-orange-300 ring-2 ring-orange-100' : 'border-stone-200'
                     }`}
                   >
-                    <p className="font-medium text-stone-800">{booking.poojaId?.title}</p>
-                    <p className="text-sm text-stone-600 mt-1">
+                    <p className="text-lg font-semibold text-stone-800">{booking.poojaId?.title}</p>
+                    <p className="mt-1 text-sm text-stone-600">
                       {booking.date} • {booking.time}
                     </p>
 
-                    <div className="mt-3 grid sm:grid-cols-[180px_1fr] gap-3">
+                    <div className="mt-4 grid gap-3 sm:grid-cols-[190px_1fr]">
                       <select
-                        className="w-full px-3 py-2 rounded-lg border border-stone-300"
+                        className={inputClass}
                         value={feedbackForm[booking._id]?.rating || 5}
                         onChange={(event) => handleFeedbackChange(booking._id, 'rating', event.target.value)}
                       >
@@ -203,7 +207,7 @@ function RatingsPage() {
                       </select>
 
                       <textarea
-                        className="w-full px-3 py-2 rounded-lg border border-stone-300"
+                        className={inputClass}
                         rows={3}
                         placeholder="Write your review"
                         value={feedbackForm[booking._id]?.comment || ''}
@@ -213,7 +217,7 @@ function RatingsPage() {
 
                     <button
                       onClick={() => submitFeedback(booking._id)}
-                      className="mt-3 px-4 py-2 rounded-lg bg-orange-700 text-white text-sm font-medium"
+                      className="mt-3 rounded-lg bg-orange-700 px-4 py-2.5 text-sm font-semibold text-white"
                     >
                       Submit review
                     </button>
@@ -229,19 +233,19 @@ function RatingsPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-semibold text-stone-800">My submitted reviews</h2>
+          <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-7">
+            <h2 className="text-xl font-semibold text-stone-800 sm:text-2xl">✅ My submitted reviews</h2>
             {feedbacks.length === 0 ? (
               <p className="mt-3 text-sm text-stone-600">You have not submitted any review yet.</p>
             ) : (
-              <div className="mt-4 space-y-3">
+              <div className="mt-5 space-y-3">
                 {feedbacks.map((feedback) => (
                   <article key={feedback._id} className="rounded-xl border border-stone-200 p-4 bg-stone-50/70">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="font-medium text-stone-800">{feedback.poojaId?.title || 'Pooja Service'}</p>
+                      <p className="text-base font-semibold text-stone-800">{feedback.poojaId?.title || 'Pooja Service'}</p>
                       <StarRow rating={feedback.rating} />
                     </div>
-                    <p className="mt-2 text-sm text-stone-700">{feedback.comment}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-stone-700 sm:text-base">{feedback.comment}</p>
                   </article>
                 ))}
               </div>
@@ -250,9 +254,9 @@ function RatingsPage() {
         </>
       )}
 
-      <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <h2 className="text-xl font-semibold text-stone-800">Customer reviews</h2>
+      <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-7">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-xl font-semibold text-stone-800 sm:text-2xl">🌟 Customer reviews</h2>
           <div className="flex items-center gap-2 text-sm text-stone-700">
             <StarRow rating={Math.round(Number(averageRating))} />
             <span>{averageRating} / 5</span>
@@ -265,17 +269,17 @@ function RatingsPage() {
         ) : publicFeedbacks.length === 0 ? (
           <p className="mt-3 text-sm text-stone-600">No customer reviews available yet.</p>
         ) : (
-          <div className="mt-4 grid md:grid-cols-2 gap-4">
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
             {publicFeedbacks.map((feedback) => (
-              <article key={feedback._id} className="rounded-xl border border-orange-100 bg-orange-50/30 p-4">
+              <article key={feedback._id} className="rounded-xl border border-orange-100 bg-orange-50/30 p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-stone-800">{feedback.customerName}</p>
+                    <p className="text-base font-semibold text-stone-800">{feedback.customerName}</p>
                     <p className="text-xs text-stone-500 mt-0.5">{feedback.poojaTitle}</p>
                   </div>
                   <StarRow rating={feedback.rating} />
                 </div>
-                <p className="mt-3 text-sm text-stone-700">{feedback.comment}</p>
+                <p className="mt-3 text-sm leading-relaxed text-stone-700 sm:text-base">{feedback.comment}</p>
               </article>
             ))}
           </div>

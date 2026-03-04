@@ -17,6 +17,35 @@ const getFunnelSessionId = () => {
   return generated
 }
 
+function DetailInfoCard({ icon, title, items }) {
+  if (!Array.isArray(items) || items.length === 0) return null
+  const isRequirements = String(title || '').toLowerCase() === 'requirements'
+
+  return (
+    <div className="rounded-2xl border border-stone-200 bg-white p-4 sm:p-5 shadow-sm">
+      <div className="mb-3 flex items-center gap-2.5">
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 text-lg" aria-hidden="true">
+          {icon}
+        </span>
+        <h3 className="text-base font-semibold text-stone-900 sm:text-lg">{title}</h3>
+      </div>
+      <ul className="space-y-2 text-sm leading-relaxed text-stone-700 sm:text-[15px]">
+        {items.map((item) => (
+          <li
+            key={item}
+            className={isRequirements ? 'rounded-xl border border-stone-300 bg-stone-100 px-3 py-2.5 font-medium text-stone-900 shadow-xs' : 'flex items-start gap-2'}
+          >
+            {!isRequirements && (
+              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-500" aria-hidden="true" />
+            )}
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 function PoojaDetailPage() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
@@ -763,39 +792,67 @@ function PoojaDetailPage() {
   const packageNote =
     selectedPackageData?.note || ''
 
+  const engagementTimingNote =
+    'NOTE: Panditji will be there for maximum of 2 hours from your given time. After that, for extra hours ₹1000/hour will be charged.'
+
+  const isEngagementService = /engagement|nischitartha|sagai|nirbandha|roka/i.test(
+    String(displayTitle || '')
+  )
+
+  const descriptionPreview =
+    String(displayDescription || '').length > 260
+      ? `${String(displayDescription || '').slice(0, 257).trim()}...`
+      : String(displayDescription || '')
+
+  const benefitItems = packageInclusions.slice(0, 6)
+
+  const ritualStepItems = packageProcedure.slice(0, 8)
+
+  const requirementItems = [
+    selectedPackageData?.pandits,
+    packageNote,
+    isEngagementService ? engagementTimingNote : '',
+    selectedPackageData?.description,
+  ]
+    .filter(Boolean)
+    .slice(0, 6)
+
   const fieldClass =
-    'w-full rounded-xl border border-stone-300 bg-white px-3.5 py-2.5 text-sm text-stone-800 shadow-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100'
+    'w-full rounded-xl border border-stone-300 bg-white px-3.5 py-3 text-base text-stone-800 shadow-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100'
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-8 sm:py-10">
+    <section className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
       <Seo
         title={`${displayTitle} | PujaSamrddhi`}
         description={displayDescription}
       />
 
-      <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-start">
+      <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-10">
         <div>
-          <div className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm">
+          <div className="mx-auto max-w-150 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm lg:mx-0">
             <img
               src={displayImage}
               alt={displayTitle}
               loading="eager"
               fetchpriority="high"
               decoding="async"
-              className="w-full h-64 sm:h-80 object-cover"
+              width="600"
+              height="600"
+              sizes="(max-width: 1024px) 100vw, 600px"
+              className="aspect-square w-full max-h-150 object-cover object-center"
             />
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-semibold mt-5 text-stone-900 leading-tight">
+          <h1 className="mt-6 text-3xl font-semibold leading-tight text-stone-900 sm:text-5xl">
             {displayTitle}
           </h1>
 
-          <p className="mt-3 text-lg leading-relaxed text-stone-700">
-            {displayDescription}
-          </p>
+          <div className="mt-4 rounded-2xl border border-stone-200 bg-white p-4 sm:p-5 shadow-sm">
+            <p className="text-base leading-8 text-stone-700 sm:text-lg">{descriptionPreview}</p>
+          </div>
 
-          <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-4 sm:p-5 shadow-sm">
-            <div className="text-lg font-semibold mb-3 text-stone-900">
+          <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
+            <div className="mb-4 text-xl font-semibold text-stone-900">
               {isBengaliVivahEnquiryOnly
                 ? 'Custom Quotation'
                 : 'Select Package'}
@@ -805,7 +862,7 @@ function PoojaDetailPage() {
               activePackages.map((pkg) => (
                 <label
                   key={pkg.name}
-                  className={`block border p-3.5 rounded-xl mb-3 cursor-pointer transition ${
+                  className={`mb-3 block cursor-pointer rounded-xl border p-4 transition ${
                     selectedPackage === pkg.name
                       ? 'border-orange-400 bg-orange-50 ring-2 ring-orange-100'
                       : 'border-stone-300 bg-white hover:border-orange-300'
@@ -822,11 +879,11 @@ function PoojaDetailPage() {
                           setSelectedPackage(pkg.name)
                         }
                       />
-                      <span className="font-medium text-stone-900">
+                      <span className="text-base font-medium text-stone-900 sm:text-lg">
                         {pkg.name}
                       </span>
                     </div>
-                    <span className="font-semibold text-stone-900">
+                    <span className="text-base font-semibold text-stone-900 sm:text-lg">
                       ₹{pkg.price}
                     </span>
                   </div>
@@ -908,62 +965,11 @@ function PoojaDetailPage() {
               </div>
             )}
 
-            {!isBengaliVivahEnquiryOnly &&
-              selectedPackageData && (
-              <div className="mt-5 p-4 border border-stone-200 rounded-xl bg-stone-50">
-                <div className="text-sm text-stone-700 space-y-2.5">
-                  {selectedPackageData.pandits && (
-                    <p>
-                      <span className="font-semibold text-stone-900">
-                        Package:
-                      </span>{' '}
-                      {selectedPackageData.pandits}
-                    </p>
-                  )}
-
-                  {selectedPackageData.description && (
-                    <p>{selectedPackageData.description}</p>
-                  )}
-
-                  {packageProcedure.length > 0 && (
-                    <div>
-                      <p className="font-semibold text-stone-900">
-                        Procedure involved:
-                      </p>
-                      <ul className="list-disc ml-5 mt-1 space-y-1">
-                        {packageProcedure.map((step) => (
-                          <li key={step}>{step}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {packageInclusions.length > 0 && (
-                    <div>
-                      <p className="font-semibold text-stone-900">
-                        Inclusions:
-                      </p>
-                      <ul className="list-disc ml-5 mt-1 space-y-1">
-                        {packageInclusions.map(
-                          (inclusion) => (
-                            <li key={inclusion}>
-                              {inclusion}
-                            </li>
-                          )
-                        )}
-                      </ul>
-                    </div>
-                  )}
-
-                  {packageNote && (
-                    <p>
-                      <span className="font-semibold text-stone-900">
-                        Note:
-                      </span>{' '}
-                      {packageNote}
-                    </p>
-                  )}
-                </div>
+            {!isBengaliVivahEnquiryOnly && selectedPackageData && (
+              <div className="mt-5 grid gap-3 sm:gap-4 md:grid-cols-3">
+                <DetailInfoCard icon="✨" title="Benefits" items={benefitItems} />
+                <DetailInfoCard icon="🪔" title="Ritual Steps" items={ritualStepItems} />
+                <DetailInfoCard icon="📋" title="Requirements" items={requirementItems} />
               </div>
             )}
 
@@ -975,8 +981,8 @@ function PoojaDetailPage() {
           </div>
         </div>
 
-        <div ref={bookingPanelRef} className="rounded-3xl border border-stone-300 bg-stone-100/95 p-4 sm:p-5 shadow-md lg:sticky lg:top-24">
-          <h2 className="text-2xl font-semibold uppercase tracking-wide text-stone-900">
+        <div ref={bookingPanelRef} className="rounded-3xl border border-stone-300 bg-stone-100/95 p-4 shadow-md sm:p-5 lg:sticky lg:top-24">
+          <h2 className="text-2xl font-semibold uppercase tracking-wide text-stone-900 sm:text-3xl">
             {isBengaliVivahEnquiryOnly
               ? 'Send Enquiry'
               : 'Book Now'}
@@ -1020,7 +1026,7 @@ function PoojaDetailPage() {
 
           <form
             onSubmit={handleBook}
-            className="mt-3 space-y-3"
+            className="mt-4 space-y-4"
             onFocus={() => {
               if (!formStartedRef.current) {
                 formStartedRef.current = true
@@ -1028,7 +1034,7 @@ function PoojaDetailPage() {
               }
             }}
           >
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <input
                 className={fieldClass}
                 placeholder="Full Name *"
@@ -1091,7 +1097,7 @@ function PoojaDetailPage() {
               </p>
             )}
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <input
                 className={fieldClass}
                 placeholder="House / Flat No. *"
@@ -1158,7 +1164,7 @@ function PoojaDetailPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <select
                 className={fieldClass}
                 value={form.priestPreference}
@@ -1232,7 +1238,7 @@ function PoojaDetailPage() {
               }
             />
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {!isBengaliVivahEnquiryOnly && (
                 <select
                   className={fieldClass}

@@ -18,19 +18,26 @@ function Testimonials() {
   ]
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-8 sm:py-10">
-      <h3 className="text-xl sm:text-2xl font-semibold text-center">Testimonials</h3>
-      <div className="grid md:grid-cols-3 gap-5 mt-6">
+    <section className="mx-auto max-w-6xl px-4 py-10 sm:py-12">
+      <div className="text-center">
+        <h3 className="text-2xl font-semibold text-stone-900 sm:text-3xl">Testimonials</h3>
+        <p className="mt-2 text-base text-stone-600">Loved by families across our puja services.</p>
+      </div>
+
+      <div className="mt-7 grid gap-6 md:grid-cols-3">
         {testimonials.map((item) => (
-          <article key={item.name} className="card bg-white rounded-2xl border border-orange-100 p-5 flex flex-col items-center text-center shadow hover:shadow-lg transition-shadow animate-fade-up">
+          <article
+            key={item.name}
+            className="card animate-fade-up flex flex-col items-center rounded-2xl border border-stone-200 bg-white p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+          >
             <img
               src={item.photo}
               alt={item.name}
-              className="w-16 h-16 rounded-full object-cover border-2 border-orange-200 mb-3 shadow"
+              className="mb-3 h-16 w-16 rounded-full border-2 border-orange-200 object-cover shadow-sm"
               loading="lazy"
             />
-            <p className="text-sm text-stone-700">“{item.text}”</p>
-            <p className="mt-3 font-medium text-orange-700 text-sm">{item.name}</p>
+            <p className="text-sm leading-relaxed text-stone-700 sm:text-base">“{item.text}”</p>
+            <p className="mt-3 text-sm font-semibold text-orange-700">{item.name}</p>
           </article>
         ))}
       </div>

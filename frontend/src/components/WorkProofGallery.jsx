@@ -21,23 +21,23 @@ function WorkProofGallery({
   className = '',
 }) {
   return (
-    <section className={`max-w-6xl mx-auto px-4 pb-12 sm:pb-16 ${className}`.trim()}>
+    <section className={`mx-auto max-w-6xl px-4 pb-12 sm:pb-16 ${className}`.trim()}>
       <div className="animate-fade-up" style={{ animationDelay: '0.2s' }}>
-        <h2 className="text-lg sm:text-2xl font-semibold">{title}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-stone-600">{description}</p>
+        <h2 className="text-xl font-semibold text-stone-900 sm:text-3xl">{title}</h2>
+        <p className="mt-2 text-base leading-relaxed text-stone-600">{description}</p>
       </div>
 
       {proofVideos.length > 0 && (
         <div className="mt-6">
-          <h3 className="text-base sm:text-xl font-semibold text-stone-800">Work Videos</h3>
-          <div className="grid md:grid-cols-2 gap-3 sm:gap-4 mt-4">
+          <h3 className="text-lg font-semibold text-stone-800 sm:text-2xl">Work Videos</h3>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
             {proofVideos.map((video, index) => (
               <article
                 key={video}
-                className="overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
+                className="animate-fade-up overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-shadow hover:shadow-md"
                 style={{ animationDelay: `${0.3 + index * 0.08}s` }}
               >
-                <video controls preload="none" className="h-56 sm:h-64 w-full object-cover bg-black">
+                <video controls preload="none" className="h-60 w-full object-cover bg-black sm:h-72">
                   <source src={video} />
                   Your browser does not support the video tag.
                 </video>
@@ -47,11 +47,15 @@ function WorkProofGallery({
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 items-start gap-3 sm:gap-4 mt-8">
+      <div className="mt-8">
+        <h3 className="text-lg font-semibold text-stone-800 sm:text-2xl">Work Photos</h3>
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 items-start gap-4 sm:grid-cols-2 md:grid-cols-3 sm:gap-5">
         {proofImages.map((image, index) => (
           <article
             key={image}
-            className="self-start overflow-hidden rounded-2xl border border-orange-100 bg-white shadow-sm hover:shadow-md transition-shadow animate-fade-up"
+            className="animate-fade-up self-start overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-shadow hover:shadow-md"
             style={{ animationDelay: `${0.26 + index * 0.06}s` }}
           >
             <img
@@ -60,7 +64,9 @@ function WorkProofGallery({
               loading="lazy"
               decoding="async"
               fetchpriority="low"
-              className="block h-52 sm:h-52 w-full object-cover"
+              width="600"
+              height="600"
+              className="block aspect-square w-full max-h-150 object-cover"
             />
           </article>
         ))}
