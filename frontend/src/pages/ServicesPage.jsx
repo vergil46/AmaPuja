@@ -6,7 +6,9 @@ import api from '../services/api'
 
 const normalizeTitle = (value) => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 const normalizeLanguageKey = (value) => String(value || '').trim().toLowerCase()
-const normalizedHindiExcludedTitles = new Set(['Engagement Puja'].map(normalizeTitle))
+const normalizedHindiExcludedTitles = new Set(
+  ['Engagement Puja', 'Namkaran Puja (Ekoisia)'].map(normalizeTitle)
+)
 
 const allowedPriestPreferences = new Set(['Hindi', 'Odia', 'Bengali'])
 const allowedCities = new Set(['Bangalore', 'Bhubaneswar'])
