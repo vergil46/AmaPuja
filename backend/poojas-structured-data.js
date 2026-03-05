@@ -3,18 +3,19 @@ module.exports = [
     "key": "annaprashan_puja",
     "availableLanguages": [
       "hindi",
-      "bengali"
+      "bengali",
+      "odia"
     ],
     "title": {
-      "odia": "",
+      "odia": "Annaprashan Puja",
       "hindi": "Annaprashan Puja",
       "kannada": "",
       "bengali": "Onnoprashon (Mukhe Bhaat)"
     },
     "description": {
       "odia": {
-        "short": "",
-        "full": ""
+        "short": "Annaprashan is the ceremony where the baby is introduced to solid foods preferably Sweet/Milk Rice for the first time. The puja is performed to bestow a very healthy and prosperous life for the baby.",
+        "full": "Annaprashan is the ceremony where the baby is introduced to solid foods preferably Sweet/Milk Rice for the first time. The puja is performed to bestow a very healthy and prosperous life for the baby."
       },
       "hindi": {
         "short": "Perform the sacred Annaprashan Puja to mark your baby’s first solid food intake with blessings of health, strength, and prosperity. Harivara provides experienced North Indian Pandits, complete puja samagri, muhurat selection, and hassle-free doorstep service across India.",
@@ -31,7 +32,41 @@ module.exports = [
     },
     "pricing": {
       "odia": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4000,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Samagries",
+            "procedure": [
+              "Ghata Sthapana",
+              "Sankalpa",
+              "Ganapathi Panchdevta Puja",
+              "Matrugana Puja",
+              "Havan",
+              "Annaprashan",
+              "Neivedhya",
+              "Aarti",
+              "Pushpanjali",
+              "Bhojya daana"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Pooja Materials"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              },
+              {
+                "name": "Satyanarayan Katha",
+                "price": 1700
+              }
+            ],
+            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos etc you will be receiving a detailed to do list after booking."
+          }
+        ],
         "addOns": []
       },
       "hindi": {
@@ -111,18 +146,19 @@ module.exports = [
   {
     "key": "engagement_puja",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "odia"
     ],
     "title": {
-      "odia": "",
+      "odia": "Engagement Puja",
       "hindi": "Engagement Puja",
       "kannada": "",
       "bengali": ""
     },
     "description": {
       "odia": {
-        "short": "",
-        "full": ""
+        "short": "Engagement or Nirbandha is an occasion where there is a formal agreement to get married and families announce the same to society. It is also known as the betrothal ceremony, Sagai, Ring ceremony, Nishchitartham, Roka, Chunni, etc.",
+        "full": "Engagement or Nirbandha is an occasion where there is a formal agreement to get married and families announce the same to society. It is also known as the betrothal ceremony, Sagai, Ring ceremony, Nishchitartham, Roka, Chunni, etc."
       },
       "hindi": {
         "short": "Engagement or Nirbandha is an occasion where there is a formal agreement to get married and families announce the same to society. It is also known as the betrothal ceremony, Sagai, Ring ceremony, Nishchitartham, Roka, Chunni, etc.",
@@ -139,7 +175,34 @@ module.exports = [
     },
     "pricing": {
       "odia": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4000,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + Puja Samagries",
+            "procedure": [
+              "Ghata Sthapana",
+              "Mangalastaka",
+              "Ganapathi Panchdevta Puja",
+              "Both Parents Sankalpa",
+              "Pushpanjali",
+              "Satya Patha",
+              "Kanya Agamana",
+              "Ring Exchange"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagries"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers and Fruits",
+                "price": 1000
+              }
+            ]
+          }
+        ],
         "addOns": []
       },
       "hindi": {
@@ -185,18 +248,19 @@ module.exports = [
   {
     "key": "ganapathi_puja",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "odia"
     ],
     "title": {
-      "odia": "",
+      "odia": "Ganapathi Puja",
       "hindi": "Ganapathi Puja",
       "kannada": "",
       "bengali": ""
     },
     "description": {
       "odia": {
-        "short": "",
-        "full": ""
+        "short": "Ganapathi Puja is performed for Lord Ganapathi who removes all the obstacles and negative energies. This puja bestows a person with victory, brings harmony to the family, and helps to attain success in life.",
+        "full": "Ganapathi Puja is performed for Lord Ganapathi who removes all the obstacles and negative energies. This puja bestows a person with victory, brings harmony to the family, and helps to attain success in life."
       },
       "hindi": {
         "short": "Ganapathi Puja is performed for Lord Ganapathi who removes all the obstacles and negative energies. This puja bestows a person with victory, brings harmony to the family, and helps to attain success in life.",
@@ -213,7 +277,39 @@ module.exports = [
     },
     "pricing": {
       "odia": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 5200,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + Pooja Samagries",
+            "procedure": [
+              "Ghata Sthapana",
+              "Sankalpa",
+              "Ganapathi Puja",
+              "Panchdevata Puja",
+              "Ganapathi Devata Avahan",
+              "Bhog Neivedhya",
+              "Aarti",
+              "Pushpanjali",
+              "Prasad Sevan"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "Puja Samagries"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              },
+              {
+                "name": "Havan",
+                "price": 100
+              }
+            ]
+          }
+        ],
         "addOns": []
       },
       "hindi": {
@@ -276,7 +372,7 @@ module.exports = [
     },
     "description": {
       "odia": {
-        "short": "Griha Pravesh puja for peaceful new home entry",
+        "short": "Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.",
         "full": "Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily."
       },
       "hindi": {
@@ -309,7 +405,7 @@ module.exports = [
               "Ganapati Ghata Puja",
               "Navagraha Mandal Puja",
               "Durga Madhava Puja",
-              "Naryana Lakshmivardhani Ghata Puja.",
+              "Naryana Lakshmivardhani Ghata Puja .",
               "Vrindavati Puja",
               "Vastu Puja",
               "Havan",
@@ -320,7 +416,6 @@ module.exports = [
               "Dakshina",
               "All Puja Samagries"
             ],
-            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji dan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc you will be receiving detailed to do list after booking.",
             "addOns": [
               {
                 "name": "Flowers & Fruits",
@@ -330,14 +425,15 @@ module.exports = [
                 "name": "Satyanarayan Katha",
                 "price": 1500
               }
-            ]
+            ],
+            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji daan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc you will be receiving detailed to do list after booking."
           },
           {
             "name": "Standard",
             "price": 11000,
             "includesSamagri": true,
             "pandits": "2 Panditjis + All Puja Samagries",
-            "description": "In Standard Griha Pravesh Puja 1 main panditji and 1 assistant panditji will be there, More number of pujas will be performed and more number of mandals are drawn, total pooja goes on for 2:30-3:00 hours.",
+            "description": "In Standard Griha Pravesh Puja 1 main panditji and 1 assistant panditji will be there, More number of pujas will be performed and more number of mandals are drawn, total pooja goes on for 2:30- 3:00 hours.",
             "procedure": [
               "Ghata sthapana",
               "Dwarapal Puja",
@@ -366,7 +462,6 @@ module.exports = [
               "Dakshina",
               "All Puja Samagries"
             ],
-            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji daan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc you will be receiving detailed to do list after booking.",
             "addOns": [
               {
                 "name": "Flowers & Fruits",
@@ -376,7 +471,8 @@ module.exports = [
                 "name": "Satyanarayan Katha",
                 "price": 1500
               }
-            ]
+            ],
+            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji daan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc you will be receiving detailed to do list after booking."
           }
         ],
         "addOns": []
@@ -534,18 +630,19 @@ module.exports = [
   {
     "key": "janma_chuti_poka_mundan",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "odia"
     ],
     "title": {
-      "odia": "",
+      "odia": "Janma Chuti Poka (Mundan)",
       "hindi": "Janma Chuti Poka (Mundan)",
       "kannada": "",
       "bengali": ""
     },
     "description": {
       "odia": {
-        "short": "",
-        "full": ""
+        "short": "Mundan Ceremony is performed for the child, the hairs are shaved to signify freedom from the past and moving into the new life. Chudakarana is done to ensure the baby grows as a healthy and spiritual individual who is free from sins and also to attain the goodness of life.",
+        "full": "Mundan Ceremony is performed for the child, the hairs are shaved to signify freedom from the past and moving into the new life. Chudakarana is done to ensure the baby grows as a healthy and spiritual individual who is free from sins and also to attain the goodness of life."
       },
       "hindi": {
         "short": "Mundan Ceremony is performed for the child, the hairs are shaved to signify freedom from the past and moving into the new life. Chudakarana is done to ensure the baby grows as a healthy and spiritual individual who is free from sins and also to attain the goodness of life.",
@@ -562,7 +659,38 @@ module.exports = [
     },
     "pricing": {
       "odia": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 3500,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + Puja Samagri",
+            "procedure": [
+              "Swastivachanam",
+              "Sankalp",
+              "Gauri Ganesh Puja",
+              "Panchdevata Puja",
+              "Chudakaran Puja",
+              "Bhog Neivedhya",
+              "Pushpanjali",
+              "Prasad Sevan"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagries"
+            ],
+            "addOns": [
+              {
+                "name": "Fruits & Flowers",
+                "price": 1000
+              },
+              {
+                "name": "Havan",
+                "price": 800
+              }
+            ]
+          }
+        ],
         "addOns": []
       },
       "hindi": {
@@ -614,18 +742,19 @@ module.exports = [
     "key": "lakshmi_puja",
     "availableLanguages": [
       "hindi",
-      "bengali"
+      "bengali",
+      "odia"
     ],
     "title": {
-      "odia": "",
+      "odia": "Lakshmi Puja",
       "hindi": "Lakshmi Puja",
       "kannada": "",
       "bengali": "Laxmi Puja"
     },
     "description": {
       "odia": {
-        "short": "",
-        "full": ""
+        "short": "Lakshmi Puja is performed to gain, conserve the existing wealth, and also to achieve financial stability by appeasing Goddess Laxmi, the Goddess of wealth and prosperity.",
+        "full": "Lakshmi Puja is performed to gain, conserve the existing wealth, and also to achieve financial stability by appeasing Goddess Laxmi, the Goddess of wealth and prosperity."
       },
       "hindi": {
         "short": "Lakshmi Puja is performed to gain, conserve the existing wealth, and also to achieve financial stability by appeasing Goddess Laxmi, the Goddess of wealth and prosperity.",
@@ -642,7 +771,39 @@ module.exports = [
     },
     "pricing": {
       "odia": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4000,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + Puja Samagries",
+            "procedure": [
+              "Kaya Shudhi",
+              "Ghata Sthapana",
+              "Sankalpa",
+              "Ganapathi Panchdevta Puja",
+              "Brahama Savitri matrigana mandal Puja",
+              "Narayan Vardhani Ghata Puja",
+              "Lakshmi Ghata puja",
+              "Neivedhya, Aarti",
+              "Pushpanjali and Bhojyadana"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagries"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              },
+              {
+                "name": "Havan",
+                "price": 1000
+              }
+            ]
+          }
+        ],
         "addOns": []
       },
       "hindi": {
@@ -719,18 +880,19 @@ module.exports = [
   {
     "key": "namkaran_puja_ekoisia",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "odia"
     ],
     "title": {
-      "odia": "",
+      "odia": "Namkaran Puja (Ekoisia)",
       "hindi": "Namkaran Puja (Ekoisia)",
       "kannada": "",
       "bengali": ""
     },
     "description": {
       "odia": {
-        "short": "",
-        "full": ""
+        "short": "Namkaran is the naming ceremony of the child, it is very important as it's the first ceremony of a child's life. Its also known as Ekoisia or Ekusia. Satyanarayan Katha and havan are performed for the well-being of the child to get all the blessings for a healthy and happy life.",
+        "full": "Namkaran is the naming ceremony of the child, it is very important as it's the first ceremony of a child's life. Its also known as Ekoisia or Ekusia. Satyanarayan Katha and havan are performed for the well-being of the child to get all the blessings for a healthy and happy life."
       },
       "hindi": {
         "short": "Namkaran is the naming ceremony of the child, it is very important as it is the first ceremony of a child’s life. It is also known as Ekoisia or Ekusia. Satyanarayan Katha and havan are performed for the well-being of the child to get all the blessings for a healthy and happy life.",
@@ -747,7 +909,39 @@ module.exports = [
     },
     "pricing": {
       "odia": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 5200,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Puja Samagries",
+            "procedure": [
+              "Ghata Sthapana",
+              "Sankalpa",
+              "Ganapathi Panchdevta Puja",
+              "Navagraha Mandala Puja",
+              "Narayan Puja",
+              "Satyanarayan Katha",
+              "Havan",
+              "Neivedhya",
+              "Aarti",
+              "Pushpanjali",
+              "Namakaran",
+              "Bhojya daana"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagries"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              }
+            ],
+            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos etc you will be receiving a detailed to do list after booking."
+          }
+        ],
         "addOns": []
       },
       "hindi": {
@@ -802,15 +996,15 @@ module.exports = [
       "hindi"
     ],
     "title": {
-      "odia": "Office Opening Puja",
+      "odia": "Office/Shop Opening Puja",
       "hindi": "Office Opening Puja",
       "kannada": "",
       "bengali": ""
     },
     "description": {
       "odia": {
-        "short": "In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.",
-        "full": "In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business."
+        "short": "In the New building or Place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the power or influence of negative energies and bring in success in the business.",
+        "full": "In the New building or Place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the power or influence of negative energies and bring in success in the business."
       },
       "hindi": {
         "short": "In the New building or Place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the power or influence of negative energies and bring in success in the business.",
@@ -832,7 +1026,7 @@ module.exports = [
             "name": "Standard",
             "price": 4300,
             "includesSamagri": true,
-            "pandits": "1 Panditji + All Puja Samagries",
+            "pandits": "1 Panditji + All Pooja Samagries",
             "procedure": [
               "Ganapathi Puja",
               "Lakshmi Puja",
@@ -850,15 +1044,17 @@ module.exports = [
             "inclusions": [
               "Dakshina",
               "All Puja Samagries"
-            ]
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              }
+            ],
+            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos etc you will be receiving a detailed to do list after booking."
           }
         ],
-        "addOns": [
-          {
-            "name": "Flowers & Fruits",
-            "price": 1000
-          }
-        ]
+        "addOns": []
       },
       "hindi": {
         "packages": [
@@ -935,18 +1131,19 @@ module.exports = [
     "key": "saraswati_puja",
     "availableLanguages": [
       "hindi",
-      "bengali"
+      "bengali",
+      "odia"
     ],
     "title": {
-      "odia": "",
+      "odia": "Saraswati Puja",
       "hindi": "Saraswati Puja",
       "kannada": "",
       "bengali": "Saraswati Puja"
     },
     "description": {
       "odia": {
-        "short": "",
-        "full": ""
+        "short": "Mata Saraswati is the deity of intelligence, wisdom, arts, music, memory power, and other soft skills. This havan relieves people from mental pressure. It improves concentration, memory power, focus, and the ability to understand complex things.",
+        "full": "Mata Saraswati is the deity of intelligence, wisdom, arts, music, memory power, and other soft skills. This havan relieves people from mental pressure. It improves concentration, memory power, focus, and the ability to understand complex things."
       },
       "hindi": {
         "short": "Saraswati Puja is performed to seek the blessings of Goddess Saraswati for intelligence, wisdom, arts, and learning.",
@@ -963,7 +1160,39 @@ module.exports = [
     },
     "pricing": {
       "odia": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4300,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + Pooja Samagries",
+            "procedure": [
+              "Ghata Sthapana",
+              "Sankalpa",
+              "Ganapathi Puja",
+              "Panchdevata Puja",
+              "Saraswati Devi Avahan",
+              "Bhog Neivedhya",
+              "Aarti",
+              "Pushpanjali",
+              "Prasad Sevan"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "Puja Samagries"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              },
+              {
+                "name": "Havan",
+                "price": 1000
+              }
+            ]
+          }
+        ],
         "addOns": []
       },
       "hindi": {
@@ -1072,18 +1301,19 @@ module.exports = [
     "key": "satyanarayan_puja",
     "availableLanguages": [
       "hindi",
-      "bengali"
+      "bengali",
+      "odia"
     ],
     "title": {
-      "odia": "",
+      "odia": "Satyanarayan Puja",
       "hindi": "Satyanarayan Puja",
       "kannada": "",
       "bengali": "Satyanarayan Puja"
     },
     "description": {
       "odia": {
-        "short": "",
-        "full": ""
+        "short": "Satyanarayan Puja is performed to remove all the obstacles and negative energies and gives victory or success. It acquires wealth and prosperity and brings harmony to the family and success in life.",
+        "full": "Satyanarayan Puja is performed to remove all the obstacles and negative energies and gives victory or success. It acquires wealth and prosperity and brings harmony to the family and success in life."
       },
       "hindi": {
         "short": "Satyanarayan Puja is performed to remove obstacles, eliminate negative energies, and bring success and prosperity.",
@@ -1100,7 +1330,39 @@ module.exports = [
     },
     "pricing": {
       "odia": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4000,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + All Pooja Samagries",
+            "procedure": [
+              "Ganapathi Puja",
+              "Varun Puja",
+              "Narayan Puja",
+              "Pachdevta Puja",
+              "Navagraha Puja",
+              "Asthadasha Matrika Puja",
+              "Satyanarayan Katha Shravan",
+              "Havan",
+              "Pushpanjali",
+              "Neivedhya",
+              "Aarti",
+              "Prasad Vitran"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagries"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              }
+            ],
+            "note": "Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos, Bhojya daan ( Raw Rice, dal, vegetable etc.) you will be receiving detailed to do list after booking."
+          }
+        ],
         "addOns": []
       },
       "hindi": {
@@ -1229,18 +1491,19 @@ module.exports = [
   {
     "key": "vishwakarma_puja",
     "availableLanguages": [
-      "hindi"
+      "hindi",
+      "odia"
     ],
     "title": {
-      "odia": "",
+      "odia": "Vishwakarma Puja",
       "hindi": "Vishwakarma Puja",
       "kannada": "",
       "bengali": ""
     },
     "description": {
       "odia": {
-        "short": "",
-        "full": ""
+        "short": "Lord Vishwakarma is the chief deity of all architects and craftsmen also known as Devashilpi. This puja is performed to please Lord Vishwakarma and get his blessings for a happy and wealthy life.",
+        "full": "Lord Vishwakarma is the chief deity of all architects and craftsmen also known as Devashilpi. This puja is performed to please Lord Vishwakarma and get his blessings for a happy and wealthy life."
       },
       "hindi": {
         "short": "Vishwakarma Puja is performed to seek blessings of Lord Vishwakarma for prosperity, protection, and professional success.",
@@ -1257,7 +1520,38 @@ module.exports = [
     },
     "pricing": {
       "odia": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Standard",
+            "price": 4000,
+            "includesSamagri": true,
+            "pandits": "1 Panditji + Puja Samagries",
+            "procedure": [
+              "Kaya Shudhi",
+              "Ghata Sthapana",
+              "Sankalpa",
+              "Ganapathi Panchdevta Puja",
+              "Narayan Vardhani Ghata Puja",
+              "Vishwakarma puja",
+              "Neivedhya, Aarti",
+              "Pushpanjali and Bhojyadana"
+            ],
+            "inclusions": [
+              "Dakshina",
+              "All Puja Samagries"
+            ],
+            "addOns": [
+              {
+                "name": "Flowers & Fruits",
+                "price": 1000
+              },
+              {
+                "name": "Havan",
+                "price": 1000
+              }
+            ]
+          }
+        ],
         "addOns": []
       },
       "hindi": {
@@ -4064,4 +4358,4 @@ module.exports = [
       }
     }
   }
-];
+]

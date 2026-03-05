@@ -32,7 +32,8 @@ function RatingsPage() {
   const [feedbacks, setFeedbacks] = useState([])
   const [publicFeedbacks, setPublicFeedbacks] = useState(null)
   const [feedbackForm, setFeedbackForm] = useState({})
-  const [message, setMessage] = useState('')
+  const [submittingByBookingId, setSubmittingByBookingId] = useState({})
+  const [message, setMessage] = useState({ type: '', text: '' })
 
   useEffect(() => {
     api
@@ -96,33 +97,44 @@ function RatingsPage() {
   }
 
   const submitFeedback = async (bookingId) => {
+    if (submittingByBookingId[bookingId]) return
+
     const payload = feedbackForm[bookingId] || { rating: 5, comment: '' }
 
     if (!payload.comment?.trim()) {
-      setMessage('Please write a comment before submitting.')
+      setMessage({ type: 'error', text: 'Please write a comment before submitting.' })
       return
     }
 
-    const response = await api.post('/feedback', {
-      bookingId,
-      rating: Number(payload.rating || 5),
-      comment: payload.comment,
-    })
+    setSubmittingByBookingId((prev) => ({ ...prev, [bookingId]: true }))
 
-    setFeedbacks((prev) => [response.data, ...prev.filter((item) => item.bookingId !== bookingId)])
-    setFeedbackForm((prev) => ({ ...prev, [bookingId]: { rating: 5, comment: '' } }))
-    setPublicFeedbacks((prev) => [
-      {
-        _id: response.data._id,
-        rating: response.data.rating,
-        comment: response.data.comment,
-        createdAt: response.data.createdAt,
-        customerName: 'You',
-        poojaTitle: response.data.poojaId?.title || 'Pooja Service',
-      },
-      ...prev,
-    ])
-    setMessage('Thank you! Your review was submitted successfully.')
+    try {
+      const response = await api.post('/feedback', {
+        bookingId,
+        rating: Number(payload.rating || 5),
+        comment: payload.comment,
+      })
+
+      setFeedbacks((prev) => [response.data, ...prev.filter((item) => item.bookingId !== bookingId)])
+      setFeedbackForm((prev) => ({ ...prev, [bookingId]: { rating: 5, comment: '' } }))
+      setPublicFeedbacks((prev) => [
+        {
+          _id: response.data._id,
+          rating: response.data.rating,
+          comment: response.data.comment,
+          createdAt: response.data.createdAt,
+          customerName: 'You',
+          poojaTitle: response.data.poojaId?.title || 'Pooja Service',
+        },
+        ...(prev || []),
+      ])
+      setMessage({ type: 'success', text: 'Thank you! Your review was submitted successfully.' })
+    } catch (error) {
+      const apiMessage = error?.response?.data?.message
+      setMessage({ type: 'error', text: apiMessage || 'Unable to submit review right now. Please try again.' })
+    } finally {
+      setSubmittingByBookingId((prev) => ({ ...prev, [bookingId]: false }))
+    }
   }
 
   const feedbackCount = publicFeedbacks?.length || 0
@@ -217,18 +229,25 @@ function RatingsPage() {
 
                     <button
                       onClick={() => submitFeedback(booking._id)}
-                      className="mt-3 rounded-lg bg-orange-700 px-4 py-2.5 text-sm font-semibold text-white"
+                      disabled={Boolean(submittingByBookingId[booking._id])}
+                      className="mt-3 rounded-lg bg-orange-700 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      Submit review
+                      {submittingByBookingId[booking._id] ? 'Submitting...' : 'Submit review'}
                     </button>
                   </div>
                 ))}
               </div>
             )}
 
-            {message && (
-              <div className="mt-4 rounded-lg border border-green-200 bg-green-50 text-green-800 text-sm px-3 py-2">
-                {message}
+            {message.text && (
+              <div
+                className={`mt-4 rounded-lg border text-sm px-3 py-2 ${
+                  message.type === 'success'
+                    ? 'border-green-200 bg-green-50 text-green-800'
+                    : 'border-rose-200 bg-rose-50 text-rose-800'
+                }`}
+              >
+                {message.text}
               </div>
             )}
           </div>

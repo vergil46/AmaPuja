@@ -9,7 +9,8 @@ function DashboardPage() {
   const [bookings, setBookings] = useState([])
   const [feedbacks, setFeedbacks] = useState([])
   const [feedbackForm, setFeedbackForm] = useState({})
-  const [feedbackMessage, setFeedbackMessage] = useState('')
+  const [feedbackSubmittingById, setFeedbackSubmittingById] = useState({})
+  const [feedbackMessage, setFeedbackMessage] = useState({ type: '', text: '' })
   const [cancelLoadingById, setCancelLoadingById] = useState({})
   const [isLoading, setIsLoading] = useState(true)
 
@@ -105,24 +106,38 @@ function DashboardPage() {
   }
 
   const submitFeedback = async (bookingId) => {
+    if (feedbackSubmittingById[bookingId]) return
+
     const payload = feedbackForm[bookingId] || { rating: 5, comment: '' }
     if (!payload.comment?.trim()) {
-      setFeedbackMessage('Please write a comment before submitting feedback.')
+      setFeedbackMessage({ type: 'error', text: 'Please write a comment before submitting feedback.' })
       return
     }
 
-    const res = await api.post('/feedback', {
-      bookingId,
-      rating: Number(payload.rating || 5),
-      comment: payload.comment,
-    })
+    setFeedbackSubmittingById((prev) => ({ ...prev, [bookingId]: true }))
 
-    setFeedbacks((prev) => [res.data, ...prev.filter((item) => item.bookingId !== bookingId)])
-    setFeedbackMessage('Thank you! Your feedback has been submitted.')
+    try {
+      const res = await api.post('/feedback', {
+        bookingId,
+        rating: Number(payload.rating || 5),
+        comment: payload.comment,
+      })
+
+      setFeedbacks((prev) => [res.data, ...prev.filter((item) => item.bookingId !== bookingId)])
+      setFeedbackForm((prev) => ({ ...prev, [bookingId]: { rating: 5, comment: '' } }))
+      setFeedbackMessage({ type: 'success', text: 'Thank you! Your feedback has been submitted.' })
+    } catch (error) {
+      setFeedbackMessage({
+        type: 'error',
+        text: error?.response?.data?.message || 'Unable to submit feedback right now. Please try again.',
+      })
+    } finally {
+      setFeedbackSubmittingById((prev) => ({ ...prev, [bookingId]: false }))
+    }
   }
 
   const handleCancelBooking = async (bookingId) => {
-    setFeedbackMessage('')
+    setFeedbackMessage({ type: '', text: '' })
     setCancelLoadingById((prev) => ({ ...prev, [bookingId]: true }))
     try {
       const response = await api.patch(`/bookings/${bookingId}/cancel`)
@@ -134,9 +149,9 @@ function DashboardPage() {
             : booking
         )
       )
-      setFeedbackMessage('Booking cancelled successfully.')
+      setFeedbackMessage({ type: 'success', text: 'Booking cancelled successfully.' })
     } catch (error) {
-      setFeedbackMessage(error?.response?.data?.message || 'Failed to cancel booking.')
+      setFeedbackMessage({ type: 'error', text: error?.response?.data?.message || 'Failed to cancel booking.' })
     } finally {
       setCancelLoadingById((prev) => ({ ...prev, [bookingId]: false }))
     }
@@ -347,9 +362,15 @@ function DashboardPage() {
           </div>
         </div>
         
-        {feedbackMessage && (
-          <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg text-sm">
-            {feedbackMessage}
+        {feedbackMessage.text && (
+          <div
+            className={`mb-4 p-3 rounded-lg text-sm border ${
+              feedbackMessage.type === 'success'
+                ? 'bg-green-50 border-green-200 text-green-800'
+                : 'bg-rose-50 border-rose-200 text-rose-800'
+            }`}
+          >
+            {feedbackMessage.text}
           </div>
         )}
 
@@ -392,9 +413,10 @@ function DashboardPage() {
 
                 <button
                   onClick={() => submitFeedback(booking._id)}
-                  className="mt-3 px-4 py-2 rounded bg-orange-700 text-white"
+                  disabled={Boolean(feedbackSubmittingById[booking._id])}
+                  className="mt-3 px-4 py-2 rounded bg-orange-700 text-white disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Submit Feedback
+                  {feedbackSubmittingById[booking._id] ? 'Submitting...' : 'Submit Feedback'}
                 </button>
               </div>
             ))}
