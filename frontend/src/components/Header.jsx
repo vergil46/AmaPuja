@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 import LanguageSwitcher from './LanguageSwitcher'
-import { useLanguage } from '../context/LanguageContext'
+import { useLanguage } from '../context/useLanguage'
 import Logo from './Logo'
 
 function Header() {
@@ -18,7 +18,7 @@ function Header() {
   const mobileNavClass = ({ isActive }) =>
     `w-full text-sm font-medium px-3.5 py-2.5 rounded-xl border transition-colors ${
       isActive
-        ? 'text-orange-100 border-orange-400/50 bg-linear-to-r from-orange-700/40 to-rose-700/30'
+        ? 'text-orange-100 border-orange-400/50 bg-orange-800/60'
         : 'text-stone-200 border-stone-700/70 bg-stone-900/60 hover:text-orange-100 hover:border-orange-400/45 hover:bg-orange-700/20'
     }`
 
@@ -102,9 +102,9 @@ function Header() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-orange-100/80 bg-linear-to-b from-orange-100/70 via-amber-50/70 to-orange-100/70 backdrop-blur animate-fade-up">
+        <div className="lg:hidden border-t border-orange-100/80 bg-orange-50/85 backdrop-blur animate-fade-up">
           <nav className="max-w-6xl mx-auto px-3.5 py-4" style={{ animationDelay: '0.05s' }}>
-            <div className="rounded-2xl border border-orange-300/40 bg-linear-to-br from-stone-900/95 to-rose-950/80 shadow-lg shadow-orange-900/20 p-4 flex flex-col gap-2.5">
+            <div className="rounded-2xl border border-orange-300/40 bg-stone-900/95 shadow-lg shadow-orange-900/20 p-4 flex flex-col gap-2.5">
             <NavLink to="/" className={mobileNavClass} onClick={closeMobileMenu}>
               {t('home')}
             </NavLink>
@@ -150,7 +150,7 @@ function Header() {
                   <Link
                     to="/login"
                     onClick={closeMobileMenu}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-linear-to-r from-orange-500 via-amber-500 to-rose-500 text-white text-sm font-semibold text-center shadow-md shadow-orange-500/30 hover:from-orange-600 hover:via-amber-600 hover:to-rose-600 transition-all"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-linear-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold text-center shadow-md shadow-orange-500/30 hover:from-orange-600 hover:to-amber-600 transition-all"
                   >
                     {t('login')} / {t('signup')}
                   </Link>

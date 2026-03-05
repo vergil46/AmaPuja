@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import api from '../services/api'
-
-const AuthContext = createContext(null)
+import { AuthContext } from './auth-context'
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(sessionStorage.getItem('pujasamrddhi_token') || '')
@@ -9,6 +8,13 @@ export function AuthProvider({ children }) {
     const raw = sessionStorage.getItem('pujasamrddhi_user')
     return raw ? JSON.parse(raw) : null
   })
+
+  const logout = () => {
+    setToken('')
+    setUser(null)
+    sessionStorage.removeItem('pujasamrddhi_token')
+    sessionStorage.removeItem('pujasamrddhi_user')
+  }
 
   useEffect(() => {
     if (!token) return
@@ -25,16 +31,7 @@ export function AuthProvider({ children }) {
     sessionStorage.setItem('pujasamrddhi_user', JSON.stringify(nextUser))
   }
 
-  const logout = () => {
-    setToken('')
-    setUser(null)
-    sessionStorage.removeItem('pujasamrddhi_token')
-    sessionStorage.removeItem('pujasamrddhi_user')
-  }
-
   const value = useMemo(() => ({ token, user, login, logout }), [token, user])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
-
-export const useAuth = () => useContext(AuthContext)

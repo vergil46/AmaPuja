@@ -687,6 +687,31 @@ function ServicesPage() {
         </p>
       )}
 
+      <div className="mt-4 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-stone-900">Need help choosing the right puja package?</p>
+            <p className="text-sm text-stone-600">Talk to our team for language, samagri, and timing guidance before booking.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href="tel:+919000012345"
+              className="rounded-lg border border-stone-300 px-3.5 py-2 text-sm font-semibold text-stone-800"
+            >
+              Call Now
+            </a>
+            <a
+              href="https://wa.me/919739362962?text=I%20need%20help%20selecting%20a%20puja%20service"
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-lg bg-green-600 px-3.5 py-2 text-sm font-semibold text-white"
+            >
+              WhatsApp Support
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div className="mt-8 flex items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-stone-900 sm:text-2xl">Available Pooja Services</h2>
         <span className="text-sm text-stone-500">{isLoading ? 'Loading services...' : `${displayPoojas.length} found`}</span>

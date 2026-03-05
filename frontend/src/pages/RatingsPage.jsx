@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Seo from '../components/Seo'
 import Testimonials from '../components/Testimonials'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 import api from '../services/api'
 
 const RATING_OPTIONS = [
@@ -143,6 +143,22 @@ function RatingsPage() {
     ? (publicFeedbacks.reduce((sum, feedback) => sum + Number(feedback.rating || 0), 0) / feedbackCount).toFixed(1)
     : '0.0'
 
+  const ratingDistribution = useMemo(() => {
+    const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+    ;(publicFeedbacks || []).forEach((feedback) => {
+      const rating = Number(feedback.rating || 0)
+      if (counts[rating] !== undefined) {
+        counts[rating] += 1
+      }
+    })
+
+    return [5, 4, 3, 2, 1].map((rating) => {
+      const count = counts[rating]
+      const percent = feedbackCount ? Math.round((count / feedbackCount) * 100) : 0
+      return { rating, count, percent }
+    })
+  }, [publicFeedbacks, feedbackCount])
+
   const inputClass =
     'w-full rounded-xl border border-stone-300 bg-white px-3.5 py-3 text-base text-stone-800 shadow-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100'
 
@@ -192,13 +208,14 @@ function RatingsPage() {
               <p className="mt-4 text-sm text-stone-600">No completed booking pending feedback.</p>
             ) : (
               <div className="mt-5 space-y-4">
-                {completedBookingsWithoutFeedback.map((booking) => (
+                {completedBookingsWithoutFeedback.map((booking, index) => (
                   <div
                     id={`rating-booking-${booking._id}`}
                     key={booking._id}
-                    className={`rounded-xl border p-4 ${
+                    className={`rounded-xl border p-4 animate-fade-up ${
                       reviewBookingId === booking._id ? 'border-orange-300 ring-2 ring-orange-100' : 'border-stone-200'
                     }`}
+                    style={{ animationDelay: `${Math.min(index * 0.06, 0.36)}s` }}
                   >
                     <p className="text-lg font-semibold text-stone-800">{booking.poojaId?.title}</p>
                     <p className="mt-1 text-sm text-stone-600">
@@ -258,8 +275,12 @@ function RatingsPage() {
               <p className="mt-3 text-sm text-stone-600">You have not submitted any review yet.</p>
             ) : (
               <div className="mt-5 space-y-3">
-                {feedbacks.map((feedback) => (
-                  <article key={feedback._id} className="rounded-xl border border-stone-200 p-4 bg-stone-50/70">
+                {feedbacks.map((feedback, index) => (
+                  <article
+                    key={feedback._id}
+                    className="rounded-xl border border-stone-200 p-4 bg-stone-50/70 animate-fade-up"
+                    style={{ animationDelay: `${Math.min(index * 0.05, 0.3)}s` }}
+                  >
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-base font-semibold text-stone-800">{feedback.poojaId?.title || 'Pooja Service'}</p>
                       <StarRow rating={feedback.rating} />
@@ -283,14 +304,42 @@ function RatingsPage() {
           </div>
         </div>
 
+        <div className="mt-5 rounded-xl border border-orange-100 bg-linear-to-r from-orange-50/70 to-amber-50/60 p-4">
+          <div className="grid gap-3 sm:grid-cols-[140px_1fr] sm:items-center">
+            <div>
+              <p className="text-[11px] uppercase tracking-widest text-orange-700">Overall Score</p>
+              <p className="mt-1 text-3xl font-semibold text-stone-900">{averageRating}</p>
+              <p className="text-sm text-stone-600">Based on {feedbackCount} verified reviews</p>
+            </div>
+            <div className="space-y-2">
+              {ratingDistribution.map((item) => (
+                <div key={item.rating} className="grid grid-cols-[56px_1fr_40px] items-center gap-2 text-sm">
+                  <span className="text-stone-700">{item.rating} stars</span>
+                  <div className="h-2.5 overflow-hidden rounded-full bg-stone-200">
+                    <div
+                      className="h-full rounded-full bg-linear-to-r from-orange-500 to-amber-500 transition-all duration-500"
+                      style={{ width: `${item.percent}%` }}
+                    />
+                  </div>
+                  <span className="text-right text-stone-600">{item.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {publicFeedbacks === null ? (
           <p className="mt-3 text-sm text-stone-500">Loading customer reviews...</p>
         ) : publicFeedbacks.length === 0 ? (
           <p className="mt-3 text-sm text-stone-600">No customer reviews available yet.</p>
         ) : (
           <div className="mt-5 grid gap-4 md:grid-cols-2">
-            {publicFeedbacks.map((feedback) => (
-              <article key={feedback._id} className="rounded-xl border border-orange-100 bg-orange-50/30 p-4 shadow-sm">
+            {publicFeedbacks.map((feedback, index) => (
+              <article
+                key={feedback._id}
+                className="rounded-xl border border-orange-100 bg-orange-50/30 p-4 shadow-sm animate-fade-up"
+                style={{ animationDelay: `${Math.min(index * 0.06, 0.42)}s` }}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-base font-semibold text-stone-800">{feedback.customerName}</p>

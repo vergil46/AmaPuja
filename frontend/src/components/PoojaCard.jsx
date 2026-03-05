@@ -118,12 +118,13 @@ function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
         {!isBengaliVivahCard && (
           <p className="mt-3 text-base font-semibold text-orange-700 sm:text-lg">Starting ₹{pooja.startPrice}</p>
         )}
+        <p className="mt-1 text-xs text-stone-500">Instant confirmation with priest language preference.</p>
         <Link
           to={`/services/${pooja._id}${cityQuery}`}
           className="mt-auto inline-block pt-4"
         >
           <span className="inline-block w-full rounded-lg bg-linear-to-r from-stone-900 to-stone-700 px-4 py-3 text-center text-sm font-semibold text-white shadow-sm group-hover:shadow-md sm:w-auto">
-            View Details
+            Check Packages & Book
           </span>
         </Link>
         {localPageLink && (

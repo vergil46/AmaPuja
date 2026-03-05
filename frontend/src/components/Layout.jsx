@@ -19,7 +19,7 @@ function Layout({ children }) {
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pb-20 sm:pb-0">{children}</main>
       <Footer />
       <WhatsAppButton />
     </div>

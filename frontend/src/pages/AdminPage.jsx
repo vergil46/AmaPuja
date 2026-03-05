@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Seo from '../components/Seo'
 import api from '../services/api'
 
@@ -57,8 +57,6 @@ function AdminPage() {
   const [packageFilter, setPackageFilter] = useState('all')
   const [bookingStatusFilter, setBookingStatusFilter] = useState('all')
   const [bookingSearch, setBookingSearch] = useState('')
-  const [recentPackageFilter, setRecentPackageFilter] = useState('all')
-  const [recentStatusFilter, setRecentStatusFilter] = useState('all')
   const [reviewRequestLoadingById, setReviewRequestLoadingById] = useState({})
   const [reviewRequestMessage, setReviewRequestMessage] = useState('')
   const [panditMessageLoadingById, setPanditMessageLoadingById] = useState({})
@@ -119,17 +117,6 @@ function AdminPage() {
     return values.sort((left, right) => left.localeCompare(right))
   }, [bookings])
 
-  const recentPackageOptions = useMemo(() => {
-    const values = Array.from(
-      new Set(
-        recentBookings
-          .map((booking) => String(booking.package || '').trim())
-          .filter(Boolean)
-      )
-    )
-    return values.sort((left, right) => left.localeCompare(right))
-  }, [recentBookings])
-
   const filteredBookings = useMemo(() => {
     const normalizedQuery = bookingSearch.trim().toLowerCase()
 
@@ -157,22 +144,15 @@ function AdminPage() {
   }, [bookings, packageFilter, bookingStatusFilter, bookingSearch])
 
   const filteredRecentBookings = useMemo(() => {
-    return recentBookings.filter((booking) => {
-      const packageMatches = recentPackageFilter === 'all' || booking.package === recentPackageFilter
-      const statusMatches =
-        recentStatusFilter === 'all' ||
-        normalizeBookingStatus(booking.bookingStatus) === recentStatusFilter
+    return recentBookings
+  }, [recentBookings])
 
-      return packageMatches && statusMatches
-    })
-  }, [recentBookings, recentPackageFilter, recentStatusFilter])
-
-  const loadStats = async (range = analyticsRange) => {
+  const loadStats = useCallback(async (range) => {
     const statsRes = await api.get('/dashboard/admin/stats', {
       params: { range },
     })
     setStats(statsRes.data)
-  }
+  }, [])
 
   const loadData = async () => {
     const [poojaRes, bookingRes, recentBookingRes, enquiryRes, paymentRes] = await Promise.all([
@@ -205,7 +185,7 @@ function AdminPage() {
 
   useEffect(() => {
     loadStats(analyticsRange)
-  }, [analyticsRange])
+  }, [analyticsRange, loadStats])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -516,26 +496,26 @@ function AdminPage() {
     return null
   }, [analyticsRange])
 
-  const isWithinSelectedRange = (value) => {
+  const isWithinSelectedRange = useCallback((value) => {
     if (!rangeWindowInMs) return true
     const time = new Date(value).getTime()
     if (Number.isNaN(time)) return false
     return Date.now() - time <= rangeWindowInMs
-  }
+  }, [rangeWindowInMs])
 
   const filteredBookingsForExport = useMemo(
     () => filteredBookings.filter((booking) => isWithinSelectedRange(booking.createdAt)),
-    [filteredBookings, rangeWindowInMs]
+    [filteredBookings, isWithinSelectedRange]
   )
 
   const filteredEnquiriesForExport = useMemo(
     () => enquiries.filter((item) => isWithinSelectedRange(item.createdAt)),
-    [enquiries, rangeWindowInMs]
+    [enquiries, isWithinSelectedRange]
   )
 
   const filteredPaymentsForExport = useMemo(
     () => payments.filter((payment) => isWithinSelectedRange(payment.createdAt)),
-    [payments, rangeWindowInMs]
+    [payments, isWithinSelectedRange]
   )
 
   const exportBookingsCsv = () => {
@@ -682,10 +662,6 @@ function AdminPage() {
 
   const completionRate = stats.totalBookings
     ? Math.round((bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'completed').length / stats.totalBookings) * 100)
-    : 0
-
-  const paidBookingRate = bookings.length
-    ? Math.round((bookings.filter((booking) => String(booking.paymentStatus || '').toLowerCase() === 'paid').length / bookings.length) * 100)
     : 0
 
   const navigateToSection = (section) => {

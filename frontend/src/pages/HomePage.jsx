@@ -29,6 +29,11 @@ function HomePage() {
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-orange-50/95 sm:text-lg">
               Premium puja support for homes and temples with verified priests, transparent pricing, and smooth booking.
             </p>
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+              <span className="rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-orange-50">4.9/5 customer satisfaction</span>
+              <span className="rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-orange-50">Secure online payment</span>
+              <span className="rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-orange-50">Same-day support</span>
+            </div>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Link
                 to="/services"
@@ -36,6 +41,12 @@ function HomePage() {
               >
                 Book a Puja
               </Link>
+              <a
+                href="tel:+919000012345"
+                className="inline-block w-full rounded-xl border border-white/35 bg-white/10 px-5 py-3 text-center text-base font-semibold text-white sm:w-auto sm:px-6"
+              >
+                Call for Guidance
+              </a>
               <span className="rounded-xl border border-white/20 bg-white/15 px-3 py-2 text-sm text-orange-50 sm:px-4">
                 Serving Bangalore & Bhubaneswar
               </span>

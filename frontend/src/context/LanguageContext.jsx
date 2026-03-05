@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useMemo } from 'react'
+import { useCallback, useState, useMemo } from 'react'
 import { translations } from '../i18n/translations'
-
-const LanguageContext = createContext(null)
+import { LanguageContext } from './language-context'
 
 export function LanguageProvider({ children }) {
   const [currentLanguage, setCurrentLanguage] = useState(
@@ -13,13 +12,13 @@ export function LanguageProvider({ children }) {
     localStorage.setItem('appLanguage', langCode)
   }
 
-  const t = (key) => {
+  const t = useCallback((key) => {
     return translations[currentLanguage]?.[key] || translations.en[key] || key
-  }
+  }, [currentLanguage])
 
   const value = useMemo(
     () => ({ currentLanguage, changeLanguage, t }),
-    [currentLanguage]
+    [currentLanguage, t]
   )
 
   return (
@@ -27,12 +26,4 @@ export function LanguageProvider({ children }) {
       {children}
     </LanguageContext.Provider>
   )
-}
-
-export const useLanguage = () => {
-  const context = useContext(LanguageContext)
-  if (!context) {
-    throw new Error('useLanguage must be used within LanguageProvider')
-  }
-  return context
 }
