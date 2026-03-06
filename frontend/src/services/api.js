@@ -38,9 +38,14 @@ const shouldRetryWithProduction = (error) => {
     return false
   }
 
-  // No response usually means network/CORS issue where local backend is unreachable.
   const isNetworkFailure = !error.response
-  if (!isNetworkFailure) {
+  const statusCode = Number(error?.response?.status)
+  const isServerUnavailable = Number.isFinite(statusCode) && statusCode >= 500
+  const isLikelyWrongLocalTarget = statusCode === 404
+
+  // Retry for local-only failures when localhost backend is down/unavailable
+  // or when another service is running on the same port without our API routes.
+  if (!isNetworkFailure && !isServerUnavailable && !isLikelyWrongLocalTarget) {
     return false
   }
 
@@ -72,6 +77,9 @@ api.interceptors.response.use(
       baseURL: productionApiBaseUrl,
       __retriedWithProduction: true,
     }
+
+    // Keep subsequent calls on a healthy backend instead of failing once per request.
+    api.defaults.baseURL = productionApiBaseUrl
 
     return api.request(retryConfig)
   }
