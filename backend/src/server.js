@@ -32,6 +32,43 @@ connectDB().then(seedPoojas);
 
 const app = express();
 
+const normalizeOrigin = (value) => String(value || '').trim().replace(/\/+$/, '');
+
+const isIPv4Host = (hostname) => /^\d{1,3}(?:\.\d{1,3}){3}$/.test(hostname);
+
+const buildAllowedConfiguredOrigins = (origins) => {
+  const allowedOrigins = new Set();
+
+  origins.forEach((origin) => {
+    const normalized = normalizeOrigin(origin);
+    if (!normalized) {
+      return;
+    }
+
+    allowedOrigins.add(normalized);
+
+    try {
+      const parsed = new URL(normalized);
+      const { protocol, hostname, port } = parsed;
+      const canAddWwwVariant = hostname.includes('.') && hostname !== 'localhost' && !isIPv4Host(hostname) && !port;
+
+      if (!canAddWwwVariant) {
+        return;
+      }
+
+      if (hostname.startsWith('www.')) {
+        allowedOrigins.add(`${protocol}//${hostname.slice(4)}`);
+      } else {
+        allowedOrigins.add(`${protocol}//www.${hostname}`);
+      }
+    } catch {
+      // Ignore invalid CLIENT_URL/CLIENT_URLS entries and keep strict CORS behavior.
+    }
+  });
+
+  return allowedOrigins;
+};
+
 if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
@@ -52,23 +89,20 @@ app.use(
       const configuredClientUrls = process.env.CLIENT_URLS
         ? process.env.CLIENT_URLS.split(',').map((value) => value.trim()).filter(Boolean)
         : [];
+      const configuredOrigins = [configuredClientUrl, ...configuredClientUrls].filter(Boolean);
+      const allowedConfiguredOrigins = buildAllowedConfiguredOrigins(configuredOrigins);
 
-      const normalizeOrigin = (value) => value.replace(/\/$/, '');
       const normalizedOrigin = normalizeOrigin(origin);
-      const normalizedConfigured = configuredClientUrl ? normalizeOrigin(configuredClientUrl) : null;
-      const normalizedConfiguredList = configuredClientUrls.map(normalizeOrigin);
       const isKnownRenderFrontend = /^https:\/\/amapuja-frontend(?:-[a-z0-9-]+)?\.onrender\.com$/i.test(
         normalizedOrigin
       );
       const isKnownVercelFrontend = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(normalizedOrigin);
 
-      const isConfiguredClient = normalizedConfigured && normalizedOrigin === normalizedConfigured;
-      const isConfiguredClientList = normalizedConfiguredList.includes(normalizedOrigin);
+      const isConfiguredClient = allowedConfiguredOrigins.has(normalizedOrigin);
       const isLocalhostVitePort = /^http:\/\/localhost:\d+$/.test(origin);
 
       if (
         isConfiguredClient ||
-        isConfiguredClientList ||
         isLocalhostVitePort ||
         isKnownRenderFrontend ||
         isKnownVercelFrontend
