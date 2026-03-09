@@ -49,11 +49,29 @@ function Logo({ className = '', variant = 'default' }) {
         <circle cx="27" cy="30" r="1" fill="#FBBF24" opacity="0.6" />
       </svg>
       <div className="flex flex-col leading-tight relative z-10 bg-white/80 px-2 py-1 rounded-xl shadow-md">
-        <span className="font-bold text-orange-800 tracking-tight" style={{ fontSize: variant === 'small' ? '1rem' : variant === 'large' ? '1.5rem' : '1.25rem' }}>
+        <span
+          className="font-semibold tracking-tight"
+          style={{
+            fontFamily: "'Cinzel', 'Playfair Display', serif",
+            color: '#FF6A00',
+            fontSize: variant === 'small' ? '1rem' : variant === 'large' ? '1.5rem' : '1.25rem'
+          }}
+        >
           PujaSamrddhi
         </span>
         {variant !== 'small' && (
-          <span className="text-xs text-orange-600 -mt-0.5">Sacred Rituals</span>
+          <span
+            className="-mt-0.5"
+            style={{
+              fontFamily: "'Playfair Display', 'Cinzel', serif",
+              color: '#FF6A00',
+              fontSize: '0.6rem',
+              fontWeight: 500,
+              letterSpacing: '0.04em'
+            }}
+          >
+            Sacred Ritual Services
+          </span>
         )}
       </div>
     </div>
