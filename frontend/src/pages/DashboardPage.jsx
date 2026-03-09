@@ -191,7 +191,7 @@ function DashboardPage() {
 
   return (
     <section className="max-w-6xl mx-auto px-4 py-10">
-      <Seo title="Dashboard | PujaSamrddhi" description="View your bookings and statuses on PujaSamrddhi." />
+      <Seo title="Dashboard | Puja Samriddhi" description="View your bookings and statuses on Puja Samriddhi." />
       
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
@@ -428,3 +428,4 @@ function DashboardPage() {
 }
 
 export default DashboardPage
+

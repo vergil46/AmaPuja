@@ -31,14 +31,14 @@ const sendVerificationEmail = async (user, token) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
       to: user.email,
-      subject: 'Verify Your Ama Puja Account',
+      subject: 'Verify Your Puja Samriddhi Account',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #b45309;">Welcome to Ama Puja! 🙏</h2>
+          <h2 style="color: #b45309;">Welcome to Puja Samriddhi! 🙏</h2>
           <p>Hello ${user.name},</p>
-          <p>Thank you for registering with Ama Puja. Please verify your email address to activate your account.</p>
+          <p>Thank you for registering with Puja Samriddhi. Please verify your email address to activate your account.</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${verificationUrl}" style="background-color: #b45309; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
               Verify Email Address
@@ -64,7 +64,7 @@ const sendBookingConfirmationEmail = async (booking, pooja, user) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
       to: booking.email,
       subject: `Booking Confirmed - ${pooja.title}`,
       html: `
@@ -125,10 +125,10 @@ const sendBookingConfirmationEmail = async (booking, pooja, user) => {
           </div>` : ''}
 
           <p style="margin-top: 30px;">Our team will contact you soon to confirm the arrangements.</p>
-          <p>For any queries, please contact us at <a href="mailto:support@amapuja.com" style="color: #b45309;">support@amapuja.com</a></p>
+          <p>For any queries, please contact us at <a href="mailto:support@pujasamriddhi.com" style="color: #b45309;">support@pujasamriddhi.com</a></p>
           
           <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-            <p style="color: #999; font-size: 12px;">Thank you for choosing Ama Puja</p>
+            <p style="color: #999; font-size: 12px;">Thank you for choosing Puja Samriddhi</p>
             <p style="color: #999; font-size: 12px; margin-top: 5px;">🙏 May the divine blessings be with you 🙏</p>
           </div>
         </div>
@@ -149,12 +149,12 @@ const sendPoojaCompletionReviewEmail = async (booking, pooja, reviewUrl) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
       to: booking.email,
       subject: `Pooja Completed - Please Share Your Review`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #f0f0f0; border-radius: 10px;">
-          <h2 style="color: #b45309; text-align: center;">🙏 Thank You for Booking with Ama Puja</h2>
+          <h2 style="color: #b45309; text-align: center;">🙏 Thank You for Booking with Puja Samriddhi</h2>
           <p>Namaste ${booking.name},</p>
           <p>Your <strong>${poojaTitle}</strong> booking has been marked as completed.</p>
           <p>We would love to hear your feedback about your experience.</p>
@@ -175,7 +175,7 @@ const sendPoojaCompletionReviewEmail = async (booking, pooja, reviewUrl) => {
           <p style="color: #666; font-size: 12px; word-break: break-all;">${reviewUrl}</p>
 
           <div style="text-align: center; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 16px;">
-            <p style="color: #999; font-size: 12px;">Thank you for your trust in Ama Puja</p>
+            <p style="color: #999; font-size: 12px;">Thank you for your trust in Puja Samriddhi</p>
           </div>
         </div>
       `,
@@ -196,7 +196,7 @@ const sendAdminBookingAlertEmail = async (booking, pooja) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
       to: adminEmail,
       subject: `New Booking Alert: ${pooja?.title || booking?.package || 'Service'}`,
       html: `
@@ -229,7 +229,7 @@ const sendAdminEnquiryAlertEmail = async (enquiry) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
       to: adminEmail,
       subject: `New Enquiry Alert: ${enquiry?.service || 'General'}`,
       html: `
@@ -263,7 +263,7 @@ const sendOpsAlertEmail = async ({ title, message, metadata = {} }) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
       to: adminEmail,
       subject: `[CRITICAL] ${title}`,
       html: `
@@ -292,9 +292,9 @@ const sendDailyOpsSummaryEmail = async (summary) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
       to: adminEmail,
-      subject: `Daily Business Summary - ${summary?.dateLabel || 'Ama Puja'}`,
+      subject: `Daily Business Summary - ${summary?.dateLabel || 'Puja Samriddhi'}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #b45309; margin-bottom: 12px;">Daily Business Summary</h2>
@@ -328,14 +328,14 @@ const sendPasswordResetEmail = async (user, token) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'Ama Puja <no-reply@amapuja.com>',
+      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
       to: user.email,
-      subject: 'Reset Your Ama Puja Password',
+      subject: 'Reset Your Puja Samriddhi Password',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #b45309;">Password Reset Request 🔐</h2>
           <p>Hello ${user.name},</p>
-          <p>We received a request to reset your password for your Ama Puja account.</p>
+          <p>We received a request to reset your password for your Puja Samriddhi account.</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetUrl}" style="background-color: #b45309; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
               Reset Password
@@ -366,3 +366,4 @@ module.exports = {
   sendOpsAlertEmail,
   sendDailyOpsSummaryEmail,
 };
+

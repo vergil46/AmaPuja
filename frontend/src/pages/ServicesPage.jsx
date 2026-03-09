@@ -592,7 +592,7 @@ function ServicesPage() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
-      <Seo title="PujaSamrddhi Services" description="Explore all available puja services and packages." />
+      <Seo title="Puja Samriddhi Services" description="Explore all available puja services and packages." />
 
       <div className="overflow-hidden rounded-3xl border border-orange-100 bg-linear-to-br from-white via-orange-50/40 to-amber-50/60 shadow-sm">
         <div className="px-5 py-7 sm:px-7 sm:py-8">
@@ -754,3 +754,4 @@ function ServicesPage() {
 }
 
 export default ServicesPage
+

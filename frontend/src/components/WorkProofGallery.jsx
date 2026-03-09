@@ -60,7 +60,7 @@ function WorkProofGallery({
           >
             <img
               src={image}
-              alt={`PujaSamrddhi work proof ${index + 1}`}
+              alt={`Puja Samriddhi work proof ${index + 1}`}
               loading="lazy"
               decoding="async"
               fetchpriority="low"
@@ -76,3 +76,4 @@ function WorkProofGallery({
 }
 
 export default WorkProofGallery
+

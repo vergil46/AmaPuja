@@ -5,7 +5,7 @@ import Seo from '../components/Seo'
 import api from '../services/api'
 import { PoojaDetailSkeleton } from '../components/LoadingSkeleton'
 
-const FUNNEL_SESSION_KEY = 'pujasamrddhi_funnel_session'
+const FUNNEL_SESSION_KEY = 'pujasamriddhi_funnel_session'
 
 const getFunnelSessionId = () => {
   if (typeof window === 'undefined') return ''
@@ -766,7 +766,7 @@ function PoojaDetailPage() {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
-        name: 'PujaSamrddhi',
+        name: 'Puja Samriddhi',
         description: `${displayTitle} Booking`,
         order_id: order.id,
         handler: async (response) => {
@@ -860,7 +860,7 @@ function PoojaDetailPage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
       <Seo
-        title={`${displayTitle} | PujaSamrddhi`}
+        title={`${displayTitle} | Puja Samriddhi`}
         description={displayDescription}
       />
 

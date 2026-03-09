@@ -41,8 +41,8 @@ function Footer() {
             Trusted priests, transparent packages, and smooth ritual booking for families.
           </p>
           <p className="mt-3 text-sm sm:text-base text-stone-300">Contact: 9739362962</p>
-          <p className="text-sm sm:text-base text-stone-300">Email: support@pujasamrddhi.com</p>
-          <p className="text-sm sm:text-base text-stone-300">Website: www.pujasamrddhi.com</p>
+          <p className="text-sm sm:text-base text-stone-300">Email: support@pujasamriddhi.com</p>
+          <p className="text-sm sm:text-base text-stone-300">Website: www.pujasamriddhi.com</p>
           <div className="mt-4 grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm">
             <a
               href="https://www.facebook.com/my_best_puja"
@@ -139,10 +139,11 @@ function Footer() {
         </div>
       </div>
       <p className="text-center text-xs sm:text-sm text-stone-300 border-t border-orange-500/20 bg-stone-950/40 py-3 sm:py-3.5">
-        © {new Date().getFullYear()} PujaSamrddhi. All rights reserved.
+        © {new Date().getFullYear()} Puja Samriddhi. All rights reserved.
       </p>
     </footer>
   )
 }
 
 export default Footer
+

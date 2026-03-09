@@ -59,7 +59,7 @@ function TrustBadges() {
   return (
     <section className="max-w-6xl mx-auto px-4 py-10 sm:py-12">
       <div className="text-center mb-8 sm:mb-10">
-        <h2 className="text-2xl sm:text-3xl font-bold text-stone-800">Why Families Trust PujaSamrddhi</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-stone-800">Why Families Trust Puja Samriddhi</h2>
         <p className="text-stone-600 mt-2">Professional puja services with complete peace of mind</p>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -99,3 +99,4 @@ function TrustBadges() {
 }
 
 export default TrustBadges
+

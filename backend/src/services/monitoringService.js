@@ -153,7 +153,7 @@ const getApiHealthStatus = () => {
 
   return {
     status: dbState === 'connected' ? 'ok' : 'degraded',
-    app: 'Ama Puja API',
+    app: 'Puja Samriddhi API',
     uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     db: dbState,
@@ -168,3 +168,4 @@ module.exports = {
   startDailyBusinessSummaryJob,
   getApiHealthStatus,
 };
+

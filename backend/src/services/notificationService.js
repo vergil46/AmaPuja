@@ -87,7 +87,7 @@ const sendOwnerLeadWhatsAppAlert = async ({ type, name, phone, email, service, d
   }
 
   const lines = [
-    '🔔 New Lead Alert - Ama Puja',
+    '🔔 New Lead Alert - Puja Samriddhi',
     `Type: ${String(type || 'Lead')}`,
     `Name: ${String(name || '-').trim() || '-'}`,
     `Phone: ${String(phone || '-').trim() || '-'}`,
@@ -108,8 +108,8 @@ const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
   const phone = normalizePhone(booking.phone);
   const reviewUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/dashboard`;
 
-  const smsBody = `Ama Puja: Booking received for ${pooja.title} on ${booking.date} at ${booking.time}. Amount: Rs ${booking.paymentAmount}.`; 
-  const whatsappBody = `Namaste ${booking.name}, your booking for ${pooja.title} is received on Ama Puja. Date: ${booking.date}, Time: ${booking.time}. Track details in your dashboard.`;
+  const smsBody = `Puja Samriddhi: Booking received for ${pooja.title} on ${booking.date} at ${booking.time}. Amount: Rs ${booking.paymentAmount}.`; 
+  const whatsappBody = `Namaste ${booking.name}, your booking for ${pooja.title} is received on Puja Samriddhi. Date: ${booking.date}, Time: ${booking.time}. Track details in your dashboard.`;
 
   const [emailSent, adminAlertSent, smsSent, whatsappSent, ownerLeadWhatsAppSent] = await Promise.all([
     sendBookingConfirmationEmail(booking, pooja),
@@ -170,7 +170,7 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
   const poojaTitle = pooja?.title || 'your pooja';
   const reviewUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/dashboard?reviewBooking=${booking._id}#feedback`;
 
-  const smsBody = `Ama Puja: Your ${poojaTitle} booking is marked completed. Please share your review: ${reviewUrl}`;
+  const smsBody = `Puja Samriddhi: Your ${poojaTitle} booking is marked completed. Please share your review: ${reviewUrl}`;
   const whatsappBody = `Namaste ${booking.name}, we hope your ${poojaTitle} went well. Please share your review here: ${reviewUrl}`;
 
   const [emailSent, smsSent, whatsappSent] = await Promise.all([
@@ -208,3 +208,4 @@ module.exports = {
   sendCompletionReviewNotifications,
   sendEnquiryCreatedNotifications,
 };
+

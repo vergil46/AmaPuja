@@ -7,7 +7,7 @@ function HomePage() {
   return (
     <>
       <Seo
-        title="PujaSamrddhi | Trusted Pandit Booking"
+        title="Puja Samriddhi | Trusted Pandit Booking"
         description="Book trusted pandits for sacred rituals with transparent packages and secure online booking."
       />
       <section
@@ -76,7 +76,7 @@ function HomePage() {
 
       <section className="mx-auto max-w-6xl px-4 py-10 sm:py-12">
         <div className="flex items-end justify-between gap-4 animate-fade-up" style={{ animationDelay: '0.1s' }}>
-          <h2 className="text-xl font-semibold text-stone-900 sm:text-3xl">Why Families Choose PujaSamrddhi</h2>
+          <h2 className="text-xl font-semibold text-stone-900 sm:text-3xl">Why Families Choose Puja Samriddhi</h2>
           <Link to="/services" className="hidden text-sm font-semibold text-orange-700 hover:text-orange-800 sm:inline-flex">
             Explore Services →
           </Link>
@@ -118,3 +118,4 @@ function HomePage() {
 }
 
 export default HomePage
+

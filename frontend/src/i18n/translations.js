@@ -16,7 +16,7 @@ export const translations = {
     heroSubtitle: 'Premium puja support for homes and temples with verified priests, transparent pricing, and smooth booking.',
     bookAPuja: 'Book a Puja',
     servingCities: 'Serving Bangalore & Bhubaneswar',
-    whyChooseUs: 'Why Families Choose PujaSamrddhi',
+    whyChooseUs: 'Why Families Choose Puja Samriddhi',
     verifiedPriests: 'Verified Priests',
     verifiedPriestsDesc: 'Experienced priests for all major rituals in your preferred language.',
     transparentPackages: 'Transparent Packages',
@@ -295,3 +295,4 @@ export const languages = [
   { code: 'bn', name: 'Bengali', nativeName: 'বাংলা' },
   { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ' }
 ]
+

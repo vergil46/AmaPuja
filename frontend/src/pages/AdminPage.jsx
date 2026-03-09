@@ -742,13 +742,13 @@ function AdminPage() {
 
   return (
     <section className={`min-h-screen p-3 sm:p-4 ${isDarkMode ? 'bg-stone-950' : 'bg-orange-50/50'}`}>
-      <Seo title="Admin Panel | PujaSamrddhi" description="Manage poojas, bookings, enquiries, and payments." />
+      <Seo title="Admin Panel | Puja Samriddhi" description="Manage poojas, bookings, enquiries, and payments." />
 
       <div className={`mx-auto max-w-362.5 rounded-2xl border shadow-md ${isDarkMode ? 'border-stone-700 bg-stone-900 text-stone-100' : 'border-orange-100 bg-white/95'}`}>
         <div className="grid lg:grid-cols-[230px_minmax(0,1fr)]">
           <aside className={`hidden lg:flex flex-col border-r p-4 ${isDarkMode ? 'border-stone-700 bg-stone-900' : 'border-orange-100 bg-stone-50/40'}`}>
             <div className="rounded-lg border border-orange-200 bg-orange-100/70 px-3 py-3 shadow-sm">
-              <p className="text-2xl font-bold text-stone-900">PujaSamrddhi</p>
+              <p className="text-2xl font-bold text-stone-900">Puja Samriddhi</p>
               <p className="text-xs text-stone-500">Sacred Rituals</p>
             </div>
 
@@ -1320,3 +1320,4 @@ function AdminPage() {
 }
 
 export default AdminPage
+

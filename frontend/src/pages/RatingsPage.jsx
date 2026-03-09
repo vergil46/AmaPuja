@@ -164,7 +164,7 @@ function RatingsPage() {
 
   return (
     <section className="mx-auto max-w-6xl space-y-8 px-4 py-10">
-      <Seo title="Ratings & Reviews | PujaSamrddhi" description="Share feedback for your completed pooja bookings." />
+      <Seo title="Ratings & Reviews | Puja Samriddhi" description="Share feedback for your completed pooja bookings." />
 
       <div className="rounded-3xl border border-orange-100 bg-white/90 p-6 shadow-sm sm:p-7">
         <p className="text-xs font-medium uppercase tracking-widest text-orange-700">Customer Trust</p>
@@ -360,3 +360,4 @@ function RatingsPage() {
 }
 
 export default RatingsPage
+

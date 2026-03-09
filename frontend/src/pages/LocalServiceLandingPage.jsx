@@ -35,8 +35,8 @@ function LocalServiceLandingPage() {
     }
   }, [service])
 
-  const pageTitle = `${serviceLabel} in ${cityLabel} | PujaSamrddhi`
-  const pageDescription = `Book ${serviceLabel} in ${cityLabel} with verified priests, transparent pricing, and secure payments on PujaSamrddhi.`
+  const pageTitle = `${serviceLabel} in ${cityLabel} | Puja Samriddhi`
+  const pageDescription = `Book ${serviceLabel} in ${cityLabel} with verified priests, transparent pricing, and secure payments on Puja Samriddhi.`
 
   const faqItems = useMemo(
     () => [
@@ -131,3 +131,4 @@ function LocalServiceLandingPage() {
 }
 
 export default LocalServiceLandingPage
+

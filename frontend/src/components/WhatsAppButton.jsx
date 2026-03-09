@@ -1,5 +1,5 @@
 function WhatsAppButton() {
-  const message = encodeURIComponent('Message Puja Samrddhi on WhatsApp.')
+  const message = encodeURIComponent('Message Puja Samriddhi on WhatsApp.')
 
   return (
     <>
@@ -35,3 +35,4 @@ function WhatsAppButton() {
 }
 
 export default WhatsAppButton
+

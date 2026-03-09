@@ -57,7 +57,7 @@ function Logo({ className = '', variant = 'default' }) {
             fontSize: variant === 'small' ? '1rem' : variant === 'large' ? '1.5rem' : '1.25rem'
           }}
         >
-          PujaSamrddhi
+          Puja Samriddhi
         </span>
         {variant !== 'small' && (
           <span
@@ -79,3 +79,4 @@ function Logo({ className = '', variant = 'default' }) {
 }
 
 export default Logo
+

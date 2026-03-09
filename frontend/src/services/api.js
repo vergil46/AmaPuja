@@ -1,6 +1,8 @@
 import axios from 'axios'
 
 const DEFAULT_PRODUCTION_API_URL = 'https://amapuja-backend-lokanath.onrender.com/api'
+const TOKEN_KEY = 'pujasamriddhi_token'
+const LEGACY_TOKEN_KEY = 'pujasamrddhi_token'
 
 const trimTrailingSlash = (value) => String(value || '').replace(/\/+$/, '')
 
@@ -58,7 +60,7 @@ const shouldRetryWithProduction = (error) => {
 }
 
 api.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem('pujasamrddhi_token')
+  const token = sessionStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(LEGACY_TOKEN_KEY)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
