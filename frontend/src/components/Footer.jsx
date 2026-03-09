@@ -40,7 +40,7 @@ function Footer() {
           <p className="text-sm sm:text-base text-stone-300 leading-relaxed">
             Trusted priests, transparent packages, and smooth ritual booking for families.
           </p>
-          <p className="mt-3 text-sm sm:text-base text-stone-300">Contact: +91 90000 12345</p>
+          <p className="mt-3 text-sm sm:text-base text-stone-300">Contact: 9739362962</p>
           <p className="text-sm sm:text-base text-stone-300">Email: support@pujasamrddhi.com</p>
           <p className="text-sm sm:text-base text-stone-300">Website: www.pujasamrddhi.com</p>
           <div className="mt-4 grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-3 text-xs sm:text-sm">

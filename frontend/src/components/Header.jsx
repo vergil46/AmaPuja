@@ -27,7 +27,7 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-orange-200/90 bg-white/95 backdrop-blur-xl shadow-lg transition-shadow">
       <div className="bg-linear-to-r from-orange-100 via-amber-50 to-orange-100 text-right px-3.5 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm text-stone-700 border-b border-orange-100/80">
-        Helpline: +91 90000 12345
+        Helpline: 9739362962
       </div>
       <div className="max-w-6xl mx-auto px-3.5 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3">
         <Link to="/" onClick={closeMobileMenu} className="shrink-0 flex items-center">

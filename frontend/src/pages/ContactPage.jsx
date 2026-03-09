@@ -67,7 +67,7 @@ function ContactPage() {
               </svg>
               <div>
                 <p className="text-sm text-stone-600">Helpline</p>
-                <p className="font-semibold text-stone-800">+91 90000 12345</p>
+                <p className="font-semibold text-stone-800">9739362962</p>
               </div>
             </div>
             
