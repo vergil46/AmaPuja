@@ -19,13 +19,13 @@ function HomePage() {
         }}
       >
         {/* Layered dark overlays for depth */}
-        <div className="absolute inset-0 bg-linear-to-br from-[#1a0800]/92 via-[#7c2d12]/72 to-[#92400e]/55" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-linear-to-br from-[#0f0728]/95 via-[#2e1065]/75 to-[#4c1d95]/50" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-[#1e1b4b]/30" />
 
         {/* Subtle glow orb behind the card */}
         <div
-          className="pointer-events-none absolute left-1/4 top-1/3 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #f97316 0%, transparent 70%)' }}
+          className="pointer-events-none absolute left-1/4 top-1/3 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-30 blur-3xl"
+          style={{ background: 'radial-gradient(circle, #a855f7 0%, transparent 70%)' }}
         />
 
         <div className="relative mx-auto max-w-6xl px-4 py-14 text-white sm:py-24">
