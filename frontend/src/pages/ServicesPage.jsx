@@ -425,23 +425,58 @@ function ServicesPage() {
   }, [selectedCity, priestPreference, searchTerm, searchParams, setSearchParams])
 
   useEffect(() => {
+    let cancelled = false
+    // Retry while Render wakes up from cold start.
+    const retryDelaysMs = [0, 4000, 8000]
+
     const loadPoojas = async () => {
       setIsLoading(true)
       try {
-        const res = await api.get('/poojas')
+        let res = null
+
+        for (let attempt = 0; attempt < retryDelaysMs.length; attempt += 1) {
+          const delay = retryDelaysMs[attempt]
+          if (delay > 0) {
+            await new Promise((resolve) => setTimeout(resolve, delay))
+          }
+
+          try {
+            res = await api.get('/poojas')
+            break
+          } catch (error) {
+            const isLastAttempt = attempt === retryDelaysMs.length - 1
+            if (isLastAttempt) {
+              throw error
+            }
+          }
+        }
+
+        if (cancelled || !res) {
+          return
+        }
+
         const apiPoojas = Array.isArray(res.data) ? res.data : []
         const hasApiData = apiPoojas.length > 0
         setPoojas(hasApiData ? apiPoojas : defaultPoojas)
         setIsUsingFallbackData(!hasApiData)
       } catch {
+        if (cancelled) {
+          return
+        }
         setPoojas(defaultPoojas)
         setIsUsingFallbackData(true)
       } finally {
-        setIsLoading(false)
+        if (!cancelled) {
+          setIsLoading(false)
+        }
       }
     }
 
     loadPoojas()
+
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const languageMatchedPoojas = useMemo(() => {
