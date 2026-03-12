@@ -6,27 +6,37 @@ const LEGACY_TOKEN_KEY = 'pujasamrddhi_token'
 
 const trimTrailingSlash = (value) => String(value || '').replace(/\/+$/, '')
 
+const isLocalhostUrl = (url) =>
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/.test(String(url || ''))
+
 const resolveApiBaseUrl = () => {
   const configuredUrl = import.meta.env.VITE_API_URL
-  if (configuredUrl) {
-    return trimTrailingSlash(configuredUrl)
-  }
 
   if (typeof window !== 'undefined') {
     const host = window.location.hostname
-    if (host === 'localhost' || host === '127.0.0.1') {
-      return 'http://localhost:5000/api'
+    const onLocalhost = host === 'localhost' || host === '127.0.0.1'
+
+    if (onLocalhost) {
+      // In local dev: honour VITE_API_URL if set, otherwise default to local backend
+      return configuredUrl ? trimTrailingSlash(configuredUrl) : 'http://localhost:5000/api'
+    }
+
+    // In production: only use VITE_API_URL when it is NOT a localhost address,
+    // so a stale .env copy in Vercel never silently breaks the app.
+    if (configuredUrl && !isLocalhostUrl(configuredUrl)) {
+      return trimTrailingSlash(configuredUrl)
     }
 
     return DEFAULT_PRODUCTION_API_URL
   }
 
-  return 'http://localhost:5000/api'
+  return configuredUrl ? trimTrailingSlash(configuredUrl) : 'http://localhost:5000/api'
 }
 
+// 65 s gives Render free-tier services time to wake from sleep (~50 s cold start)
 const api = axios.create({
   baseURL: resolveApiBaseUrl(),
-  timeout: 20000,
+  timeout: 65000,
 })
 
 const localApiBaseUrl = 'http://localhost:5000/api'

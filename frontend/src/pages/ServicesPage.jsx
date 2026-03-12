@@ -683,7 +683,7 @@ function ServicesPage() {
 
       {isUsingFallbackData && (
         <p className="mt-3 rounded-lg border border-orange-200 bg-orange-50 px-4 py-2 text-sm text-orange-700">
-          Showing fallback data because backend pooja data is unavailable.
+          Unable to reach the server right now — showing cached service data. Please refresh in a moment.
         </p>
       )}
 
@@ -714,7 +714,7 @@ function ServicesPage() {
 
       <div className="mt-8 flex items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-stone-900 sm:text-2xl">Available Pooja Services</h2>
-        <span className="text-sm text-stone-500">{isLoading ? 'Loading services...' : `${displayPoojas.length} found`}</span>
+        <span className="text-sm text-stone-500">{isLoading ? 'Fetching services… please wait' : `${displayPoojas.length} found`}</span>
       </div>
 
       {isLoading ? (
