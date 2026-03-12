@@ -882,7 +882,14 @@ function PoojaDetailPage() {
 
         {/* Title */}
         <div className="relative z-10 max-w-[62%] sm:max-w-[58%]">
-          <h1 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl">
+          <h1
+            className="text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl"
+            style={{
+              color: '#fff',
+              textShadow: '0 2px 24px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9)',
+              WebkitTextStroke: '0.5px rgba(255,255,255,0.15)',
+            }}
+          >
             {displayTitle}
           </h1>
           <div className="mt-2 h-1 w-28 rounded-full bg-linear-to-r from-blue-500 via-pink-500 to-yellow-400" />
