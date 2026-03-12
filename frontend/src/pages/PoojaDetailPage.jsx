@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { getPoojaImage } from '../assets/poojaImageMap'
 import Seo from '../components/Seo'
@@ -22,21 +22,21 @@ function DetailInfoCard({ icon, title, items }) {
   const isRequirements = String(title || '').toLowerCase() === 'requirements'
 
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white p-4 sm:p-5 shadow-sm">
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5 backdrop-blur-sm">
       <div className="mb-3 flex items-center gap-2.5">
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 text-lg" aria-hidden="true">
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/20 text-lg" aria-hidden="true">
           {icon}
         </span>
-        <h3 className="text-base font-semibold text-stone-900 sm:text-lg">{title}</h3>
+        <h3 className="text-base font-semibold text-white sm:text-lg">{title}</h3>
       </div>
-      <ul className="space-y-2 text-sm leading-relaxed text-stone-700 sm:text-[15px]">
+      <ul className="space-y-2 text-sm leading-relaxed text-white/70 sm:text-[15px]">
         {items.map((item) => (
           <li
             key={item}
-            className={isRequirements ? 'rounded-xl border border-stone-300 bg-stone-100 px-3 py-2.5 font-medium text-stone-900 shadow-xs' : 'flex items-start gap-2'}
+            className={isRequirements ? 'rounded-xl border border-white/10 bg-white/10 px-3 py-2.5 font-medium text-white/90' : 'flex items-start gap-2'}
           >
             {!isRequirements && (
-              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-500" aria-hidden="true" />
+              <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" aria-hidden="true" />
             )}
             <span>{item}</span>
           </li>
@@ -855,215 +855,192 @@ function PoojaDetailPage() {
     .slice(0, 6)
 
   const fieldClass =
-    'w-full rounded-xl border border-stone-300 bg-white px-3.5 py-3 text-base text-stone-800 shadow-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100'
+    'w-full rounded-xl border border-white/15 bg-white/10 px-3.5 py-3 text-base text-white placeholder:text-white/50 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 backdrop-blur-sm'
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
+    <div className="min-h-screen bg-linear-to-b from-[#06061a] via-[#0d0a24] to-[#130a2c]">
       <Seo
         title={`${displayTitle} | Puja Samriddhi`}
         description={displayDescription}
       />
 
-      <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-10">
-        <div>
-          <div className="mx-auto max-w-150 overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm lg:mx-0">
-            <img
-              src={displayImage}
-              alt={displayTitle}
-              loading="eager"
-              fetchpriority="high"
-              decoding="async"
-              width="600"
-              height="600"
-              sizes="(max-width: 1024px) 100vw, 600px"
-              className="aspect-square w-full max-h-150 object-cover object-center"
-            />
-          </div>
+      {/* ── Hero ── */}
+      <section className="relative mx-auto max-w-6xl overflow-hidden px-4 pt-8 pb-6 sm:pt-12">
+        {/* Right-side image */}
+        <div className="pointer-events-none absolute top-0 right-0 h-full w-1/2 overflow-hidden sm:w-2/5">
+          <img
+            src={displayImage}
+            alt={displayTitle}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            className="h-full w-full object-cover opacity-90"
+          />
+          <div className="absolute inset-0 bg-linear-to-r from-[#06061a] via-[#06061a]/70 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-[#06061a]/80" />
+        </div>
 
-          <h1 className="mt-6 text-3xl font-semibold leading-tight text-stone-900 sm:text-5xl">
+        {/* Title */}
+        <div className="relative z-10 max-w-[62%] sm:max-w-[58%]">
+          <h1 className="text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl">
             {displayTitle}
           </h1>
+          <div className="mt-2 h-1 w-28 rounded-full bg-linear-to-r from-blue-500 via-pink-500 to-yellow-400" />
+          {descriptionPreview && (
+            <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/65 sm:text-base">
+              {descriptionPreview}
+            </p>
+          )}
+        </div>
+      </section>
 
-          <div className="mt-4 rounded-2xl border border-stone-200 bg-white p-4 sm:p-5 shadow-sm">
-            <p className="text-base leading-8 text-stone-700 sm:text-lg">{descriptionPreview}</p>
+      {/* ── Package Cards ── */}
+      <section className="mx-auto max-w-6xl px-4 pb-8">
+        {isBengaliVivahEnquiryOnly ? (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-white/80 backdrop-blur-sm">
+            <p className="font-semibold text-white">This service is available on custom quotation.</p>
+            <p className="mt-2 leading-relaxed">Share your requirements and our team will contact you with package details, pandit availability, and final quote.</p>
           </div>
-
-          <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:p-5">
-            <div className="mb-4 text-xl font-semibold text-stone-900">
-              {isBengaliVivahEnquiryOnly
-                ? 'Custom Quotation'
-                : 'Select Package'}
-            </div>
-
-            {!isBengaliVivahEnquiryOnly &&
-              activePackages.map((pkg) => (
-                <label
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {activePackages.map((pkg, index) => {
+              const isSelected = selectedPackage === pkg.name
+              const btnGradient = index === 0
+                ? 'bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500'
+                : 'bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400'
+              return (
+                <div
                   key={pkg.name}
-                  className={`mb-3 block cursor-pointer rounded-xl border p-4 transition ${
-                    selectedPackage === pkg.name
-                      ? 'border-orange-400 bg-orange-50 ring-2 ring-orange-100'
-                      : 'border-stone-300 bg-white hover:border-orange-300'
+                  onClick={() => setSelectedPackage(pkg.name)}
+                  className={`relative cursor-pointer rounded-2xl border p-5 transition backdrop-blur-sm ${
+                    isSelected
+                      ? 'border-white/30 bg-white/12 ring-2 ring-white/20'
+                      : 'border-white/10 bg-white/5 hover:border-white/20'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2.5">
-                      <input
-                        type="radio"
-                        name="package"
-                        className="h-4 w-4 accent-orange-600"
-                        checked={selectedPackage === pkg.name}
-                        onChange={() =>
-                          setSelectedPackage(pkg.name)
-                        }
-                      />
-                      <span className="text-base font-medium text-stone-900 sm:text-lg">
-                        {pkg.name}
-                      </span>
-                    </div>
-                    <span className="text-base font-semibold text-stone-900 sm:text-lg">
-                      ₹{pkg.price}
-                    </span>
+                  <div className="mb-2 text-xs font-bold uppercase tracking-widest text-white/45">
+                    {pkg.name}
                   </div>
-                </label>
-              ))}
-
-            {isBengaliVivahEnquiryOnly && (
-              <div className="rounded-xl border border-red-200 bg-linear-to-br from-red-50 to-orange-50 p-4 text-sm text-stone-700 shadow-sm">
-                <p className="font-semibold text-stone-900">
-                  This service is available on custom quotation.
-                </p>
-                <p className="mt-2 leading-relaxed">
-                  Share your requirements and our team will contact you with package details, pandit availability, and final quote.
-                </p>
-              </div>
-            )}
-
-            {!isBengaliVivahEnquiryOnly &&
-              availableAddOns.length > 0 && (
-              <div className="mt-4">
-                <div className="font-semibold text-stone-900">
-                  Add-ons
+                  <div className="text-3xl font-extrabold text-white sm:text-4xl">
+                    ₹{Number(pkg.price).toLocaleString('en-IN')}
+                  </div>
+                  <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-white/55">
+                    {pkg.description || descriptionPreview || 'Premium pooja service with experienced pandit'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setSelectedPackage(pkg.name); scrollToBookingForm() }}
+                    className={`mt-4 w-full rounded-xl py-2.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition ${btnGradient}`}
+                  >
+                    Book Puja Now
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setSelectedPackage(pkg.name); scrollToBookingForm() }}
+                    className="mt-2 w-full text-center text-xs text-white/45 underline underline-offset-2 hover:text-white/80 transition"
+                  >
+                    Enquire
+                  </button>
                 </div>
+              )
+            })}
+          </div>
+        )}
 
-                {availableAddOns.map((addon) => (
+        {/* Add-ons */}
+        {!isBengaliVivahEnquiryOnly && availableAddOns.length > 0 && (
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+            <div className="mb-3 font-semibold text-white">Add-ons</div>
+            <div className="flex flex-wrap gap-2">
+              {availableAddOns.map((addon) => {
+                const checked = selectedAddOns.some(
+                  (item) => normalizeName(item) === normalizeName(addon.name)
+                )
+                return (
                   <label
                     key={addon.name}
-                    className={`mt-2 flex items-center gap-2.5 rounded-lg border px-3 py-2 cursor-pointer transition ${
-                      selectedAddOns.some(
-                        (item) =>
-                          normalizeName(item) ===
-                          normalizeName(addon.name)
-                      )
-                        ? 'border-orange-300 bg-orange-50'
-                        : 'border-stone-200 bg-white hover:border-orange-200'
+                    className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition ${
+                      checked
+                        ? 'border-orange-400 bg-orange-500/20 text-orange-200'
+                        : 'border-white/10 bg-white/5 text-white/65 hover:border-white/20'
                     }`}
                   >
                     <input
                       type="checkbox"
-                      className="h-4 w-4 accent-orange-600"
-                      checked={selectedAddOns.some(
-                        (item) =>
-                          normalizeName(item) ===
-                          normalizeName(addon.name)
-                      )}
+                      className="h-3.5 w-3.5 accent-orange-500"
+                      checked={checked}
                       onChange={() => {
-                        const addonName = String(
-                          addon.name || ''
-                        ).trim()
-                        const addonKey = normalizeName(
-                          addonName
-                        )
-
+                        const addonName = String(addon.name || '').trim()
+                        const addonKey = normalizeName(addonName)
                         setSelectedAddOns((previous) => {
-                          const exists = previous.some(
-                            (item) =>
-                              normalizeName(item) ===
-                              addonKey
-                          )
-
-                          if (exists) {
-                            return previous.filter(
-                              (item) =>
-                                normalizeName(item) !==
-                                addonKey
-                            )
-                          }
-
-                          return [
-                            ...previous,
-                            addonName,
-                          ]
+                          const exists = previous.some((item) => normalizeName(item) === addonKey)
+                          if (exists) return previous.filter((item) => normalizeName(item) !== addonKey)
+                          return [...previous, addonName]
                         })
                       }}
                     />
                     {addon.name}
+                    <span className="text-white/40">+₹{addon.price}</span>
                   </label>
-                ))}
-              </div>
-            )}
-
-            {!isBengaliVivahEnquiryOnly && selectedPackageData && (
-              <div className="mt-5 grid gap-3 sm:gap-4 md:grid-cols-3">
-                <DetailInfoCard icon="✨" title="Benefits" items={benefitItems} />
-                <DetailInfoCard icon="🪔" title="Ritual Steps" items={ritualStepItems} />
-                <DetailInfoCard icon="📋" title="Requirements" items={requirementItems} />
-              </div>
-            )}
-
-            {!isBengaliVivahEnquiryOnly && (
-              <div className="mt-4 font-semibold text-green-700">
-                Total Amount (Price + Add-ons): ₹{packagePrice}
-              </div>
-            )}
+                )
+              })}
+            </div>
           </div>
+        )}
+
+        {/* Info cards: Benefits / Ritual Steps / Requirements */}
+        {!isBengaliVivahEnquiryOnly && selectedPackageData && (
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <DetailInfoCard icon="✨" title="Benefits" items={benefitItems} />
+            <DetailInfoCard icon="🪔" title="Ritual Steps" items={ritualStepItems} />
+            <DetailInfoCard icon="📋" title="Requirements" items={requirementItems} />
+          </div>
+        )}
+
+        {!isBengaliVivahEnquiryOnly && (
+          <div className="mt-4 text-sm font-semibold text-green-400">
+            Total Amount (Package + Add-ons): ₹{packagePrice.toLocaleString('en-IN')}
+          </div>
+        )}
+      </section>
+
+      {/* ── Booking Form ── */}
+      <section ref={bookingPanelRef} className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl px-0 pb-16">
+        {/* Blurred puja image behind form */}
+        <div className="pointer-events-none absolute inset-0">
+          <img src={displayImage} alt="" aria-hidden="true" className="h-full w-full object-cover opacity-35" />
+          <div className="absolute inset-0 bg-linear-to-b from-black/55 via-black/65 to-black/85" />
         </div>
 
-        <div ref={bookingPanelRef} className="rounded-3xl border border-stone-300 bg-stone-100/95 p-4 shadow-md sm:p-5 lg:sticky lg:top-24">
-          <h2 className="text-2xl font-semibold uppercase tracking-wide text-stone-900 sm:text-3xl">
-            {isBengaliVivahEnquiryOnly
-              ? 'Send Enquiry'
-              : 'Book Now'}
+        <div className="relative z-10 px-5 py-8 sm:px-8">
+          <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
+            {isBengaliVivahEnquiryOnly ? 'Send Enquiry' : 'Enter Your Details'}
           </h2>
-
-          <p className="mt-1 text-sm text-stone-600">
+          <p className="mt-1 text-sm text-white/60">
             {isBengaliVivahEnquiryOnly
-              ? 'Share your event details and get a personalized quote from our team.'
-              : 'Secure your pooja booking in just a few steps'}
+              ? 'Share your event details and get a personalised quote.'
+              : 'Secure your puja booking in just a few steps.'}
           </p>
 
-          <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs sm:text-sm text-emerald-800">
+          <div className="mt-3 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-xs text-emerald-300 sm:text-sm">
             Verified Priests • 1000+ Rituals Completed • Secure Payment
           </div>
 
           {!isBengaliVivahEnquiryOnly && (
-            <div className="mt-3 rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-medium text-stone-700">
-              Payable Now ({payableLabel}): ₹{payableAmount}
-            </div>
-          )}
-
-          {!isBengaliVivahEnquiryOnly && (
-            <div className="mt-2 rounded-lg border border-stone-300 bg-white px-3 py-2 text-xs text-stone-700">
-              <div className="flex items-center justify-between">
-                <span>Package</span>
-                <span>₹{basePackagePrice}</span>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <div className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm text-white/80">
+                Payable Now ({payableLabel}): <span className="font-bold text-white">₹{payableAmount.toLocaleString('en-IN')}</span>
               </div>
-              <div className="mt-1 flex items-center justify-between">
-                <span>Add-ons</span>
-                <span>₹{addOnTotal}</span>
-              </div>
-              <div className="mt-1 flex items-center justify-between font-semibold text-stone-900">
-                <span>Final Amount</span>
-                <span>₹{packagePrice}</span>
-              </div>
-              <div className="mt-1 text-[11px] text-stone-600">
-                Total Amount = Package Price + Add-ons
+              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/55">
+                Package ₹{basePackagePrice.toLocaleString('en-IN')} + Add-ons ₹{addOnTotal.toLocaleString('en-IN')} =
+                <span className="font-semibold text-white/80"> ₹{packagePrice.toLocaleString('en-IN')}</span>
               </div>
             </div>
           )}
 
           <form
             onSubmit={handleBook}
-            className="mt-4 space-y-4"
+            className="mt-5 space-y-4"
             onFocus={() => {
               if (!formStartedRef.current) {
                 formStartedRef.current = true
@@ -1072,262 +1049,158 @@ function PoojaDetailPage() {
             }}
           >
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <input
-                className={fieldClass}
-                placeholder="Full Name *"
-                required
-                value={form.name}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    name: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className={fieldClass}
-                placeholder="Phone *"
-                required
-                value={form.phone}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    phone: e.target.value,
-                  })
-                }
-              />
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">Full Name *</label>
+                <input className={fieldClass} placeholder="Full Name" required value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">Phone Number *</label>
+                <input className={fieldClass} placeholder="Phone Number" required value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+              </div>
             </div>
 
             {quickValidationMessage && (
-              <p className="text-xs text-red-600">{quickValidationMessage}</p>
+              <p className="text-xs text-red-400">{quickValidationMessage}</p>
             )}
 
-            <input
-              className={fieldClass}
-              type="email"
-              placeholder="Email *"
-              required
-              value={form.email}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  email: e.target.value,
-                })
-              }
-            />
+            <div>
+              <label className="mb-1 block text-xs font-medium text-white/55">Email *</label>
+              <input className={fieldClass} type="email" placeholder="Email Address" required value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            </div>
 
             <button
               type="button"
               onClick={handleUseCurrentLocation}
               disabled={isFetchingLocation}
-              className="w-full rounded-xl border border-orange-300 bg-orange-50 px-3.5 py-2.5 text-sm font-semibold text-orange-800 transition hover:bg-orange-100 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full rounded-xl border border-orange-400/40 bg-orange-500/15 px-3.5 py-2.5 text-sm font-semibold text-orange-300 transition hover:bg-orange-500/25 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isFetchingLocation
-                ? 'Fetching your location...'
-                : 'Use My Current Location'}
+              {isFetchingLocation ? 'Fetching your location…' : '📍 Use My Current Location'}
             </button>
 
             {locationMessage && (
-              <p className={`text-xs ${locationMessage.toLowerCase().includes('successfully') ? 'text-green-700' : 'text-red-600'}`}>
-                {locationMessage}
-              </p>
+              <p className={`text-xs ${
+                locationMessage.toLowerCase().includes('successfully') ? 'text-green-400' : 'text-red-400'
+              }`}>{locationMessage}</p>
             )}
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <input
-                className={fieldClass}
-                placeholder="House / Flat No. *"
-                required
-                value={form.house}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    house: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className={fieldClass}
-                placeholder="Street / Area *"
-                required
-                value={form.street}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    street: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className={fieldClass}
-                placeholder="City *"
-                required
-                value={form.city}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    city: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className={fieldClass}
-                placeholder="State *"
-                required
-                value={form.state}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    state: e.target.value,
-                  })
-                }
-              />
-
-              <input
-                className={fieldClass}
-                placeholder="Pincode *"
-                required
-                value={form.pincode}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    pincode: e.target.value,
-                  })
-                }
-              />
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">House / Flat No. *</label>
+                <input className={fieldClass} placeholder="House / Flat No." required value={form.house}
+                  onChange={(e) => setForm({ ...form, house: e.target.value })} />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">Street / Area *</label>
+                <input className={fieldClass} placeholder="Street / Area" required value={form.street}
+                  onChange={(e) => setForm({ ...form, street: e.target.value })} />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">City *</label>
+                <input className={fieldClass} placeholder="City" required value={form.city}
+                  onChange={(e) => setForm({ ...form, city: e.target.value })} />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">Pincode *</label>
+                <input className={fieldClass} placeholder="Pincode" required value={form.pincode}
+                  onChange={(e) => setForm({ ...form, pincode: e.target.value })} />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="mb-1 block text-xs font-medium text-white/55">State *</label>
+                <input className={fieldClass} placeholder="State" required value={form.state}
+                  onChange={(e) => setForm({ ...form, state: e.target.value })} />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <select
-                className={fieldClass}
-                value={form.priestPreference}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    priestPreference: e.target.value,
-                  })
-                }
-              >
-                <option value="">Select Language</option>
-                {languageOptions.map((language) => (
-                  <option
-                    key={language}
-                    value={language}
-                  >
-                    {language}
-                  </option>
-                ))}
-              </select>
-
-              <input
-                className={fieldClass}
-                type="time"
-                value={form.time}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    time: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <input
-              className={fieldClass}
-              type="date"
-              required
-              value={form.date}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  date: e.target.value,
-                })
-              }
-            />
-
-            <input
-              className={fieldClass}
-              placeholder="Full Address *"
-              required
-              value={form.address}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  address: e.target.value,
-                })
-              }
-            />
-
-            <textarea
-              className={fieldClass}
-              rows={3}
-              placeholder="Special requirements (optional)"
-              value={form.specialNotes}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  specialNotes: e.target.value,
-                })
-              }
-            />
-
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {!isBengaliVivahEnquiryOnly && (
-                <select
-                  className={fieldClass}
-                  value={form.paymentOption}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      paymentOption: e.target.value,
-                    })
-                  }
-                >
-                  <option value="full">Full Payment</option>
-                  <option value="advance">Advance (30%)</option>
-                  <option value="pay-after-pooja">Pay After Pooja</option>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">Priest Language</label>
+                <select className={fieldClass} value={form.priestPreference}
+                  onChange={(e) => setForm({ ...form, priestPreference: e.target.value })}>
+                  <option value="" className="bg-[#0d0a24]">Select Language</option>
+                  {languageOptions.map((language) => (
+                    <option key={language} value={language} className="bg-[#0d0a24]">{language}</option>
+                  ))}
                 </select>
-              )}
-
-              <button className={`w-full rounded-xl py-2.5 text-sm font-semibold uppercase tracking-wide text-white transition disabled:opacity-60 disabled:cursor-not-allowed ${
-                isBengaliVivahEnquiryOnly
-                  ? 'bg-red-600 hover:bg-red-700 sm:col-span-2'
-                  : 'bg-stone-900 hover:bg-stone-800 sm:col-span-1'
-              }`} disabled={isSubmitting || !isPrimaryFormValid}>
-                {isSubmitting
-                  ? isBengaliVivahEnquiryOnly
-                    ? 'Sending Enquiry...'
-                    : 'Booking...'
-                  : isBengaliVivahEnquiryOnly
-                    ? 'Send Enquiry & Get Quote'
-                    : 'Book Now'}
-              </button>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">Preferred Time</label>
+                <input className={fieldClass} type="time" value={form.time}
+                  onChange={(e) => setForm({ ...form, time: e.target.value })} />
+              </div>
             </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">Date *</label>
+                <input className={fieldClass} type="date" required value={form.date}
+                  onChange={(e) => setForm({ ...form, date: e.target.value })} />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">Full Address *</label>
+                <input className={fieldClass} placeholder="Full Address" required value={form.address}
+                  onChange={(e) => setForm({ ...form, address: e.target.value })} />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-xs font-medium text-white/55">Special Requirements (optional)</label>
+              <textarea className={fieldClass} rows={3} placeholder="Special requirements…"
+                value={form.specialNotes}
+                onChange={(e) => setForm({ ...form, specialNotes: e.target.value })} />
+            </div>
+
+            {!isBengaliVivahEnquiryOnly && (
+              <div>
+                <label className="mb-1 block text-xs font-medium text-white/55">Payment Option</label>
+                <select className={fieldClass} value={form.paymentOption}
+                  onChange={(e) => setForm({ ...form, paymentOption: e.target.value })}>
+                  <option value="full" className="bg-[#0d0a24]">Full Payment</option>
+                  <option value="advance" className="bg-[#0d0a24]">Advance (30%)</option>
+                  <option value="pay-after-pooja" className="bg-[#0d0a24]">Pay After Pooja</option>
+                </select>
+              </div>
+            )}
+
+            <button
+              className={`w-full rounded-2xl py-4 text-base font-extrabold uppercase tracking-wide text-white shadow-2xl transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                isBengaliVivahEnquiryOnly
+                  ? 'bg-linear-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400'
+                  : 'bg-linear-to-r from-orange-500 via-pink-500 to-red-500 hover:from-orange-400 hover:via-pink-400 hover:to-red-400'
+              }`}
+              disabled={isSubmitting || !isPrimaryFormValid}
+            >
+              {isSubmitting
+                ? (isBengaliVivahEnquiryOnly ? 'Sending Enquiry…' : 'Booking…')
+                : (isBengaliVivahEnquiryOnly ? 'Send Enquiry & Get Quote' : `Book ${displayTitle}`)}
+            </button>
           </form>
 
           {bookingMessage && (
-            <p className="mt-3 text-green-700">
+            <p className={`mt-3 text-sm font-medium ${
+              bookingMessage.toLowerCase().includes('success') || bookingMessage.toLowerCase().includes('sent')
+                ? 'text-green-400'
+                : 'text-red-400'
+            }`}>
               {bookingMessage}
             </p>
           )}
         </div>
-      </div>
+      </section>
 
+      {/* Mobile sticky CTA */}
       <button
         type="button"
         onClick={scrollToBookingForm}
-        className="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-sm rounded-2xl bg-stone-900 px-4 py-3 text-sm font-semibold uppercase tracking-wide text-white shadow-lg shadow-stone-900/30 transition hover:bg-stone-800"
+        className="md:hidden fixed bottom-20 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-2xl bg-linear-to-r from-orange-500 to-red-500 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition"
       >
-        {isBengaliVivahEnquiryOnly
-          ? 'Send Enquiry'
-          : `Book Now • ₹${payableAmount}`}
+        {isBengaliVivahEnquiryOnly ? 'Send Enquiry' : `Book Now • ₹${payableAmount.toLocaleString('en-IN')}`}
       </button>
-    </section>
+    </div>
   )
 }
 
 export default PoojaDetailPage
+
