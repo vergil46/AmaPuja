@@ -1,9 +1,10 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { getPoojaImage } from '../assets/poojaImageMap'
 import Seo from '../components/Seo'
 import api from '../services/api'
 import { PoojaDetailSkeleton } from '../components/LoadingSkeleton'
+import { useAuth } from '../context/useAuth'
 
 const FUNNEL_SESSION_KEY = 'pujasamriddhi_funnel_session'
 
@@ -49,6 +50,8 @@ function DetailInfoCard({ icon, title, items }) {
 function PoojaDetailPage() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
+  const navigate = useNavigate()
+  const { token } = useAuth()
 
   const languageQuery = String(
     searchParams.get('language') || ''
@@ -640,6 +643,11 @@ function PoojaDetailPage() {
     event.preventDefault()
     setBookingMessage('')
     if (isSubmitting) return
+
+    if (!token) {
+      navigate('/login')
+      return
+    }
 
     if (!isPrimaryFormValid) {
       setBookingMessage(quickValidationMessage || 'Please correct highlighted fields before continuing.')
