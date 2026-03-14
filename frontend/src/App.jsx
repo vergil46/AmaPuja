@@ -90,6 +90,7 @@ function App() {
           <Route path="/privacy-policy" element={<PolicyPage type="privacy" />} />
           <Route path="/terms-and-conditions" element={<PolicyPage type="terms" />} />
           <Route path="/health" element={<HealthPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
     </Layout>
