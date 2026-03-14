@@ -111,7 +111,7 @@ function Footer() {
               ))}
             </div>
           </div>
-}
+
           {/* ── Quick Links ── */}
           <div
             className="rounded-2xl border border-white/10 p-5 backdrop-blur-sm sm:p-6"
@@ -148,7 +148,7 @@ function Footer() {
               </ul>
             </div>
           </div>
-export default Footer
+
           {/* ── Enquiry Form ── */}
           <div
             className="rounded-2xl border border-white/10 p-5 backdrop-blur-sm sm:p-6"
@@ -211,4 +211,7 @@ export default Footer
       </div>
     </footer>
   )
+}
+
+export default Footer
 
