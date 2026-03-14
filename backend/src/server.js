@@ -97,6 +97,7 @@ app.use(
         normalizedOrigin
       );
       const isKnownVercelFrontend = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(normalizedOrigin);
+      const isKnownCustomFrontend = /^https:\/\/(www\.)?pujasamriddhi\.com$/i.test(normalizedOrigin);
 
       const isConfiguredClient = allowedConfiguredOrigins.has(normalizedOrigin);
       const isLocalhostVitePort = /^http:\/\/localhost:\d+$/.test(origin);
@@ -105,7 +106,8 @@ app.use(
         isConfiguredClient ||
         isLocalhostVitePort ||
         isKnownRenderFrontend ||
-        isKnownVercelFrontend
+        isKnownVercelFrontend ||
+        isKnownCustomFrontend
       ) {
         return callback(null, true);
       }

@@ -31,7 +31,12 @@ function LoginPage() {
       login(res.data)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed')
+      const apiMessage = err.response?.data?.message
+      if (apiMessage) {
+        setError(apiMessage)
+      } else {
+        setError('Unable to reach login server. Please try again in a moment.')
+      }
     } finally {
       setIsSubmitting(false)
     }
