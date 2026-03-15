@@ -13,6 +13,7 @@ const ContactPage = lazy(() => import('./pages/ContactPage'))
 const BlogPage = lazy(() => import('./pages/BlogPage'))
 const RatingsPage = lazy(() => import('./pages/RatingsPage'))
 const PoojaSeoLandingPage = lazy(() => import('./pages/PoojaSeoLandingPage'))
+const OnlinePanditBookingBangalorePage = lazy(() => import('./pages/OnlinePanditBookingBangalorePage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'))
 const SignupPage = lazy(() => import('./pages/SignupPage'))
@@ -69,6 +70,7 @@ function App() {
           <Route path="/griha-pravesh-puja" element={<PoojaSeoLandingPage slug="griha-pravesh-puja" />} />
           <Route path="/ganesh-puja" element={<PoojaSeoLandingPage slug="ganesh-puja" />} />
           <Route path="/rudrabhishek" element={<PoojaSeoLandingPage slug="rudrabhishek" />} />
+          <Route path="/online-pandit-booking-bangalore" element={<OnlinePanditBookingBangalorePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/admin-login" element={<AdminLoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
