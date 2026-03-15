@@ -1,8 +1,9 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import { useAuth } from './context/useAuth'
 import HomePage from './pages/HomePage'
+import { prewarmApi } from './services/api'
 
 const ServicesPage = lazy(() => import('./pages/ServicesPage'))
 const LocalServiceLandingPage = lazy(() => import('./pages/LocalServiceLandingPage'))
@@ -48,6 +49,10 @@ function AdminRoute({ children }) {
 }
 
 function App() {
+  useEffect(() => {
+    prewarmApi()
+  }, [])
+
   return (
     <Layout>
       <Suspense fallback={<RouteFallback />}>

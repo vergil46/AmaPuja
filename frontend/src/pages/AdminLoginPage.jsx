@@ -1,22 +1,37 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Seo from '../components/Seo'
 import { useAuth } from '../context/useAuth'
-import api from '../services/api'
+import api, { prewarmApi } from '../services/api'
 
 function AdminLoginPage() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [isWarmingServer, setIsWarmingServer] = useState(true)
   const navigate = useNavigate()
   const { login } = useAuth()
+
+  useEffect(() => {
+    let mounted = true
+    prewarmApi().finally(() => {
+      if (mounted) {
+        setIsWarmingServer(false)
+      }
+    })
+
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     if (isSubmitting) return
     setError('')
     setIsSubmitting(true)
+    prewarmApi()
 
     try {
       const res = await api.post('/auth/login', {
@@ -69,6 +84,9 @@ function AdminLoginPage() {
           </label>
         </div>
         {error && <p className="text-red-700 text-sm">{error}</p>}
+        {!error && isWarmingServer && (
+          <p className="text-amber-700 text-sm">Waking server... first login may take a few seconds.</p>
+        )}
         <button className="w-full py-2 rounded-lg bg-stone-900 text-white disabled:opacity-60" disabled={isSubmitting}>
           {isSubmitting ? 'Logging in...' : 'Admin Login'}
         </button>

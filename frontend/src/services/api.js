@@ -39,6 +39,28 @@ const api = axios.create({
   timeout: 65000,
 })
 
+let warmupPromise = null
+
+export const prewarmApi = () => {
+  if (warmupPromise) {
+    return warmupPromise
+  }
+
+  warmupPromise = api
+    .get('/health', {
+      timeout: 65000,
+      headers: {
+        'x-prewarm-request': '1',
+      },
+    })
+    .catch(() => null)
+    .finally(() => {
+      warmupPromise = null
+    })
+
+  return warmupPromise
+}
+
 const localApiBaseUrl = 'http://localhost:5000/api'
 const productionApiBaseUrl = trimTrailingSlash(DEFAULT_PRODUCTION_API_URL)
 
