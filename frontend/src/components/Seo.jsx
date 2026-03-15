@@ -1,17 +1,26 @@
 import { useEffect } from 'react'
 
-function Seo({ title, description, canonical, structuredData }) {
+function Seo({ title, description, canonical, keywords, structuredData }) {
   useEffect(() => {
     document.title = title
-    const metaDescription = document.querySelector('meta[name="description"]')
-    if (metaDescription) {
-      metaDescription.setAttribute('content', description)
-    } else {
+
+    const upsertMetaTag = (name, content) => {
+      if (!content) return
+
+      const existingMeta = document.querySelector(`meta[name="${name}"]`)
+      if (existingMeta) {
+        existingMeta.setAttribute('content', content)
+        return
+      }
+
       const meta = document.createElement('meta')
-      meta.name = 'description'
-      meta.content = description
+      meta.name = name
+      meta.content = content
       document.head.appendChild(meta)
     }
+
+    upsertMetaTag('description', description)
+    upsertMetaTag('keywords', Array.isArray(keywords) ? keywords.join(', ') : keywords)
 
     if (canonical) {
       let canonicalLink = document.querySelector('link[rel="canonical"]')
@@ -37,7 +46,7 @@ function Seo({ title, description, canonical, structuredData }) {
         scriptElement.parentNode.removeChild(scriptElement)
       }
     }
-  }, [title, description, canonical, structuredData])
+  }, [title, description, canonical, keywords, structuredData])
 
   return null
 }
