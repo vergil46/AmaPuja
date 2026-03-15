@@ -1,43 +1,53 @@
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo'
 import { getPoojaImage } from '../assets/poojaImageMap'
-import ganeshPujaBangaloreImg from '../assets/poojas/ganesh-puja-bangalore.jpg'
-import grihaPraveshBangaloreImg from '../assets/poojas/griha-pravesh-bangalore.jpg'
-import onlinePanditBangaloreImg from '../assets/poojas/online-pandit-bangalore-1.jpg'
+import ganeshPujaBangaloreImg from '../assets/poojas/ganesh-puja-pandit-bangalore.jpg'
+import grihaPraveshBangaloreImg from '../assets/poojas/griha-pravesh-puja-bangalore.jpg'
+import lakshmiPujaBangaloreImg from '../assets/poojas/lakshmi-puja-bangalore.jpg'
+import satyanarayanPujaBangaloreImg from '../assets/poojas/satyanarayan-puja-bangalore.jpg'
 
 const SITE_URL = 'https://pujasamriddhi.com'
 const PAGE_PATH = '/online-pandit-booking-bangalore'
 
 const galleryItems = [
   {
-    image: onlinePanditBangaloreImg,
-    title: 'Online Pandit Booking Bangalore',
-    caption: 'Trusted online pandit booking service for puja ceremonies across Bangalore homes.',
-  },
-  {
+    image: satyanarayanPujaBangaloreImg,
     title: 'Satyanarayan Puja',
+    link: '/satyanarayan-puja',
+    alt: 'Satyanarayan Puja ceremony performed by pandit in Bangalore',
     caption: 'Satyanarayan Puja service in Bangalore',
   },
   {
     image: grihaPraveshBangaloreImg,
     title: 'Griha Pravesh',
+    link: '/griha-pravesh-puja',
+    alt: 'Griha Pravesh housewarming puja setup in Bangalore',
     caption: 'Griha Pravesh pandit booking for housewarming in Bangalore',
   },
   {
     image: ganeshPujaBangaloreImg,
     title: 'Ganesh Puja',
+    link: '/ganesh-puja',
+    alt: 'Ganesh Puja ceremony performed by pandit in Bangalore',
     caption: 'Ganesh Puja performed by experienced pandits in Bangalore',
   },
   {
+    image: lakshmiPujaBangaloreImg,
     title: 'Lakshmi Puja',
+    link: '/lakshmi-puja',
+    alt: 'Lakshmi Puja ritual for prosperity performed by pandit in Bangalore',
     caption: 'Lakshmi Puja rituals for prosperity and blessings',
   },
   {
     title: 'Rudrabhishek Puja',
+    link: '/rudrabhishek',
+    alt: 'Rudrabhishek Puja ritual performed by experienced pandit in Bangalore',
     caption: 'Traditional Rudrabhishek Puja with Vedic procedure',
   },
   {
     title: 'Namkaran Puja',
+    link: '/services?search=Namkaran%20Puja',
+    alt: 'Namkaran Puja naming ceremony performed at home by pandit in Bangalore',
     caption: 'Namkaran and family rituals performed at home in Bangalore',
   },
 ]
@@ -154,20 +164,30 @@ function OnlinePanditBookingBangalorePage() {
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {galleryItems.map((item, index) => (
-          <article key={item.title} className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-            <img
-              src={item.image || getPoojaImage(item.title)}
-              alt={`${item.title} in Bangalore by Puja Samriddhi`}
-              loading={index < 2 ? 'eager' : 'lazy'}
-              decoding="async"
-              fetchpriority={index < 2 ? 'high' : 'low'}
-              className="h-60 w-full object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-sm font-semibold text-stone-900">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-stone-700">{item.caption}</p>
-            </div>
-          </article>
+          <Link
+            key={item.title}
+            to={item.link}
+            className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+            aria-label={`Open ${item.title} service page`}
+          >
+            <article>
+              <img
+                src={item.image || getPoojaImage(item.title)}
+                alt={item.alt}
+                loading={index < 2 ? 'eager' : 'lazy'}
+                decoding="async"
+                fetchpriority={index < 2 ? 'high' : 'low'}
+                className="h-60 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="p-4">
+                <h3 className="text-sm font-semibold text-stone-900">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-stone-700">{item.caption}</p>
+                <span className="mt-3 inline-flex text-sm font-semibold text-orange-700 transition group-hover:text-orange-800">
+                  View service
+                </span>
+              </div>
+            </article>
+          </Link>
         ))}
       </div>
 

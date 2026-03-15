@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo'
 
-const SITE_URL = 'https://pujasmarddhi.vercel.app'
+const SITE_URL = 'https://pujasamriddhi.com'
 
 const pageContent = {
   'satyanarayan-puja': {
-    title: 'Satyanarayan Puja Booking | Puja Samrddhi',
+    title: 'Satyanarayan Puja Booking | Puja Samriddhi',
     heading: 'Satyanarayan Puja',
     description:
       'Book experienced pandits for Satyanarayan Puja at home with complete guidance and authentic rituals.',
@@ -16,7 +16,7 @@ const pageContent = {
     ],
   },
   'griha-pravesh-puja': {
-    title: 'Griha Pravesh Puja Booking | Puja Samrddhi',
+    title: 'Griha Pravesh Puja Booking | Puja Samriddhi',
     heading: 'Griha Pravesh Puja',
     description:
       'Perform a peaceful housewarming ritual with verified pandits and transparent pricing for Griha Pravesh Puja.',
@@ -27,7 +27,7 @@ const pageContent = {
     ],
   },
   'ganesh-puja': {
-    title: 'Ganesh Puja Booking | Puja Samrddhi',
+    title: 'Ganesh Puja Booking | Puja Samriddhi',
     heading: 'Ganesh Puja',
     description:
       'Book Ganesh Puja for new beginnings, office opening, and prosperity with trusted pandits near you.',
@@ -37,8 +37,19 @@ const pageContent = {
       'Fast booking with verified priest profiles',
     ],
   },
+  'lakshmi-puja': {
+    title: 'Lakshmi Puja Booking | Puja Samriddhi',
+    heading: 'Lakshmi Puja',
+    description:
+      'Book Lakshmi Puja with experienced pandits for prosperity, festive rituals, and auspicious blessings at home.',
+    highlights: [
+      'Ideal for Diwali, Friday pujas, and prosperity rituals',
+      'Traditional vidhi with mantra, sankalp, and guided setup',
+      'Simple online booking with verified priest support',
+    ],
+  },
   rudrabhishek: {
-    title: 'Rudrabhishek Puja Booking | Puja Samrddhi',
+    title: 'Rudrabhishek Puja Booking | Puja Samriddhi',
     heading: 'Rudrabhishek',
     description:
       'Schedule Rudrabhishek Puja with skilled pandits to seek divine blessings, peace, and protection.',

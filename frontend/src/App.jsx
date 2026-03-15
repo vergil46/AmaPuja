@@ -69,6 +69,7 @@ function App() {
           <Route path="/satyanarayan-puja" element={<PoojaSeoLandingPage slug="satyanarayan-puja" />} />
           <Route path="/griha-pravesh-puja" element={<PoojaSeoLandingPage slug="griha-pravesh-puja" />} />
           <Route path="/ganesh-puja" element={<PoojaSeoLandingPage slug="ganesh-puja" />} />
+          <Route path="/lakshmi-puja" element={<PoojaSeoLandingPage slug="lakshmi-puja" />} />
           <Route path="/rudrabhishek" element={<PoojaSeoLandingPage slug="rudrabhishek" />} />
           <Route path="/online-pandit-booking-bangalore" element={<OnlinePanditBookingBangalorePage />} />
           <Route path="/login" element={<LoginPage />} />
