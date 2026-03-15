@@ -46,6 +46,9 @@ function Header() {
           <NavLink to="/blog" className={navClass}>
             Blog
           </NavLink>
+          <NavLink to="/online-pandit-booking-bangalore" className={navClass}>
+            Bangalore Pandit
+          </NavLink>
           <NavLink to="/ratings" className={navClass}>
             Ratings
           </NavLink>
@@ -113,6 +116,9 @@ function Header() {
             </NavLink>
             <NavLink to="/about" className={mobileNavClass} onClick={closeMobileMenu}>
               {t('about')}
+            </NavLink>
+            <NavLink to="/online-pandit-booking-bangalore" className={mobileNavClass} onClick={closeMobileMenu}>
+              Bangalore Pandit
             </NavLink>
             <NavLink to="/ratings" className={mobileNavClass} onClick={closeMobileMenu}>
               Ratings
