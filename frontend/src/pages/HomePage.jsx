@@ -40,7 +40,7 @@ function HomePage() {
 
             {/* Headline */}
             <h1
-              className="mt-4 max-w-3xl text-3xl font-extrabold leading-tight sm:text-5xl md:text-6xl"
+              className="mt-4 max-w-3xl text-3xl font-extrabold leading-tight text-orange-50 sm:text-5xl md:text-6xl"
               style={{ textShadow: '0 2px 20px rgba(0,0,0,0.7)' }}
             >
               Book Trusted Pandits for Your{' '}
@@ -52,7 +52,7 @@ function HomePage() {
               </span>
             </h1>
 
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-orange-50/85 sm:text-lg">
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-orange-50/95 sm:text-lg">
               Premium puja support for homes and temples — verified priests, transparent pricing, smooth booking.
             </p>
 
