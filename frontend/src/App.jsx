@@ -77,7 +77,7 @@ function InactivityWarningModal() {
           <button
             type="button"
             onClick={stayLoggedIn}
-            className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+            className="rounded-lg bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 px-4 py-2 text-sm font-semibold text-white hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700"
           >
             Stay Logged In
           </button>

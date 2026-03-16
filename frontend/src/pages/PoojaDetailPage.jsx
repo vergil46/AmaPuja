@@ -922,7 +922,7 @@ function PoojaDetailPage() {
               const isSelected = selectedPackage === pkg.name
               const btnGradient = index === 0
                 ? 'bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500'
-                : 'bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400'
+                : 'bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500'
               return (
                 <div
                   key={pkg.name}
@@ -1182,8 +1182,8 @@ function PoojaDetailPage() {
             <button
               className={`w-full rounded-2xl py-4 text-base font-extrabold uppercase tracking-wide text-white shadow-2xl transition disabled:cursor-not-allowed disabled:opacity-60 ${
                 isBengaliVivahEnquiryOnly
-                  ? 'bg-linear-to-r from-red-600 to-orange-500 hover:from-red-500 hover:to-orange-400'
-                  : 'bg-linear-to-r from-orange-500 via-pink-500 to-red-500 hover:from-orange-400 hover:via-pink-400 hover:to-red-400'
+                  ? 'bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500'
+                  : 'bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500'
               }`}
               disabled={isSubmitting || !isPrimaryFormValid}
             >
@@ -1209,7 +1209,7 @@ function PoojaDetailPage() {
       <button
         type="button"
         onClick={scrollToBookingForm}
-        className="md:hidden fixed bottom-20 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-2xl bg-linear-to-r from-orange-500 to-red-500 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition"
+        className="md:hidden fixed bottom-20 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-2xl bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition"
       >
         {isBengaliVivahEnquiryOnly ? 'Send Enquiry' : `Book Now • ₹${payableAmount.toLocaleString('en-IN')}`}
       </button>

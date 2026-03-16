@@ -754,7 +754,7 @@ function PoojaSeoLandingPage({ slug }) {
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
           to={servicesSearchLink}
-          className="rounded-xl bg-orange-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-orange-800"
+          className="rounded-xl bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white transition hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700"
         >
           View Packages
         </Link>
@@ -794,7 +794,7 @@ function PoojaSeoLandingPage({ slug }) {
         <div className="mt-5 flex flex-wrap gap-3">
           <Link
             to={servicesSearchLink}
-            className="rounded-xl bg-orange-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-orange-500"
+            className="rounded-xl bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white transition hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700"
           >
             Check {content.searchTerm || content.heading} Packages
           </Link>

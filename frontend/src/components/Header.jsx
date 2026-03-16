@@ -79,7 +79,7 @@ function Header() {
             <>
               <Link
                 to="/login"
-                className="px-4 py-2 rounded-xl bg-linear-to-r from-orange-600 to-amber-600 text-white text-sm font-medium shadow-sm hover:from-orange-700 hover:to-amber-700 transition-all"
+                className="px-4 py-2 rounded-xl bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-sm font-medium shadow-sm hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 transition-all"
               >
                 {t('login')} / {t('signup')}
               </Link>
@@ -156,7 +156,7 @@ function Header() {
                   <Link
                     to="/login"
                     onClick={closeMobileMenu}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-linear-to-r from-orange-500 to-amber-500 text-white text-sm font-semibold text-center shadow-md shadow-orange-500/30 hover:from-orange-600 hover:to-amber-600 transition-all"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 text-white text-sm font-semibold text-center shadow-md shadow-purple-500/30 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 transition-all"
                   >
                     {t('login')} / {t('signup')}
                   </Link>
