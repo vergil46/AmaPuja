@@ -6,8 +6,9 @@ const SITE_URL = 'https://pujasamriddhi.com'
 const satyanarayanBookingPage = {
   canonicalPath: '/satyanarayan-puja-booking',
   badge: 'Puja Booking Guide',
-  title: 'Satyanarayan Puja Booking | Online Pandit - Puja Samriddhi',
+  title: 'Satyanarayan Puja Booking in Bangalore | Puja Samriddhi',
   heading: 'Satyanarayan Puja Booking',
+  h1: 'Book Satyanarayan Puja with Experienced Pandit',
   description:
     'Book Satyanarayan Puja at home with experienced pandits, guided vidhi, and smooth online scheduling through Puja Samriddhi.',
   intro:
@@ -82,8 +83,9 @@ const satyanarayanBookingPage = {
 const grihaPraveshPage = {
   canonicalPath: '/griha-pravesh-puja',
   badge: 'Housewarming Ritual',
-  title: 'Griha Pravesh Puja | House Warming Puja Booking',
+  title: 'Griha Pravesh Puja Booking in Bangalore | Puja Samriddhi',
   heading: 'Griha Pravesh Puja',
+  h1: 'Book Griha Pravesh Puja with Experienced Pandit',
   description:
     'Book Griha Pravesh Puja online for housewarming rituals, muhurat guidance, and experienced pandit support with Puja Samriddhi.',
   intro:
@@ -158,8 +160,9 @@ const grihaPraveshPage = {
 const ganeshAtHomePage = {
   canonicalPath: '/ganesh-puja-at-home',
   badge: 'Home Puja Service',
-  title: 'Ganesh Puja at Home | Book Pandit for Ganesh Puja',
+  title: 'Ganesh Puja Booking in Bangalore | Puja Samriddhi',
   heading: 'Ganesh Puja at Home',
+  h1: 'Book Ganesh Puja with Experienced Pandit',
   description:
     'Book Ganesh Puja at home with a trusted pandit for new beginnings, family blessings, and obstacle removal through Puja Samriddhi.',
   intro:
@@ -225,8 +228,9 @@ const ganeshAtHomePage = {
 const navagrahaPage = {
   canonicalPath: '/navagraha-puja',
   badge: 'Graha Shanti Service',
-  title: 'Navagraha Puja | Remove Planetary Doshas',
+  title: 'Navagraha Puja Booking in Bangalore | Puja Samriddhi',
   heading: 'Navagraha Puja',
+  h1: 'Book Navagraha Puja with Experienced Pandit',
   description:
     'Book Navagraha Puja for graha shanti, dosha relief, and balanced planetary blessings with guided online pandit support.',
   intro:
@@ -292,8 +296,9 @@ const navagrahaPage = {
 const rudrabhishekPage = {
   canonicalPath: '/rudrabhishek-puja',
   badge: 'Shiva Worship Ritual',
-  title: 'Rudrabhishek Puja | Lord Shiva Abhishek',
+  title: 'Rudrabhishek Puja Booking in Bangalore | Puja Samriddhi',
   heading: 'Rudrabhishek Puja',
+  h1: 'Book Rudrabhishek Puja with Experienced Pandit',
   description:
     'Book Rudrabhishek Puja for Lord Shiva worship, abhishek vidhi, and spiritual blessings with experienced pandit support.',
   intro:
@@ -350,8 +355,9 @@ const rudrabhishekPage = {
 const lakshmiForWealthPage = {
   canonicalPath: '/lakshmi-puja-for-wealth',
   badge: 'Prosperity Puja',
-  title: 'Lakshmi Puja | Prosperity and Wealth Puja',
+  title: 'Lakshmi Puja Booking in Bangalore | Puja Samriddhi',
   heading: 'Lakshmi Puja for Wealth',
+  h1: 'Book Lakshmi Puja with Experienced Pandit',
   description:
     'Book Lakshmi Puja for prosperity, Diwali worship, and family blessings with guided priest support from Puja Samriddhi.',
   intro:
@@ -533,8 +539,9 @@ const onlinePanditBookingPage = {
 const marriagePujaPage = {
   canonicalPath: '/marriage-puja',
   badge: 'Wedding Ritual Service',
-  title: 'Marriage Puja | Hindu Wedding Rituals',
+  title: 'Marriage Puja Booking in Bangalore | Puja Samriddhi',
   heading: 'Marriage Puja',
+  h1: 'Book Marriage Puja with Experienced Pandit',
   description:
     'Book pandit support for marriage puja, Hindu wedding rituals, and sacred ceremony guidance with Puja Samriddhi.',
   intro:
@@ -582,8 +589,9 @@ const marriagePujaPage = {
 const vastuShantiPage = {
   canonicalPath: '/vastu-shanti-puja',
   badge: 'Vastu Remedy Ritual',
-  title: 'Vastu Shanti Puja | Remove Vastu Dosha',
+  title: 'Vastu Shanti Puja Booking in Bangalore | Puja Samriddhi',
   heading: 'Vastu Shanti Puja',
+  h1: 'Book Vastu Shanti Puja with Experienced Pandit',
   description:
     'Book Vastu Shanti Puja for vastu dosha remedies, home energy balance, and guided ritual support through Puja Samriddhi.',
   intro:
@@ -643,31 +651,35 @@ const pageContent = {
   'satyanarayan-puja': {
     ...satyanarayanBookingPage,
     canonicalPath: '/satyanarayan-puja',
-    title: 'Satyanarayan Puja Booking | Puja Samriddhi',
+    title: 'Satyanarayan Puja in Bangalore | Puja Samriddhi',
     heading: 'Satyanarayan Puja',
+    h1: 'Book Satyanarayan Puja with Experienced Pandit',
   },
   'griha-pravesh-puja': grihaPraveshPage,
   'ganesh-puja-at-home': ganeshAtHomePage,
   'ganesh-puja': {
     ...ganeshAtHomePage,
     canonicalPath: '/ganesh-puja',
-    title: 'Ganesh Puja Booking | Puja Samriddhi',
+    title: 'Ganesh Puja in Bangalore | Puja Samriddhi',
     heading: 'Ganesh Puja',
+    h1: 'Book Ganesh Puja with Experienced Pandit',
   },
   'navagraha-puja': navagrahaPage,
   'rudrabhishek-puja': rudrabhishekPage,
   rudrabhishek: {
     ...rudrabhishekPage,
     canonicalPath: '/rudrabhishek',
-    title: 'Rudrabhishek Puja Booking | Puja Samriddhi',
+    title: 'Rudrabhishek in Bangalore | Puja Samriddhi',
     heading: 'Rudrabhishek',
+    h1: 'Book Rudrabhishek Puja with Experienced Pandit',
   },
   'lakshmi-puja-for-wealth': lakshmiForWealthPage,
   'lakshmi-puja': {
     ...lakshmiForWealthPage,
     canonicalPath: '/lakshmi-puja',
-    title: 'Lakshmi Puja Booking | Puja Samriddhi',
+    title: 'Lakshmi Puja in Bangalore | Puja Samriddhi',
     heading: 'Lakshmi Puja',
+    h1: 'Book Lakshmi Puja with Experienced Pandit',
   },
   'online-pandit-booking': onlinePanditBookingPage,
   'marriage-puja': marriagePujaPage,
@@ -736,7 +748,7 @@ function PoojaSeoLandingPage({ slug }) {
       />
 
       <p className="text-xs font-semibold uppercase tracking-widest text-orange-700">{content.badge}</p>
-      <h1 className="mt-2 text-3xl font-extrabold text-stone-900 sm:text-4xl">{content.heading}</h1>
+      <h1 className="mt-2 text-3xl font-extrabold text-stone-900 sm:text-4xl">{content.h1 || content.heading}</h1>
       <p className="mt-4 max-w-4xl text-base leading-relaxed text-stone-700 sm:text-lg">{content.description}</p>
       <p className="mt-3 max-w-4xl text-base leading-relaxed text-stone-700">{content.intro}</p>
 
@@ -754,7 +766,7 @@ function PoojaSeoLandingPage({ slug }) {
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
           to={servicesSearchLink}
-          className="rounded-xl bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white transition hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700"
+          className="rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-orange-700 hover:via-amber-600 hover:to-orange-600"
         >
           View Packages
         </Link>
@@ -785,22 +797,22 @@ function PoojaSeoLandingPage({ slug }) {
         ))}
       </div>
 
-      <div className="mt-10 rounded-3xl bg-stone-900 px-6 py-8 text-white shadow-lg sm:px-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-orange-300">Book With Puja Samriddhi</p>
-        <h2 className="mt-2 text-2xl font-bold sm:text-3xl">Plan your puja with clearer steps and faster support</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-stone-300 sm:text-base">
+      <div className="mt-10 rounded-3xl border border-orange-100 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 px-6 py-8 text-stone-900 shadow-lg sm:px-8">
+        <p className="text-xs font-semibold uppercase tracking-widest text-orange-700">Book With Puja Samriddhi</p>
+        <h2 className="mt-2 text-2xl font-bold text-stone-900 sm:text-3xl">Plan your puja with clearer steps and faster support</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-stone-700 sm:text-base">
           Choose the ritual you need, check packages, and move forward with an easier priest booking flow for your family ceremony.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link
             to={servicesSearchLink}
-            className="rounded-xl bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white transition hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700"
+            className="rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-orange-700 hover:via-amber-600 hover:to-orange-600"
           >
             Check {content.searchTerm || content.heading} Packages
           </Link>
           <Link
             to="/contact"
-            className="rounded-xl border border-white/20 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+            className="rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-900 transition hover:bg-white/70"
           >
             Contact Booking Support
           </Link>

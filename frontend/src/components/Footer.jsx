@@ -33,12 +33,12 @@ function Footer() {
   return (
     <footer
       className="relative mt-16 overflow-hidden border-t border-white/8 text-stone-100"
-      style={{ background: 'linear-gradient(135deg, #0a0414 0%, #130a2c 50%, #1a0a0a 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #1a1207 0%, #2a1709 50%, #3b220b 100%)' }}
     >
       {/* Background glow orbs */}
       <div
         className="pointer-events-none absolute -left-32 -top-32 h-80 w-80 rounded-full opacity-20 blur-3xl"
-        style={{ background: 'radial-gradient(circle, #7c3aed 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #f59e0b 0%, transparent 70%)' }}
       />
       <div
         className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full opacity-15 blur-3xl"

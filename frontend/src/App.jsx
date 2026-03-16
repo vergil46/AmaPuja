@@ -59,7 +59,7 @@ function InactivityWarningModal() {
   const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/45 px-4">
+    <div className="fixed inset-0 z-120 flex items-center justify-center bg-black/45 px-4">
       <div className="w-full max-w-md rounded-2xl border border-amber-200 bg-white p-6 shadow-2xl">
         <h2 className="text-2xl font-semibold text-stone-900">Session Timeout Warning</h2>
         <p className="mt-3 text-sm text-stone-700">
@@ -77,7 +77,7 @@ function InactivityWarningModal() {
           <button
             type="button"
             onClick={stayLoggedIn}
-            className="rounded-lg bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 px-4 py-2 text-sm font-semibold text-white hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700"
+            className="rounded-lg bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 px-4 py-2 text-sm font-semibold text-white hover:from-orange-700 hover:via-amber-600 hover:to-orange-600"
           >
             Stay Logged In
           </button>

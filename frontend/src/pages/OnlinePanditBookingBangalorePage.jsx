@@ -220,7 +220,7 @@ function OnlinePanditBookingBangalorePage() {
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
           to="/services"
-          className="rounded-xl bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 px-5 py-3 text-sm font-semibold text-white transition hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700"
+          className="rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-orange-700 hover:via-amber-600 hover:to-orange-600"
         >
           Browse Puja Services
         </Link>

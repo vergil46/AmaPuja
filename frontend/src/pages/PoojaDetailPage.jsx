@@ -866,7 +866,7 @@ function PoojaDetailPage() {
     'w-full rounded-xl border border-white/15 bg-white/10 px-3.5 py-3 text-base text-white placeholder:text-white/50 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 backdrop-blur-sm'
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-[#06061a] via-[#0d0a24] to-[#130a2c]">
+    <div className="min-h-screen bg-linear-to-b from-[#1a1207] via-[#2a1709] to-[#3b220b]">
       <Seo
         title={`${displayTitle} | Puja Samriddhi`}
         description={displayDescription}
@@ -884,8 +884,8 @@ function PoojaDetailPage() {
             decoding="async"
             className="h-full w-full object-cover opacity-90"
           />
-          <div className="absolute inset-0 bg-linear-to-r from-[#06061a] via-[#06061a]/70 to-transparent" />
-          <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-[#06061a]/80" />
+          <div className="absolute inset-0 bg-linear-to-r from-[#1a1207] via-[#1a1207]/70 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-[#1a1207]/80" />
         </div>
 
         {/* Title */}
@@ -900,7 +900,7 @@ function PoojaDetailPage() {
           >
             {displayTitle}
           </h1>
-          <div className="mt-2 h-1 w-28 rounded-full bg-linear-to-r from-blue-500 via-pink-500 to-yellow-400" />
+          <div className="mt-2 h-1 w-28 rounded-full bg-linear-to-r from-orange-500 via-amber-400 to-yellow-400" />
           {descriptionPreview && (
             <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/65 sm:text-base">
               {descriptionPreview}
@@ -921,8 +921,8 @@ function PoojaDetailPage() {
             {activePackages.map((pkg, index) => {
               const isSelected = selectedPackage === pkg.name
               const btnGradient = index === 0
-                ? 'bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500'
-                : 'bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500'
+                ? 'bg-linear-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400'
+                : 'bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 hover:from-orange-500 hover:via-amber-500 hover:to-orange-400'
               return (
                 <div
                   key={pkg.name}
@@ -1134,9 +1134,9 @@ function PoojaDetailPage() {
                 <label className="mb-1 block text-xs font-medium text-white/55">Priest Language</label>
                 <select className={fieldClass} value={form.priestPreference}
                   onChange={(e) => setForm({ ...form, priestPreference: e.target.value })}>
-                  <option value="" className="bg-[#0d0a24]">Select Language</option>
+                  <option value="" className="bg-[#2a1709]">Select Language</option>
                   {languageOptions.map((language) => (
-                    <option key={language} value={language} className="bg-[#0d0a24]">{language}</option>
+                    <option key={language} value={language} className="bg-[#2a1709]">{language}</option>
                   ))}
                 </select>
               </div>
@@ -1172,9 +1172,9 @@ function PoojaDetailPage() {
                 <label className="mb-1 block text-xs font-medium text-white/55">Payment Option</label>
                 <select className={fieldClass} value={form.paymentOption}
                   onChange={(e) => setForm({ ...form, paymentOption: e.target.value })}>
-                  <option value="full" className="bg-[#0d0a24]">Full Payment</option>
-                  <option value="advance" className="bg-[#0d0a24]">Advance (30%)</option>
-                  <option value="pay-after-pooja" className="bg-[#0d0a24]">Pay After Pooja</option>
+                  <option value="full" className="bg-[#2a1709]">Full Payment</option>
+                  <option value="advance" className="bg-[#2a1709]">Advance (30%)</option>
+                  <option value="pay-after-pooja" className="bg-[#2a1709]">Pay After Pooja</option>
                 </select>
               </div>
             )}
@@ -1182,8 +1182,8 @@ function PoojaDetailPage() {
             <button
               className={`w-full rounded-2xl py-4 text-base font-extrabold uppercase tracking-wide text-white shadow-2xl transition disabled:cursor-not-allowed disabled:opacity-60 ${
                 isBengaliVivahEnquiryOnly
-                  ? 'bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500'
-                  : 'bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500'
+                  ? 'bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 hover:from-orange-500 hover:via-amber-500 hover:to-orange-400'
+                  : 'bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 hover:from-orange-500 hover:via-amber-500 hover:to-orange-400'
               }`}
               disabled={isSubmitting || !isPrimaryFormValid}
             >
@@ -1209,7 +1209,7 @@ function PoojaDetailPage() {
       <button
         type="button"
         onClick={scrollToBookingForm}
-        className="md:hidden fixed bottom-20 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-2xl bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition"
+        className="md:hidden fixed bottom-20 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-2xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition"
       >
         {isBengaliVivahEnquiryOnly ? 'Send Enquiry' : `Book Now • ₹${payableAmount.toLocaleString('en-IN')}`}
       </button>
