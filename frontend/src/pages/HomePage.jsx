@@ -29,8 +29,13 @@ function HomePage() {
         />
 
         <div className="relative mx-auto max-w-6xl px-4 py-14 text-white sm:py-24">
-          <div className="max-w-4xl rounded-3xl border border-white/15 bg-white/8 p-6 shadow-2xl backdrop-blur-md animate-fade-up sm:p-10"
-            style={{ boxShadow: '0 8px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)' }}
+          <div className="max-w-4xl rounded-3xl p-6 shadow-2xl animate-fade-up sm:p-10"
+            style={{
+              background: 'rgba(255, 255, 255, 0.12)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255, 255, 255, 0.35)',
+              boxShadow: '0 8px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)',
+            }}
           >
             {/* Badge */}
             <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-400/40 bg-orange-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-orange-200">
