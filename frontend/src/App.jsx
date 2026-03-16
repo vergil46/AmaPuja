@@ -49,6 +49,44 @@ function AdminRoute({ children }) {
   return children
 }
 
+function InactivityWarningModal() {
+  const { token, logout, showInactivityWarning, secondsUntilAutoLogout, stayLoggedIn } = useAuth()
+
+  if (!token || !showInactivityWarning) return null
+
+  const minutes = Math.floor(secondsUntilAutoLogout / 60)
+  const seconds = secondsUntilAutoLogout % 60
+  const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+
+  return (
+    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/45 px-4">
+      <div className="w-full max-w-md rounded-2xl border border-amber-200 bg-white p-6 shadow-2xl">
+        <h2 className="text-2xl font-semibold text-stone-900">Session Timeout Warning</h2>
+        <p className="mt-3 text-sm text-stone-700">
+          You have been inactive. For security, your account will be logged out automatically in
+          <span className="ml-1 font-semibold text-amber-700">{formattedTime}</span>.
+        </p>
+        <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-end">
+          <button
+            type="button"
+            onClick={logout}
+            className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+          >
+            Logout Now
+          </button>
+          <button
+            type="button"
+            onClick={stayLoggedIn}
+            className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+          >
+            Stay Logged In
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function App() {
   useEffect(() => {
     prewarmApi()
@@ -110,6 +148,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
+      <InactivityWarningModal />
     </Layout>
   )
 }
