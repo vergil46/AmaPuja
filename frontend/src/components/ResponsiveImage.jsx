@@ -80,8 +80,7 @@ export function OptimizedGalleryImage({
 }) {
   return (
     <ResponsiveImage
-      src={src.replace(/\.(jpg|jpeg|png)$/i, '.webp')}
-      fallback={src}
+      src={src}
       alt={alt}
       loading={priority ? 'eager' : 'lazy'}
       fetchpriority={priority ? 'high' : 'low'}
