@@ -9,21 +9,43 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          // Vendor chunk separation for better caching
           if (!id.includes('node_modules')) return
 
-          if (id.includes('react') || id.includes('scheduler')) {
-            return 'react-vendor'
+          // Core React libraries
+          if (id.includes('react') && !id.includes('router')) {
+            return 'react-core'
           }
 
+          // React Router (lazy loaded routes)
           if (id.includes('react-router')) {
             return 'router-vendor'
           }
 
+          // API client
           if (id.includes('axios')) {
             return 'api-vendor'
           }
+
+          // Analytics and monitoring
+          if (id.includes('@sentry') || id.includes('@vercel')) {
+            return 'analytics-vendor'
+          }
+
+          // Fallback for other vendors
+          return 'vendor'
         },
       },
     },
+    // Optimize build output
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: process.env.NODE_ENV === 'production',
+        drop_debugger: true,
+      },
+    },
+    // Increase chunk size warning threshold
+    chunkSizeWarningLimit: 500,
   },
 })

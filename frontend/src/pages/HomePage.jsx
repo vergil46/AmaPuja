@@ -12,12 +12,17 @@ function HomePage() {
       />
 
       {/* ── Hero ── */}
-      <section
-        className="relative flex min-h-[65vh] items-center overflow-hidden bg-cover bg-center sm:min-h-[78vh]"
-        style={{
-          backgroundImage: `url(${homeBackground})`,
-        }}
-      >
+      <section className="relative flex min-h-[65vh] items-center overflow-hidden sm:min-h-[78vh]">
+        {/* Background image - must be first child for LCP */}
+        <img
+          src={homeBackground}
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
         {/* Layered dark overlays for depth */}
         <div className="absolute inset-0 bg-linear-to-br from-[#1a1207]/95 via-[#2a1709]/75 to-[#3b220b]/55" />
         <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-[#2f1b09]/30" />

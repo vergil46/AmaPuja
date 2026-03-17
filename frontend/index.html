@@ -9,6 +9,14 @@
       name="description"
       content="Book trusted pandits for puja and sacred rituals online with Puja Samrddhi."
     />
+    
+    <!-- Preload Google Fonts for faster LCP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="/src/index.css" as="style" />
+    
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18016259636"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -19,6 +27,8 @@
   </head>
   <body>
     <div id="root"></div>
+    
+    <!-- Main app bundle - critical, uses module (naturally deferred) -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

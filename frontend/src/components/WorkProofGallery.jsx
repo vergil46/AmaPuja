@@ -15,6 +15,8 @@ const proofImages = [
   '/proofs/work8.jpeg',
 ]
 
+import { OptimizedGalleryImage } from './ResponsiveImage'
+
 function WorkProofGallery({
   title = 'Our Work',
   description = 'Real photos and videos from pujas and rituals completed by our team.',
@@ -58,14 +60,10 @@ function WorkProofGallery({
             className="animate-fade-up self-start overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-shadow hover:shadow-md"
             style={{ animationDelay: `${0.26 + index * 0.06}s` }}
           >
-            <img
+            <OptimizedGalleryImage 
               src={image}
               alt={`Puja Samriddhi work proof ${index + 1}`}
-              loading="lazy"
-              decoding="async"
-              fetchpriority="low"
-              width="600"
-              height="600"
+              priority={index < 2}
               className="block aspect-square w-full max-h-150 object-cover"
             />
           </article>
