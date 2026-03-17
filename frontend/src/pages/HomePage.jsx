@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import homeBackground from '../assets/poojas/background-optimized.webp'
+import homeBackground from '../assets/poojas/background-optimized-1280.webp'
 import Seo from '../components/Seo'
 import WorkProofGallery from '../components/WorkProofGallery'
 
