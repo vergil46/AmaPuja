@@ -9,10 +9,20 @@ const { alertCriticalIssue } = require('../services/monitoringService');
 
 const router = express.Router();
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'test',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'test',
-});
+const getRazorpayConfig = () => {
+  const keyId = String(process.env.RAZORPAY_KEY_ID || '').trim();
+  const keySecret = String(process.env.RAZORPAY_KEY_SECRET || '').trim();
+  return { keyId, keySecret };
+};
+
+const getRazorpayClient = () => {
+  const { keyId, keySecret } = getRazorpayConfig();
+  if (!keyId || !keySecret) return null;
+  return new Razorpay({
+    key_id: keyId,
+    key_secret: keySecret,
+  });
+};
 
 const computePaymentAmount = (price, paymentOption) => {
   if (paymentOption === 'advance') return Math.round(price * 0.3);
@@ -118,6 +128,13 @@ const recalculateBookingAmount = async (booking) => {
 
 router.post('/create-order', protect, async (req, res) => {
   try {
+    const razorpay = getRazorpayClient();
+    const { keyId } = getRazorpayConfig();
+
+    if (!razorpay || !keyId) {
+      return res.status(500).json({ message: 'Payment gateway is not configured on server' });
+    }
+
     const { bookingId, finalAmount: requestedFinalAmount } = req.body;
     const booking = await Booking.findById(bookingId);
 
@@ -169,7 +186,7 @@ router.post('/create-order', protect, async (req, res) => {
       status: 'created',
     });
 
-    return res.json({ order, payment });
+    return res.json({ order, payment, keyId });
   } catch (error) {
     await alertCriticalIssue({
       type: 'payment_order_creation_failed',
@@ -187,10 +204,15 @@ router.post('/create-order', protect, async (req, res) => {
 
 router.post('/verify', protect, async (req, res) => {
   try {
+    const { keySecret } = getRazorpayConfig();
+    if (!keySecret) {
+      return res.status(500).json({ message: 'Payment gateway is not configured on server' });
+    }
+
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
     const generatedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .createHmac('sha256', keySecret)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
 

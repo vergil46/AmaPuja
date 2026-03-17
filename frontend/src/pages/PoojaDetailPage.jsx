@@ -768,8 +768,8 @@ function PoojaDetailPage() {
         }
       )
 
-      const { order } = orderRes.data
-      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID
+      const { order, keyId } = orderRes.data
+      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || keyId
 
       if (!razorpayKey) {
         setBookingMessage('Payment is unavailable: missing Razorpay key configuration.')
