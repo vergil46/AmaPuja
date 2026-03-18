@@ -301,6 +301,88 @@ const normalizePoojaPayload = (input = {}) => {
 const packagesChanged = (currentPackages, normalizedPackages) =>
   JSON.stringify(currentPackages || []) !== JSON.stringify(normalizedPackages || []);
 
+const compactPricingForList = (pricing) => {
+  if (!pricing || typeof pricing !== 'object' || Array.isArray(pricing)) {
+    return {};
+  }
+
+  return Object.entries(pricing).reduce((accumulator, [languageKey, config]) => {
+    const normalizedLanguageKey = normalizeLanguageKey(languageKey);
+    if (!normalizedLanguageKey || !config || typeof config !== 'object') {
+      return accumulator;
+    }
+
+    const packages = (Array.isArray(config.packages) ? config.packages : [])
+      .map((pkg) => {
+        const name = normalizeText(pkg?.name);
+        const price = Number(pkg?.price);
+
+        if (!name || !Number.isFinite(price) || price < 0) {
+          return null;
+        }
+
+        return {
+          name,
+          price: Math.round(price),
+          includesSamagri: Boolean(pkg?.includesSamagri),
+        };
+      })
+      .filter(Boolean);
+
+    const hasLanguagePackages = packages.length > 0;
+    const hasLanguageAddOns = Array.isArray(config.addOns) && config.addOns.length > 0;
+
+    if (!hasLanguagePackages && !hasLanguageAddOns) {
+      return accumulator;
+    }
+
+    accumulator[normalizedLanguageKey] = {
+      packages,
+      addOns: hasLanguageAddOns,
+    };
+    return accumulator;
+  }, {});
+};
+
+const summarizePoojaForList = (poojaDoc) => {
+  const normalizedDescription = normalizeText(poojaDoc?.description);
+  const shortDescription =
+    normalizedDescription.length > 220
+      ? `${normalizedDescription.slice(0, 217).trim()}...`
+      : normalizedDescription;
+
+  return {
+    _id: poojaDoc?._id,
+    title: normalizeText(poojaDoc?.title),
+    description: shortDescription,
+    image: normalizeText(poojaDoc?.image),
+    startPrice: toValidPrice(poojaDoc?.startPrice, 0),
+    availableLanguages: normalizeStringArray(poojaDoc?.availableLanguages).map(normalizeLanguageKey),
+    pricing: compactPricingForList(poojaDoc?.pricing),
+  };
+};
+
+router.get('/summary', async (req, res) => {
+  const poojaDocs = await Pooja.find(
+    {},
+    {
+      title: 1,
+      description: 1,
+      image: 1,
+      startPrice: 1,
+      availableLanguages: 1,
+      pricing: 1,
+      createdAt: 1,
+    }
+  )
+    .sort({ createdAt: -1 })
+    .lean();
+
+  // Short cache window improves repeated visits without serving stale data for long.
+  res.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+  return res.json(poojaDocs.map(summarizePoojaForList));
+});
+
 router.get('/', async (req, res) => {
   const poojaDocs = await Pooja.find().sort({ createdAt: -1 });
   // Return all fields for each pooja, not just normalized

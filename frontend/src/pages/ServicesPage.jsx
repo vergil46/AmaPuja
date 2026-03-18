@@ -9,6 +9,8 @@ const normalizeLanguageKey = (value) => String(value || '').trim().toLowerCase()
 const normalizedHindiExcludedTitles = new Set(
   ['Engagement Puja', 'Namkaran Puja (Ekoisia)'].map(normalizeTitle)
 )
+const servicesListCacheKey = 'services_list_cache_v1'
+const servicesListCacheTtlMs = 30 * 60 * 1000
 
 const allowedPriestPreferences = new Set(['Hindi', 'Odia', 'Bengali'])
 const allowedCities = new Set(['Bangalore', 'Bhubaneswar'])
@@ -137,6 +139,46 @@ const defaultPoojas = [
     packages,
   };
 })
+
+const getCachedServicesList = () => {
+  try {
+    const raw = sessionStorage.getItem(servicesListCacheKey)
+    if (!raw) {
+      return []
+    }
+
+    const parsed = JSON.parse(raw)
+    const timestamp = Number(parsed?.timestamp)
+    const items = Array.isArray(parsed?.items) ? parsed.items : []
+
+    const isFresh = Number.isFinite(timestamp) && Date.now() - timestamp < servicesListCacheTtlMs
+    if (!isFresh || items.length === 0) {
+      return []
+    }
+
+    return items
+  } catch {
+    return []
+  }
+}
+
+const setCachedServicesList = (items) => {
+  try {
+    if (!Array.isArray(items) || items.length === 0) {
+      return
+    }
+
+    sessionStorage.setItem(
+      servicesListCacheKey,
+      JSON.stringify({
+        timestamp: Date.now(),
+        items,
+      })
+    )
+  } catch {
+    // Ignore storage failures (private mode / quota), network fetch still works.
+  }
+}
 
 const priestLanguagePoojas = {
   Odia: new Set(
@@ -427,10 +469,20 @@ function ServicesPage() {
   useEffect(() => {
     let cancelled = false
     // Retry while Render wakes up from cold start.
-    const retryDelaysMs = [0, 4000, 8000]
+    const retryDelaysMs = [0, 2000, 4000]
 
     const loadPoojas = async () => {
-      setIsLoading(true)
+      const cachedPoojas = getCachedServicesList()
+      const hasCachedPoojas = cachedPoojas.length > 0
+
+      if (hasCachedPoojas) {
+        setPoojas(cachedPoojas)
+        setIsUsingFallbackData(false)
+        setIsLoading(false)
+      } else {
+        setIsLoading(true)
+      }
+
       try {
         let res = null
 
@@ -441,9 +493,17 @@ function ServicesPage() {
           }
 
           try {
-            res = await api.get('/poojas')
+            res = await api.get('/poojas/summary')
             break
           } catch (error) {
+            const status = Number(error?.response?.status)
+            const isSummaryNotAvailable = status === 404
+
+            if (isSummaryNotAvailable) {
+              res = await api.get('/poojas')
+              break
+            }
+
             const isLastAttempt = attempt === retryDelaysMs.length - 1
             if (isLastAttempt) {
               throw error
@@ -459,12 +519,18 @@ function ServicesPage() {
         const hasApiData = apiPoojas.length > 0
         setPoojas(hasApiData ? apiPoojas : defaultPoojas)
         setIsUsingFallbackData(!hasApiData)
+        if (hasApiData) {
+          setCachedServicesList(apiPoojas)
+        }
       } catch {
         if (cancelled) {
           return
         }
-        setPoojas(defaultPoojas)
-        setIsUsingFallbackData(true)
+
+        if (!hasCachedPoojas) {
+          setPoojas(defaultPoojas)
+          setIsUsingFallbackData(true)
+        }
       } finally {
         if (!cancelled) {
           setIsLoading(false)

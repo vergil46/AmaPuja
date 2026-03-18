@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 const path = require('path');
 const Sentry = require('@sentry/node');
 
@@ -120,6 +121,7 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(compression());
 app.use(morgan('dev'));
 
 app.get('/api/health', (req, res) => {
