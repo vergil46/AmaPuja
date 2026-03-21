@@ -1,12 +1,10 @@
 import { trackGoogleAdsConversion } from '../utils/googleAds'
 
 function WhatsAppButton() {
-  const message = encodeURIComponent('Message Puja Samriddhi on WhatsApp.')
-
   return (
     <>
       <a
-        href={`https://wa.me/919739362962?text=${message}`}
+        href="https://wa.me/919739362962"
         onClick={trackGoogleAdsConversion}
         target="_blank"
         rel="noreferrer"
@@ -24,7 +22,7 @@ function WhatsAppButton() {
             Call Now
           </a>
           <a
-            href={`https://wa.me/919739362962?text=${message}`}
+            href="https://wa.me/919739362962"
             onClick={trackGoogleAdsConversion}
             target="_blank"
             rel="noreferrer"

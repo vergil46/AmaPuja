@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import PoojaCard from '../components/PoojaCard'
 import Seo from '../components/Seo'
 import api from '../services/api'
+import { trackGoogleAdsConversion } from '../utils/googleAds'
 
 const normalizeTitle = (value) => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 const normalizeLanguageKey = (value) => String(value || '').trim().toLowerCase()
@@ -802,7 +803,8 @@ function ServicesPage() {
               Call Now
             </a>
             <a
-              href="https://wa.me/919739362962?text=I%20need%20help%20selecting%20a%20puja%20service"
+              href="https://wa.me/919739362962"
+              onClick={trackGoogleAdsConversion}
               target="_blank"
               rel="noreferrer"
               className="rounded-lg bg-green-600 px-3.5 py-2 text-sm font-semibold text-white"
