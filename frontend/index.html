@@ -9,6 +9,16 @@
       name="description"
       content="Book trusted pandits for puja and sacred rituals online with Puja Samrddhi."
     />
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18026538115"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'AW-18026538115');
+    </script>
     
     <!-- Preconnect Google Fonts origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -41,33 +51,5 @@
     
     <!-- Main app bundle - critical, uses module (naturally deferred) -->
     <script type="module" src="/src/main.jsx"></script>
-    <!-- Delay analytics so it doesn't compete with LCP-critical resources -->
-    <script>
-      (function () {
-        var loadTracking = function () {
-          window.dataLayer = window.dataLayer || [];
-          window.gtag = function () {
-            window.dataLayer.push(arguments);
-          };
-
-          var script = document.createElement('script');
-          script.async = true;
-          script.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18016259636';
-          script.onload = function () {
-            window.gtag('js', new Date());
-            window.gtag('config', 'AW-18016259636');
-          };
-          document.head.appendChild(script);
-        };
-
-        if ('requestIdleCallback' in window) {
-          window.requestIdleCallback(loadTracking, { timeout: 3000 });
-        } else {
-          window.addEventListener('load', function () {
-            setTimeout(loadTracking, 1200);
-          });
-        }
-      })();
-    </script>
   </body>
 </html>

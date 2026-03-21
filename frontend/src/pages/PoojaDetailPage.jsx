@@ -5,6 +5,7 @@ import Seo from '../components/Seo'
 import api from '../services/api'
 import { PoojaDetailSkeleton } from '../components/LoadingSkeleton'
 import { useAuth } from '../context/useAuth'
+import { trackGoogleAdsConversion } from '../utils/googleAds'
 
 const FUNNEL_SESSION_KEY = 'pujasamriddhi_funnel_session'
 
@@ -680,6 +681,8 @@ function PoojaDetailPage() {
       return
     }
 
+    trackGoogleAdsConversion()
+
     setIsSubmitting(true)
 
     try {
@@ -1186,6 +1189,7 @@ function PoojaDetailPage() {
             )}
 
             <button
+              type="submit"
               className={`w-full rounded-2xl py-4 text-base font-extrabold uppercase tracking-wide text-white shadow-2xl transition disabled:cursor-not-allowed disabled:opacity-60 ${
                 isBengaliVivahEnquiryOnly
                   ? 'bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 hover:from-orange-500 hover:via-amber-500 hover:to-orange-400'
