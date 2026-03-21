@@ -681,8 +681,6 @@ function PoojaDetailPage() {
       return
     }
 
-    trackGoogleAdsConversion()
-
     setIsSubmitting(true)
 
     try {
@@ -711,6 +709,7 @@ function PoojaDetailPage() {
           message: enquiryLines.join('\n'),
         })
 
+        trackGoogleAdsConversion()
         setBookingMessage(
           'Enquiry sent successfully. Our team will contact you with quotation details.'
         )
@@ -749,6 +748,7 @@ function PoojaDetailPage() {
       })
 
       if (form.paymentOption === 'pay-after-pooja') {
+        trackGoogleAdsConversion()
         setBookingMessage('Booking placed successfully.')
         trackFunnelEvent('payment_success', { flow: 'pay-after-pooja' })
         if (typeof window !== 'undefined') {
@@ -788,6 +788,7 @@ function PoojaDetailPage() {
         order_id: order.id,
         handler: async (response) => {
           await api.post('/payments/verify', response)
+          trackGoogleAdsConversion()
           setBookingMessage(
             'Booking and payment completed successfully.'
           )

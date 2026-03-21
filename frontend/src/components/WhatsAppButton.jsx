@@ -1,11 +1,8 @@
-import { trackGoogleAdsConversion } from '../utils/googleAds'
-
 function WhatsAppButton() {
   return (
     <>
       <a
         href="https://wa.me/919739362962"
-        onClick={trackGoogleAdsConversion}
         target="_blank"
         rel="noreferrer"
         className="hidden sm:inline-flex fixed right-5 bottom-5 bg-green-600 hover:bg-green-700 text-white rounded-full px-4 py-3 text-base shadow-lg z-40"
@@ -23,7 +20,6 @@ function WhatsAppButton() {
           </a>
           <a
             href="https://wa.me/919739362962"
-            onClick={trackGoogleAdsConversion}
             target="_blank"
             rel="noreferrer"
             className="flex-1 rounded-xl bg-green-600 px-3 py-2.5 text-center text-sm font-semibold text-white"
