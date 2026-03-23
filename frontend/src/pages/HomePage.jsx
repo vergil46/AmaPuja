@@ -66,7 +66,7 @@ function HomePage() {
               Book Trusted Pandit Ji in Minutes
             </h1>
             <p className="mt-4 text-lg font-medium text-[#5b3c24] sm:text-[38px] sm:leading-tight">
-              500+ successful poojas • Verified priests • Same-day booking
+              Verified priests • Same-day booking
             </p>
 
             <form
