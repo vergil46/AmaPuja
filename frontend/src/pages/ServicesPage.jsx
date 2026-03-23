@@ -180,6 +180,30 @@ const setCachedServicesList = (items) => {
   }
 }
 
+const buildFetchFailureDiagnostics = (error, attempt) => {
+  const status = Number(error?.response?.status)
+  const requestUrl = [error?.config?.baseURL, error?.config?.url].filter(Boolean).join('')
+  const isNetworkError = !error?.response
+  const isTimeout = String(error?.code || '').toUpperCase() === 'ECONNABORTED'
+  const isCorsOrBlocked =
+    isNetworkError &&
+    typeof window !== 'undefined' &&
+    navigator.onLine &&
+    String(error?.message || '').toLowerCase().includes('network error')
+
+  return {
+    attempt,
+    status: Number.isFinite(status) ? status : null,
+    code: error?.code || null,
+    message: error?.message || 'Request failed',
+    requestUrl: requestUrl || null,
+    timeoutMs: Number(error?.config?.timeout) || null,
+    isNetworkError,
+    isTimeout,
+    isCorsOrBlocked,
+  }
+}
+
 const priestLanguagePoojas = {
   Odia: new Set(
     [
@@ -429,6 +453,8 @@ function ServicesPage() {
   const [searchTerm, setSearchTerm] = useState(getInitialSearchTerm)
   const [isLoading, setIsLoading] = useState(true)
   const [isUsingFallbackData, setIsUsingFallbackData] = useState(false)
+  const [fallbackMode, setFallbackMode] = useState(null)
+  const [reloadNonce, setReloadNonce] = useState(0)
 
   const selectedLanguageCount = priestPreference === 'Bengali'
     ? bengaliDisplayOrder.length
@@ -474,10 +500,12 @@ function ServicesPage() {
     const loadPoojas = async () => {
       const cachedPoojas = getCachedServicesList()
       const hasCachedPoojas = cachedPoojas.length > 0
+      const failureDiagnostics = []
 
       if (hasCachedPoojas) {
         setPoojas(cachedPoojas)
         setIsUsingFallbackData(false)
+        setFallbackMode(null)
         setIsLoading(false)
       } else {
         setIsLoading(true)
@@ -500,9 +528,20 @@ function ServicesPage() {
             const isSummaryNotAvailable = status === 404
 
             if (isSummaryNotAvailable) {
-              res = await api.get('/poojas')
-              break
+              try {
+                res = await api.get('/poojas')
+                break
+              } catch (fallbackError) {
+                failureDiagnostics.push(buildFetchFailureDiagnostics(fallbackError, attempt + 1))
+                const isLastAttempt = attempt === retryDelaysMs.length - 1
+                if (isLastAttempt) {
+                  throw fallbackError
+                }
+                continue
+              }
             }
+
+            failureDiagnostics.push(buildFetchFailureDiagnostics(error, attempt + 1))
 
             const isLastAttempt = attempt === retryDelaysMs.length - 1
             if (isLastAttempt) {
@@ -518,18 +557,31 @@ function ServicesPage() {
         const apiPoojas = Array.isArray(res.data) ? res.data : []
         const hasApiData = apiPoojas.length > 0
         setPoojas(hasApiData ? apiPoojas : defaultPoojas)
-        setIsUsingFallbackData(!hasApiData)
+        setIsUsingFallbackData(false)
+        setFallbackMode(null)
         if (hasApiData) {
           setCachedServicesList(apiPoojas)
         }
-      } catch {
+      } catch (error) {
         if (cancelled) {
           return
         }
 
-        if (!hasCachedPoojas) {
+        console.warn('[ServicesPage] Failed to load pooja services; showing fallback data.', {
+          diagnostics: failureDiagnostics.length > 0
+            ? failureDiagnostics
+            : [buildFetchFailureDiagnostics(error, retryDelaysMs.length)],
+          hasCachedPoojas,
+        })
+
+        if (hasCachedPoojas) {
+          setPoojas(cachedPoojas)
+          setIsUsingFallbackData(true)
+          setFallbackMode('cached')
+        } else {
           setPoojas(defaultPoojas)
           setIsUsingFallbackData(true)
+          setFallbackMode('backup')
         }
       } finally {
         if (!cancelled) {
@@ -543,7 +595,7 @@ function ServicesPage() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [reloadNonce])
 
   const languageMatchedPoojas = useMemo(() => {
     if (priestPreference === 'Kannada') {
@@ -783,9 +835,20 @@ function ServicesPage() {
       </div>
 
       {isUsingFallbackData && (
-        <p className="mt-3 rounded-lg border border-orange-200 bg-orange-50 px-4 py-2 text-sm text-orange-700">
-          Unable to reach the server right now — showing cached service data. Please refresh in a moment.
-        </p>
+        <div className="mt-3 flex flex-col gap-2 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-orange-700">
+            {fallbackMode === 'cached'
+              ? 'Unable to reach the server right now — showing cached service data.'
+              : 'Unable to reach the server right now — showing backup service data.'}
+          </p>
+          <button
+            type="button"
+            onClick={() => setReloadNonce((value) => value + 1)}
+            className="self-start rounded-md border border-orange-300 bg-white px-3 py-1.5 text-xs font-semibold text-orange-700 transition-colors hover:bg-orange-100 sm:self-auto"
+          >
+            Retry now
+          </button>
+        </div>
       )}
 
       <div className="mt-4 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm">
