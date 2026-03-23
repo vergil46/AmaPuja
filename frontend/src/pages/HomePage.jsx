@@ -111,7 +111,7 @@ function HomePage() {
 
                 <button
                   type="submit"
-                  className="h-12 rounded-xl bg-linear-to-r from-[#ec9b2f] to-[#e1841e] px-6 text-xl font-semibold text-white shadow-[0_10px_22px_rgba(221,123,28,0.38)] transition hover:brightness-105 md:col-span-2"
+                  className="inline-flex h-12 items-center justify-center whitespace-nowrap rounded-xl bg-linear-to-r from-[#ec9b2f] to-[#e1841e] px-5 text-base font-semibold text-white shadow-[0_10px_22px_rgba(221,123,28,0.38)] transition hover:brightness-105 md:col-span-2 md:min-w-35"
                 >
                   Find Puja
                 </button>
