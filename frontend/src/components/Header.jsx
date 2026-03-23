@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '../context/useLanguage'
@@ -8,7 +8,9 @@ import Logo from './Logo'
 function Header() {
   const { user, logout } = useAuth()
   const { t } = useLanguage()
+  const { pathname } = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const isHomePage = pathname === '/'
 
   const navClass = ({ isActive }) =>
     `text-sm md:text-[15px] font-medium px-2.5 py-1.5 rounded-md transition-colors ${
@@ -25,32 +27,20 @@ function Header() {
   const closeMobileMenu = () => setMobileMenuOpen(false)
 
   return (
-    <header className="sticky top-0 z-50 border-b border-orange-200/90 bg-white/95 backdrop-blur-xl shadow-lg transition-shadow">
-      <div className="bg-linear-to-r from-orange-100 via-amber-50 to-orange-100 text-right px-3.5 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm text-stone-700 border-b border-orange-100/80">
-        Helpline: 9739362962
-      </div>
-      <div className="max-w-6xl mx-auto px-3.5 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-50 border-b border-orange-100/90 bg-white/92 backdrop-blur-xl shadow-sm transition-shadow">
+      <div className="max-w-6xl mx-auto px-3.5 sm:px-4 py-3.5 sm:py-4 flex items-center justify-between gap-3">
         <Link to="/" onClick={closeMobileMenu} className="shrink-0 flex items-center">
           <Logo variant="default" className="scale-95 origin-left" />
         </Link>
-        <nav className="hidden lg:flex items-center gap-3 rounded-full border border-orange-100 bg-white px-3 py-2 shadow-sm">
+        <nav className="hidden lg:flex items-center gap-2 rounded-full border border-orange-100 bg-white px-3 py-2 shadow-sm">
           <NavLink to="/" className={navClass}>
             {t('home')}
-          </NavLink>
-          <NavLink to="/services" className={navClass}>
-            {t('services')}
           </NavLink>
           <NavLink to="/about" className={navClass}>
             {t('about')}
           </NavLink>
-          <NavLink to="/blog" className={navClass}>
-            Blog
-          </NavLink>
-          <NavLink to="/online-pandit-booking-bangalore" className={navClass}>
-            Bangalore Pandit
-          </NavLink>
-          <NavLink to="/ratings" className={navClass}>
-            Ratings
+          <NavLink to="/services" className={navClass}>
+            {t('services')}
           </NavLink>
           <NavLink to="/contact" className={navClass}>
             {t('contact')}
@@ -67,28 +57,41 @@ function Header() {
           )}
         </nav>
         <div className="hidden lg:flex items-center gap-2">
-          <LanguageSwitcher />
-          {user ? (
-            <button
-              onClick={logout}
-              className="px-4 py-2 rounded-xl bg-stone-800 text-white text-sm font-medium shadow-sm hover:bg-stone-700 transition-colors"
-            >
-              {t('logout')}
-            </button>
-          ) : (
+          <a
+            href="https://wa.me/919739362962"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-2xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700"
+          >
+            <span aria-hidden="true">🟢</span>
+            WhatsApp
+          </a>
+          {!isHomePage && (
             <>
-              <Link
-                to="/login"
-                className="px-4 py-2 rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 text-white text-sm font-medium shadow-sm hover:from-orange-700 hover:via-amber-600 hover:to-orange-600 transition-all"
-              >
-                {t('login')} / {t('signup')}
-              </Link>
-              <Link
-                to="/admin-login"
-                className="px-4 py-2 rounded-xl border border-stone-300 bg-white text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors"
-              >
-                {t('admin')} {t('login')}
-              </Link>
+              <LanguageSwitcher />
+              {user ? (
+                <button
+                  onClick={logout}
+                  className="px-4 py-2 rounded-xl bg-stone-800 text-white text-sm font-medium shadow-sm hover:bg-stone-700 transition-colors"
+                >
+                  {t('logout')}
+                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 text-white text-sm font-medium shadow-sm hover:from-orange-700 hover:via-amber-600 hover:to-orange-600 transition-all"
+                  >
+                    {t('login')} / {t('signup')}
+                  </Link>
+                  <Link
+                    to="/admin-login"
+                    className="px-4 py-2 rounded-xl border border-stone-300 bg-white text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors"
+                  >
+                    {t('admin')} {t('login')}
+                  </Link>
+                </>
+              )}
             </>
           )}
         </div>

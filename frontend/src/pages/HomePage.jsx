@@ -1,9 +1,42 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import homeBackground from '../assets/poojas/background-optimized-1280.webp'
 import Seo from '../components/Seo'
 import WorkProofGallery from '../components/WorkProofGallery'
 
 function HomePage() {
+  const navigate = useNavigate()
+  const [city, setCity] = useState('Bangalore')
+  const [language, setLanguage] = useState('Odia')
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const quickSuggestions = ['Satyanarayan Puja', 'Griha Pravesh', 'Ganesh Puja']
+
+  const goToServices = (overrideTerm = '') => {
+    const nextParams = new URLSearchParams()
+    const normalizedSearch = String(overrideTerm || searchTerm).trim()
+
+    if (city && city !== 'Bangalore') {
+      nextParams.set('city', city)
+    }
+
+    if (language && language !== 'Odia') {
+      nextParams.set('priest', language)
+    }
+
+    if (normalizedSearch) {
+      nextParams.set('search', normalizedSearch)
+    }
+
+    const queryString = nextParams.toString()
+    navigate(queryString ? `/services?${queryString}` : '/services')
+  }
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault()
+    goToServices()
+  }
+
   return (
     <>
       <Seo
@@ -11,9 +44,7 @@ function HomePage() {
         description="Book trusted pandits for sacred rituals with transparent packages and secure online booking."
       />
 
-      {/* ── Hero ── */}
-      <section className="relative flex min-h-[65vh] items-center overflow-hidden sm:min-h-[78vh]">
-        {/* Background image - must be first child for LCP */}
+      <section className="relative overflow-hidden border-b border-orange-100/80">
         <img
           src={homeBackground}
           alt=""
@@ -21,95 +52,102 @@ function HomePage() {
           loading="eager"
           fetchpriority="high"
           decoding="async"
+          width="1280"
+          height="853"
+          sizes="100vw"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        {/* Layered dark overlays for depth */}
-        <div className="absolute inset-0 bg-linear-to-br from-[#1a1207]/95 via-[#2a1709]/75 to-[#3b220b]/55" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/55 via-transparent to-[#2f1b09]/30" />
+        <div className="absolute inset-0 bg-linear-to-br from-[#f7efe8]/92 via-[#f8ece2]/68 to-[#c78851]/44" />
+        <div className="absolute inset-0 bg-linear-to-t from-[#5f3416]/30 via-[#7a4a20]/8 to-transparent" />
 
-        {/* Subtle glow orb behind the card */}
-        <div
-          className="pointer-events-none absolute left-1/4 top-1/3 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-30 blur-3xl"
-          style={{ background: 'radial-gradient(circle, #ea580c 0%, transparent 70%)' }}
-        />
-
-        <div className="relative mx-auto max-w-6xl px-4 py-14 text-white sm:py-24">
-          <div className="max-w-4xl rounded-3xl p-6 shadow-2xl animate-fade-up sm:p-10"
-            style={{
-              background: 'rgba(255, 255, 255, 0.12)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255, 255, 255, 0.35)',
-              boxShadow: '0 8px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)',
-            }}
-          >
-            {/* Badge */}
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-orange-400/40 bg-orange-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-orange-200">
-              <span className="h-1.5 w-1.5 rounded-full bg-orange-400 animate-pulse" />
-              Sacred • Trusted • Professional
-            </span>
-
-            {/* Headline */}
-            <h1
-              className="mt-4 max-w-3xl text-3xl font-extrabold leading-tight text-orange-50 sm:text-5xl md:text-6xl"
-              style={{ textShadow: '0 2px 20px rgba(0,0,0,0.7)' }}
-            >
-              Book Trusted Pandits for Your{' '}
-              <span
-                className="bg-linear-to-r from-orange-300 via-amber-200 to-yellow-300 bg-clip-text text-transparent"
-                style={{ WebkitBackgroundClip: 'text' }}
-              >
-                Sacred Rituals
-              </span>
+        <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-12 sm:pb-20 sm:pt-16">
+          <div className="max-w-4xl animate-fade-up">
+            <h1 className="text-4xl font-semibold leading-tight text-[#291a11] sm:text-5xl md:text-[60px]">
+              Book Trusted Pandit Ji in Minutes
             </h1>
-
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-orange-50/95 sm:text-lg">
-              Premium puja support for homes and temples — verified priests, transparent pricing, smooth booking.
+            <p className="mt-4 text-lg font-medium text-[#5b3c24] sm:text-[38px] sm:leading-tight">
+              500+ successful poojas • Verified priests • Same-day booking
             </p>
 
-            {/* Trust pills */}
-            <div className="mt-4 flex flex-wrap gap-2 text-xs sm:text-sm">
-              {['⭐ 4.9/5 satisfaction', '🔒 Secure payment', '⚡ Same-day support'].map((label) => (
-                <span key={label} className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-orange-100">
-                  {label}
-                </span>
-              ))}
-            </div>
+            <form
+              onSubmit={handleSearchSubmit}
+              className="mt-8 rounded-3xl border border-[#e7d2bf] bg-white/80 p-4 shadow-[0_24px_60px_rgba(97,55,22,0.18)] backdrop-blur-md"
+            >
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-12">
+                <label className="relative md:col-span-3">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orange-500">📍</span>
+                  <select
+                    value={city}
+                    onChange={(event) => setCity(event.target.value)}
+                    className="h-12 w-full rounded-xl border border-[#eadbcc] bg-white pl-10 pr-3 text-lg text-stone-800 outline-none transition focus:border-orange-300"
+                  >
+                    <option value="Bangalore">Bangalore</option>
+                    <option value="Bhubaneswar">Bhubaneswar</option>
+                  </select>
+                </label>
 
-            {/* CTA buttons */}
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                to="/services"
-                className="inline-block w-full rounded-xl px-6 py-3.5 text-center text-base font-bold text-white shadow-lg transition hover:scale-[1.02] sm:w-auto"
-                style={{
-                  background: 'linear-gradient(135deg, #ea580c 0%, #d97706 100%)',
-                  boxShadow: '0 4px 24px rgba(234,88,12,0.45)',
-                }}
-              >
-                Book a Puja →
-              </Link>
-              <a
-                href="tel:+919739362962"
-                className="inline-block w-full rounded-xl border border-white/30 bg-white/10 px-6 py-3.5 text-center text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/18 sm:w-auto"
-              >
-                📞 Call for Guidance
-              </a>
-            </div>
+                <label className="relative md:col-span-3">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orange-500">💬</span>
+                  <select
+                    value={language}
+                    onChange={(event) => setLanguage(event.target.value)}
+                    className="h-12 w-full rounded-xl border border-[#eadbcc] bg-white pl-10 pr-3 text-lg text-stone-800 outline-none transition focus:border-orange-300"
+                  >
+                    <option value="Odia">Odia</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Bengali">Bengali</option>
+                  </select>
+                </label>
 
-            {/* Stats row */}
-            <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <label className="md:col-span-4">
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                    placeholder="Search Pooja"
+                    className="h-12 w-full rounded-xl border border-[#eadbcc] bg-white px-4 text-lg text-stone-800 outline-none transition placeholder:text-stone-400 focus:border-orange-300"
+                  />
+                </label>
+
+                <button
+                  type="submit"
+                  className="h-12 rounded-xl bg-linear-to-r from-[#ec9b2f] to-[#e1841e] px-6 text-xl font-semibold text-white shadow-[0_10px_22px_rgba(221,123,28,0.38)] transition hover:brightness-105 md:col-span-2"
+                >
+                  Find Puja
+                </button>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                {quickSuggestions.map((term, index) => (
+                  <button
+                    key={term}
+                    type="button"
+                    onClick={() => {
+                      setSearchTerm(term)
+                      goToServices(term)
+                    }}
+                    className="rounded-full border border-[#eadbcf] bg-[#fef5ec] px-4 py-1.5 text-base text-[#5b3b25] transition hover:bg-[#fdebd9]"
+                  >
+                    {index === 0 ? '🔥 ' : ''}
+                    {term}
+                  </button>
+                ))}
+              </div>
+            </form>
+
+            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { label: 'Cities', value: '2+' },
-                { label: 'Languages', value: '4' },
-                { label: 'Packages', value: 'Clear' },
-                { label: 'Support', value: 'Quick' },
-              ].map(({ label, value }) => (
+                { label: '11 Services', icon: '🪔' },
+                { label: city, icon: '📍' },
+                { label: language, icon: '💬' },
+                { label: '12 Packages', icon: '📦' },
+              ].map(({ label, icon }) => (
                 <div
                   key={label}
-                  className="rounded-xl border border-white/15 bg-white/8 px-3 py-3 backdrop-blur-sm"
-                  style={{ background: 'rgba(255,255,255,0.07)' }}
+                  className="flex items-center gap-3 rounded-2xl border border-[#eadacc] bg-white/88 px-4 py-3 shadow-[0_10px_24px_rgba(95,56,27,0.12)] backdrop-blur"
                 >
-                  <p className="text-[11px] uppercase tracking-widest text-orange-200/70">{label}</p>
-                  <p className="mt-0.5 text-lg font-bold text-white">{value}</p>
+                  <span className="text-xl" aria-hidden="true">{icon}</span>
+                  <span className="text-xl font-medium text-[#332116]">{label}</span>
                 </div>
               ))}
             </div>
