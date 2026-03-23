@@ -88,7 +88,15 @@ const shouldRetryWithProduction = (error) => {
     return false
   }
 
-  return isSameBaseUrl(config.baseURL, localApiBaseUrl)
+  const currentBaseUrl = trimTrailingSlash(config.baseURL || api.defaults.baseURL || '')
+  const isAlreadyOnProduction = isSameBaseUrl(currentBaseUrl, productionApiBaseUrl)
+  if (isAlreadyOnProduction) {
+    return false
+  }
+
+  // Recover from stale/misconfigured frontend API URLs by retrying once on
+  // the canonical production backend.
+  return true
 }
 
 api.interceptors.request.use((config) => {
@@ -104,6 +112,17 @@ api.interceptors.response.use(
   async (error) => {
     if (!shouldRetryWithProduction(error)) {
       return Promise.reject(error)
+    }
+
+    const retrySourceBaseUrl = trimTrailingSlash(error?.config?.baseURL || api.defaults.baseURL || '')
+    if (typeof window !== 'undefined') {
+      console.warn('[api] Retrying failed request on production API base URL.', {
+        from: retrySourceBaseUrl || null,
+        to: productionApiBaseUrl,
+        url: error?.config?.url || null,
+        code: error?.code || null,
+        status: Number(error?.response?.status) || null,
+      })
     }
 
     const retryConfig = {
