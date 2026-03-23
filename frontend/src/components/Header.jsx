@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import LanguageSwitcher from './LanguageSwitcher'
 import { useLanguage } from '../context/useLanguage'
@@ -8,9 +8,14 @@ import Logo from './Logo'
 function Header() {
   const { user, logout } = useAuth()
   const { t } = useLanguage()
-  const { pathname } = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const isHomePage = pathname === '/'
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false)
+  const accountMenuRef = useRef(null)
+  const accountRoute = user?.role === 'admin' ? '/admin' : '/dashboard'
+  const bookingsRoute = '/dashboard#bookings'
+  const feedbackRoute = '/dashboard#feedback'
+  const accountLabel = user?.role === 'admin' ? t('admin') : t('dashboard')
+  const accountInitial = (user?.name?.trim()?.[0] || user?.email?.trim()?.[0] || accountLabel?.[0] || 'A').toUpperCase()
 
   const navClass = ({ isActive }) =>
     `text-sm md:text-[15px] font-medium px-2.5 py-1.5 rounded-md transition-colors ${
@@ -25,6 +30,34 @@ function Header() {
     }`
 
   const closeMobileMenu = () => setMobileMenuOpen(false)
+
+  useEffect(() => {
+    if (!accountMenuOpen) return undefined
+
+    const handleDocumentClick = (event) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) {
+        setAccountMenuOpen(false)
+      }
+    }
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setAccountMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleDocumentClick)
+    document.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.removeEventListener('mousedown', handleDocumentClick)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [accountMenuOpen])
+
+  useEffect(() => {
+    if (!user) setAccountMenuOpen(false)
+  }, [user])
 
   return (
     <header className="sticky top-0 z-50 border-b border-orange-100/90 bg-white/92 backdrop-blur-xl shadow-sm transition-shadow">
@@ -66,34 +99,97 @@ function Header() {
             <span aria-hidden="true">🟢</span>
             WhatsApp
           </a>
-          {!isHomePage && (
-            <>
+          <div className="flex items-center gap-2 rounded-2xl border border-orange-200/80 bg-linear-to-r from-orange-50 via-amber-50 to-orange-50 px-2 py-1.5 shadow-sm animate-fade-up" style={{ animationDelay: '0.04s' }}>
+            <div className="rounded-xl border border-orange-200/80 bg-white/90 px-1.5 py-1 shadow-xs">
               <LanguageSwitcher />
-              {user ? (
+            </div>
+            {user ? (
+              <div className="relative" ref={accountMenuRef}>
                 <button
-                  onClick={logout}
-                  className="px-4 py-2 rounded-xl bg-stone-800 text-white text-sm font-medium shadow-sm hover:bg-stone-700 transition-colors"
+                  type="button"
+                  onClick={() => setAccountMenuOpen((prev) => !prev)}
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-orange-300 bg-white text-orange-800 text-sm font-semibold hover:bg-orange-50 transition-colors"
+                  aria-haspopup="menu"
+                  aria-expanded={accountMenuOpen}
                 >
-                  {t('logout')}
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-orange-600 to-amber-500 text-[11px] font-bold text-white shadow-sm">
+                    {accountInitial}
+                  </span>
+                  {accountLabel}
+                  <span className="text-xs text-orange-700/80">▾</span>
                 </button>
-              ) : (
-                <>
-                  <Link
-                    to="/login"
-                    className="px-4 py-2 rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 text-white text-sm font-medium shadow-sm hover:from-orange-700 hover:via-amber-600 hover:to-orange-600 transition-all"
+
+                {accountMenuOpen && (
+                  <div
+                    className="absolute right-0 top-[calc(100%+8px)] z-50 min-w-55 overflow-hidden rounded-2xl border border-orange-200/90 bg-white shadow-xl shadow-orange-900/10 animate-fade-up"
+                    style={{ animationDelay: '0.02s' }}
+                    role="menu"
+                    aria-label="Account menu"
                   >
-                    {t('login')} / {t('signup')}
-                  </Link>
-                  <Link
-                    to="/admin-login"
-                    className="px-4 py-2 rounded-xl border border-stone-300 bg-white text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors"
-                  >
-                    {t('admin')} {t('login')}
-                  </Link>
-                </>
-              )}
-            </>
-          )}
+                    <div className="border-b border-orange-100 bg-linear-to-r from-orange-50 to-amber-50 px-4 py-3">
+                      <p className="text-[11px] font-semibold tracking-wide text-orange-700/80">SIGNED IN</p>
+                      <p className="mt-0.5 text-sm font-semibold text-stone-900">{user?.name || user?.email || 'Account'}</p>
+                    </div>
+                    <div className="p-2">
+                      <Link
+                        to={bookingsRoute}
+                        onClick={() => setAccountMenuOpen(false)}
+                        className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-stone-800 hover:bg-orange-50 hover:text-orange-800 transition-colors"
+                        role="menuitem"
+                      >
+                        My Bookings
+                      </Link>
+                      <Link
+                        to={feedbackRoute}
+                        onClick={() => setAccountMenuOpen(false)}
+                        className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-stone-800 hover:bg-orange-50 hover:text-orange-800 transition-colors"
+                        role="menuitem"
+                      >
+                        My Feedback
+                      </Link>
+                      <Link
+                        to={accountRoute}
+                        onClick={() => setAccountMenuOpen(false)}
+                        className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-stone-800 hover:bg-orange-50 hover:text-orange-800 transition-colors inline-flex items-center gap-2"
+                        role="menuitem"
+                      >
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-100 text-[10px] font-bold text-orange-700">
+                          {accountInitial}
+                        </span>
+                        {accountLabel}
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAccountMenuOpen(false)
+                          logout()
+                        }}
+                        className="mt-1 w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-stone-800 hover:bg-rose-50 hover:text-rose-700 transition-colors"
+                        role="menuitem"
+                      >
+                        {t('logout')}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="px-4 py-2 rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 text-white text-sm font-semibold shadow-md shadow-orange-400/30 hover:from-orange-700 hover:via-amber-600 hover:to-orange-600 transition-all"
+                >
+                  {t('login')} / {t('signup')}
+                </Link>
+                <Link
+                  to="/admin-login"
+                  className="px-4 py-2 rounded-xl border border-stone-300 bg-white text-stone-700 text-sm font-semibold hover:bg-stone-50 transition-colors"
+                >
+                  {t('admin')} {t('login')}
+                </Link>
+              </>
+            )}
+          </div>
         </div>
 
         <button
@@ -145,15 +241,41 @@ function Header() {
                 <LanguageSwitcher />
               </div>
               {user ? (
-                <button
-                  onClick={() => {
-                    logout()
-                    closeMobileMenu()
-                  }}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-stone-100 text-stone-900 text-sm font-semibold hover:bg-white transition-colors"
-                >
-                  {t('logout')}
-                </button>
+                <>
+                  <Link
+                    to={bookingsRoute}
+                    onClick={closeMobileMenu}
+                    className="w-full px-4 py-2.5 rounded-2xl border border-orange-400/40 bg-orange-100 text-orange-900 text-sm font-semibold text-center hover:bg-orange-50 transition-colors"
+                  >
+                    My Bookings
+                  </Link>
+                  <Link
+                    to={feedbackRoute}
+                    onClick={closeMobileMenu}
+                    className="w-full px-4 py-2.5 rounded-2xl border border-orange-400/40 bg-orange-100 text-orange-900 text-sm font-semibold text-center hover:bg-orange-50 transition-colors"
+                  >
+                    My Feedback
+                  </Link>
+                  <Link
+                    to={accountRoute}
+                    onClick={closeMobileMenu}
+                    className="w-full px-4 py-2.5 rounded-2xl border border-amber-400/60 bg-amber-100 text-amber-900 text-sm font-semibold text-center hover:bg-amber-50 transition-colors inline-flex items-center justify-center gap-2"
+                  >
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-orange-600 to-amber-500 text-[11px] font-bold text-white shadow-sm">
+                      {accountInitial}
+                    </span>
+                    {accountLabel}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout()
+                      closeMobileMenu()
+                    }}
+                    className="w-full px-4 py-2.5 rounded-2xl bg-stone-100 text-stone-900 text-sm font-semibold hover:bg-white transition-colors"
+                  >
+                    {t('logout')}
+                  </button>
+                </>
               ) : (
                 <>
                   <Link

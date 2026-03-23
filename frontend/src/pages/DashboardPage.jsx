@@ -261,7 +261,7 @@ function DashboardPage() {
       </div>
 
       {/* Bookings Table */}
-      <div className="bg-white border border-stone-200 rounded-xl overflow-hidden mb-8">
+      <div id="bookings" className="bg-white border border-stone-200 rounded-xl overflow-hidden mb-8 scroll-mt-28">
         <div className="bg-stone-50 px-6 py-4 border-b border-stone-200">
           <h2 className="text-lg font-semibold text-stone-800">Recent Bookings</h2>
         </div>
@@ -349,7 +349,7 @@ function DashboardPage() {
       </div>
 
       {/* Feedback Section */}
-      <div id="feedback" className="bg-white border border-stone-200 rounded-xl p-6">
+      <div id="feedback" className="bg-white border border-stone-200 rounded-xl p-6 scroll-mt-28">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
             <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
