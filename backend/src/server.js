@@ -37,6 +37,15 @@ const normalizeOrigin = (value) => String(value || '').trim().replace(/\/+$/, ''
 
 const isIPv4Host = (hostname) => /^\d{1,3}(?:\.\d{1,3}){3}$/.test(hostname);
 
+const isKnownCustomFrontendOrigin = (origin) => {
+  const normalized = normalizeOrigin(origin).toLowerCase();
+  if (!normalized) {
+    return false;
+  }
+
+  return /^https:\/\/(?:[a-z0-9-]+\.)?(?:pujasamriddhi\.com|amapuja\.com)$/.test(normalized);
+};
+
 const buildAllowedConfiguredOrigins = (origins) => {
   const allowedOrigins = new Set();
 
@@ -98,7 +107,7 @@ app.use(
         normalizedOrigin
       );
       const isKnownVercelFrontend = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(normalizedOrigin);
-      const isKnownCustomFrontend = /^https:\/\/(www\.)?pujasamriddhi\.com$/i.test(normalizedOrigin);
+      const isKnownCustomFrontend = isKnownCustomFrontendOrigin(normalizedOrigin);
 
       const isConfiguredClient = allowedConfiguredOrigins.has(normalizedOrigin);
       const isLocalhostVitePort = /^http:\/\/localhost:\d+$/.test(origin);
