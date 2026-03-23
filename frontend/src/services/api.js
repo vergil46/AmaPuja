@@ -61,7 +61,6 @@ export const prewarmApi = () => {
   return warmupPromise
 }
 
-const localApiBaseUrl = 'http://localhost:5000/api'
 const productionApiBaseUrl = trimTrailingSlash(DEFAULT_PRODUCTION_API_URL)
 
 const isSameBaseUrl = (left, right) => trimTrailingSlash(left) === trimTrailingSlash(right)
