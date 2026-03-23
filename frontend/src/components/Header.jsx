@@ -65,7 +65,7 @@ function Header() {
         <Link to="/" onClick={closeMobileMenu} className="shrink-0 flex items-center">
           <Logo variant="default" className="scale-95 origin-left" />
         </Link>
-        <nav className="hidden lg:flex items-center gap-2 rounded-full border border-orange-100 bg-white px-3 py-2 shadow-sm">
+        <nav className="hidden md:flex items-center gap-2 rounded-full border border-orange-100 bg-white px-3 py-2 shadow-sm">
           <NavLink to="/" className={navClass}>
             {t('home')}
           </NavLink>
@@ -74,6 +74,9 @@ function Header() {
           </NavLink>
           <NavLink to="/services" className={navClass}>
             {t('services')}
+          </NavLink>
+          <NavLink to="/online-pandit-booking-bangalore" className={navClass}>
+            Bangalore Pandit
           </NavLink>
           <NavLink to="/contact" className={navClass}>
             {t('contact')}
@@ -89,7 +92,7 @@ function Header() {
             </NavLink>
           )}
         </nav>
-        <div className="hidden lg:flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
           <a
             href="https://wa.me/919739362962"
             target="_blank"
@@ -194,7 +197,7 @@ function Header() {
 
         <button
           type="button"
-          className="lg:hidden px-3.5 py-2.5 rounded-2xl border border-orange-300/70 bg-linear-to-r from-orange-50 to-amber-50 text-orange-900 text-sm font-semibold shadow-sm hover:from-orange-100 hover:to-amber-100 transition-colors"
+          className="md:hidden px-3.5 py-2.5 rounded-2xl border border-orange-300/70 bg-linear-to-r from-orange-50 to-amber-50 text-orange-900 text-sm font-semibold shadow-sm hover:from-orange-100 hover:to-amber-100 transition-colors"
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-label="Toggle navigation menu"
           aria-expanded={mobileMenuOpen}
@@ -204,7 +207,7 @@ function Header() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-orange-100/80 bg-orange-50/85 backdrop-blur animate-fade-up">
+        <div className="md:hidden border-t border-orange-100/80 bg-orange-50/85 backdrop-blur animate-fade-up">
           <nav className="max-w-6xl mx-auto px-3.5 py-4" style={{ animationDelay: '0.05s' }}>
             <div className="rounded-2xl border border-orange-300/40 bg-stone-900/95 shadow-lg shadow-orange-900/20 p-4 flex flex-col gap-2.5">
             <NavLink to="/" className={mobileNavClass} onClick={closeMobileMenu}>
