@@ -1,7 +1,4 @@
-const proofVideos = [
-  '/proofs/Videos/proofvideo.mp4',
-  '/proofs/Videos/workvideo2.mp4',
-]
+const proofVideos = []
 
 const proofImages = [
   '/proofs/p.jpeg',

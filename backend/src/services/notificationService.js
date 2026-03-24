@@ -7,10 +7,28 @@ const { alertCriticalIssue } = require('./monitoringService');
 const https = require('https');
 
 const normalizePhone = (phone) => {
-  if (!phone) return '';
-  const digits = String(phone).replace(/\D/g, '');
+  const raw = String(phone || '').trim();
+  if (!raw) return '';
+
+  const digits = raw.replace(/\D/g, '');
   if (!digits) return '';
+
+  // Keep explicit international format when user provides +country code.
+  if (raw.startsWith('+') && digits.length >= 8) {
+    return `+${digits}`;
+  }
+
+  // Common India inputs: 10-digit local, or 0-prefixed 11-digit local number.
+  if (digits.length === 11 && digits.startsWith('0')) {
+    return `+91${digits.slice(1)}`;
+  }
   if (digits.length === 10) return `+91${digits}`;
+
+  // Already includes country code without +
+  if (digits.length === 12 && digits.startsWith('91')) {
+    return `+${digits}`;
+  }
+
   return `+${digits}`;
 };
 
@@ -173,6 +191,7 @@ const sendOwnerLeadWhatsAppAlert = async ({ type, name, phone, email, service, d
 const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
   const phone = normalizePhone(booking.phone);
   const whatsappTo = normalizeWhatsAppAddress(phone);
+  const smsFrom = normalizePhone(process.env.TWILIO_SMS_FROM);
   const reviewUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/dashboard`;
 
   const smsBody = `Puja Samriddhi: Booking received for ${pooja.title} on ${booking.date} at ${booking.time}. Amount: Rs ${booking.paymentAmount}.`; 
@@ -182,7 +201,7 @@ const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
     sendBookingConfirmationEmail(booking, pooja),
     sendAdminBookingAlertEmail(booking, pooja),
     sendTwilioMessage({
-      from: String(process.env.TWILIO_SMS_FROM || '').trim(),
+      from: smsFrom,
       to: phone,
       body: smsBody,
     }),
@@ -235,6 +254,7 @@ const sendEnquiryCreatedNotifications = async (enquiry) => {
 const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
   const phone = normalizePhone(booking.phone);
   const whatsappTo = normalizeWhatsAppAddress(phone);
+  const smsFrom = normalizePhone(process.env.TWILIO_SMS_FROM);
   const poojaTitle = pooja?.title || 'your pooja';
   const reviewUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/dashboard?reviewBooking=${booking._id}#feedback`;
 
@@ -244,7 +264,7 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
   const [emailSent, smsSent, whatsappSent] = await Promise.all([
     sendPoojaCompletionReviewEmail(booking, pooja, reviewUrl),
     sendTwilioMessage({
-      from: String(process.env.TWILIO_SMS_FROM || '').trim(),
+      from: smsFrom,
       to: phone,
       body: smsBody,
     }),
@@ -274,7 +294,7 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
 const sendTestTwilioNotifications = async ({ to, body }) => {
   const smsTo = normalizePhone(to);
   const whatsappTo = normalizeWhatsAppAddress(to);
-  const smsFrom = String(process.env.TWILIO_SMS_FROM || '').trim();
+  const smsFrom = normalizePhone(process.env.TWILIO_SMS_FROM);
   const whatsappFrom = normalizeWhatsAppAddress(process.env.TWILIO_WHATSAPP_FROM);
 
   const message = String(body || '').trim() || `Puja Samriddhi Twilio test at ${new Date().toISOString()}`;

@@ -275,6 +275,16 @@ function PoojaDetailPage() {
       return
     }
 
+    if (
+      typeof window !== 'undefined' &&
+      !window.isSecureContext &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
+      setLocationMessage('Location access requires HTTPS. Please open this site on a secure (https) URL.')
+      return
+    }
+
     setIsFetchingLocation(true)
 
     try {
@@ -1113,13 +1123,13 @@ function PoojaDetailPage() {
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">House / Flat No. *</label>
-                <input className={fieldClass} placeholder="House / Flat No." required value={form.house}
+                <label className="mb-1 block text-xs font-medium text-white/55">House / Flat No.</label>
+                <input className={fieldClass} placeholder="House / Flat No." value={form.house}
                   onChange={(e) => setForm({ ...form, house: e.target.value })} />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Street / Area *</label>
-                <input className={fieldClass} placeholder="Street / Area" required value={form.street}
+                <label className="mb-1 block text-xs font-medium text-white/55">Street / Area</label>
+                <input className={fieldClass} placeholder="Street / Area" value={form.street}
                   onChange={(e) => setForm({ ...form, street: e.target.value })} />
               </div>
               <div>
@@ -1128,13 +1138,13 @@ function PoojaDetailPage() {
                   onChange={(e) => setForm({ ...form, city: e.target.value })} />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Pincode *</label>
-                <input className={fieldClass} placeholder="Pincode" required value={form.pincode}
+                <label className="mb-1 block text-xs font-medium text-white/55">Pincode</label>
+                <input className={fieldClass} placeholder="Pincode" value={form.pincode}
                   onChange={(e) => setForm({ ...form, pincode: e.target.value })} />
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs font-medium text-white/55">State *</label>
-                <input className={fieldClass} placeholder="State" required value={form.state}
+                <label className="mb-1 block text-xs font-medium text-white/55">State</label>
+                <input className={fieldClass} placeholder="State" value={form.state}
                   onChange={(e) => setForm({ ...form, state: e.target.value })} />
               </div>
             </div>
