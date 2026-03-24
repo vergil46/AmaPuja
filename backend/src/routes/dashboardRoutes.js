@@ -4,8 +4,26 @@ const Enquiry = require('../models/Enquiry');
 const Payment = require('../models/Payment');
 const FunnelEvent = require('../models/FunnelEvent');
 const { protect, adminOnly } = require('../middleware/auth');
+const { sendTestTwilioNotifications } = require('../services/notificationService');
 
 const router = express.Router();
+
+router.post('/admin/test-twilio', protect, adminOnly, async (req, res) => {
+  try {
+    const to = String(req.body?.to || '').trim();
+    const body = String(req.body?.body || '').trim();
+
+    if (!to) {
+      return res.status(400).json({ message: 'Field "to" is required' });
+    }
+
+    const result = await sendTestTwilioNotifications({ to, body });
+    return res.json(result);
+  } catch (error) {
+    console.error('Twilio admin test failed:', error);
+    return res.status(500).json({ message: 'Twilio test failed' });
+  }
+});
 
 router.get('/admin/stats', protect, adminOnly, async (req, res) => {
   const requestedRange = String(req.query.range || 'all').toLowerCase();

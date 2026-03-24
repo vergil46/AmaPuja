@@ -66,6 +66,10 @@ function AdminPage() {
   const [selectedBookingDetails, setSelectedBookingDetails] = useState(null)
   const [detailsBookingStatus, setDetailsBookingStatus] = useState('pending')
   const [updatingDetailsStatus, setUpdatingDetailsStatus] = useState(false)
+  const [twilioTestForm, setTwilioTestForm] = useState({ to: '', body: '' })
+  const [twilioTesting, setTwilioTesting] = useState(false)
+  const [twilioTestResult, setTwilioTestResult] = useState(null)
+  const [twilioTestError, setTwilioTestError] = useState('')
   const [form, setForm] = useState({ title: '', description: '', image: '', startPrice: 0 })
   const [activeSidebarSection, setActiveSidebarSection] = useState('dashboard')
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -660,6 +664,31 @@ function AdminPage() {
     }
   }
 
+  const runTwilioTest = async (event) => {
+    event.preventDefault()
+    const to = String(twilioTestForm.to || '').trim()
+    const body = String(twilioTestForm.body || '').trim()
+
+    if (!to) {
+      setTwilioTestError('Recipient number is required.')
+      setTwilioTestResult(null)
+      return
+    }
+
+    setTwilioTesting(true)
+    setTwilioTestError('')
+    setTwilioTestResult(null)
+
+    try {
+      const response = await api.post('/dashboard/admin/test-twilio', { to, body })
+      setTwilioTestResult(response.data)
+    } catch (error) {
+      setTwilioTestError(error.response?.data?.message || 'Twilio test failed.')
+    } finally {
+      setTwilioTesting(false)
+    }
+  }
+
   const completionRate = stats.totalBookings
     ? Math.round((bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'completed').length / stats.totalBookings) * 100)
     : 0
@@ -762,7 +791,6 @@ function AdminPage() {
             </nav>
 
             <button
-              ref={settingsSectionRef}
               type="button"
               onClick={() => setIsDarkMode((prev) => !prev)}
               className={`mt-4 w-full rounded-lg border p-3 ${isDarkMode ? 'border-stone-600 bg-stone-800 text-stone-100' : 'border-stone-200 bg-white text-stone-700'}`}
@@ -1184,6 +1212,44 @@ function AdminPage() {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                <div ref={settingsSectionRef} className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
+                  <h2 className="text-2xl font-semibold text-stone-900">Twilio Test</h2>
+                  <p className="mt-1 text-xs text-stone-500">Admin-only tool to test SMS and WhatsApp delivery.</p>
+                  <form className="mt-3 space-y-2" onSubmit={runTwilioTest}>
+                    <input
+                      className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
+                      placeholder="Recipient number (example: +919999999999)"
+                      value={twilioTestForm.to}
+                      onChange={(e) => setTwilioTestForm((prev) => ({ ...prev, to: e.target.value }))}
+                      disabled={twilioTesting}
+                    />
+                    <textarea
+                      className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
+                      placeholder="Optional test message"
+                      rows={3}
+                      value={twilioTestForm.body}
+                      onChange={(e) => setTwilioTestForm((prev) => ({ ...prev, body: e.target.value }))}
+                      disabled={twilioTesting}
+                    />
+                    <button
+                      type="submit"
+                      className="rounded bg-orange-700 px-3 py-2 text-xs text-white hover:bg-orange-800 disabled:opacity-60"
+                      disabled={twilioTesting}
+                    >
+                      {twilioTesting ? 'Testing...' : 'Run Twilio Test'}
+                    </button>
+                  </form>
+                  {twilioTestError && <p className="mt-2 text-xs text-red-700">{twilioTestError}</p>}
+                  {twilioTestResult && (
+                    <div className="mt-3 rounded border border-stone-200 bg-stone-50 p-2 text-xs text-stone-700">
+                      <p>SMS: {twilioTestResult.smsSent ? 'Sent' : 'Failed'}</p>
+                      <p>WhatsApp: {twilioTestResult.whatsappSent ? 'Sent' : 'Failed'}</p>
+                      <p>SMS To: {twilioTestResult.smsTo || '-'}</p>
+                      <p>WhatsApp To: {twilioTestResult.whatsappTo || '-'}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

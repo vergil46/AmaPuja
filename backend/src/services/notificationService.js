@@ -4,26 +4,82 @@ const {
   sendAdminBookingAlertEmail,
 } = require('./emailService');
 const { alertCriticalIssue } = require('./monitoringService');
+const https = require('https');
 
 const normalizePhone = (phone) => {
   if (!phone) return '';
-  const cleaned = String(phone).replace(/[^\d+]/g, '');
-  if (cleaned.startsWith('+')) return cleaned;
-  if (cleaned.length === 10) return `+91${cleaned}`;
-  return `+${cleaned}`;
+  const digits = String(phone).replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.length === 10) return `+91${digits}`;
+  return `+${digits}`;
+};
+
+const normalizeWhatsAppAddress = (value) => {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+
+  if (raw.startsWith('whatsapp:')) {
+    const normalized = normalizePhone(raw.slice('whatsapp:'.length));
+    return normalized ? `whatsapp:${normalized}` : '';
+  }
+
+  const normalized = normalizePhone(raw);
+  return normalized ? `whatsapp:${normalized}` : '';
+};
+
+const maskPhone = (value) => {
+  const digits = String(value || '').replace(/\D/g, '');
+  if (digits.length <= 4) return value;
+  return `${digits.slice(0, 2)}******${digits.slice(-2)}`;
+};
+
+const sendWithHttpsFallback = (url, authHeader, payload) => {
+  return new Promise((resolve, reject) => {
+    const request = https.request(
+      url,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Basic ${authHeader}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Length': Buffer.byteLength(payload),
+        },
+      },
+      (response) => {
+        let body = '';
+        response.on('data', (chunk) => {
+          body += chunk;
+        });
+        response.on('end', () => {
+          resolve({
+            ok: response.statusCode >= 200 && response.statusCode < 300,
+            status: response.statusCode || 500,
+            text: async () => body,
+          });
+        });
+      }
+    );
+
+    request.on('error', reject);
+    request.write(payload);
+    request.end();
+  });
 };
 
 const sendTwilioMessage = async ({ from, to, body }) => {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const accountSid = String(process.env.TWILIO_ACCOUNT_SID || '').trim();
+  const authToken = String(process.env.TWILIO_AUTH_TOKEN || '').trim();
+  const resolvedFrom = String(from || '').trim();
+  const resolvedTo = String(to || '').trim();
+  const resolvedBody = String(body || '').trim();
 
-  if (!accountSid || !authToken || !from || !to || !body) {
+  if (!accountSid || !authToken || !resolvedFrom || !resolvedTo || !resolvedBody) {
     console.warn('Twilio message skipped due to missing config/params', {
       hasAccountSid: Boolean(accountSid),
       hasAuthToken: Boolean(authToken),
-      hasFrom: Boolean(from),
-      hasTo: Boolean(to),
-      hasBody: Boolean(body),
+      hasFrom: Boolean(resolvedFrom),
+      hasTo: Boolean(resolvedTo),
+      hasBody: Boolean(resolvedBody),
     });
     return false;
   }
@@ -33,23 +89,41 @@ const sendTwilioMessage = async ({ from, to, body }) => {
 
   try {
     const payload = new URLSearchParams({
-      From: from,
-      To: to,
-      Body: body,
+      From: resolvedFrom,
+      To: resolvedTo,
+      Body: resolvedBody,
     });
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${authHeader}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: payload,
-    });
+    const response =
+      typeof fetch === 'function'
+        ? await fetch(url, {
+            method: 'POST',
+            headers: {
+              Authorization: `Basic ${authHeader}`,
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: payload,
+          })
+        : await sendWithHttpsFallback(url, authHeader, payload.toString());
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.warn(`Twilio message failed (${response.status}): ${errorText}`);
+      let parsedError = null;
+
+      try {
+        parsedError = JSON.parse(errorText);
+      } catch {
+        parsedError = null;
+      }
+
+      console.warn('Twilio message failed', {
+        status: response.status,
+        code: parsedError?.code,
+        message: parsedError?.message || errorText,
+        moreInfo: parsedError?.more_info,
+        from: maskPhone(resolvedFrom),
+        to: maskPhone(resolvedTo),
+      });
       return false;
     }
 
@@ -63,19 +137,11 @@ const sendTwilioMessage = async ({ from, to, body }) => {
 const getAdminWhatsAppTo = () => {
   const configured = String(process.env.ADMIN_WHATSAPP_TO || '').trim();
   if (!configured) return '';
-
-  if (configured.startsWith('whatsapp:')) {
-    return configured;
-  }
-
-  const normalized = normalizePhone(configured);
-  if (!normalized) return '';
-
-  return `whatsapp:${normalized}`;
+  return normalizeWhatsAppAddress(configured);
 };
 
 const sendOwnerLeadWhatsAppAlert = async ({ type, name, phone, email, service, details }) => {
-  const from = process.env.TWILIO_WHATSAPP_FROM;
+  const from = normalizeWhatsAppAddress(process.env.TWILIO_WHATSAPP_FROM);
   const to = getAdminWhatsAppTo();
 
   if (!from || !to) {
@@ -106,6 +172,7 @@ const sendOwnerLeadWhatsAppAlert = async ({ type, name, phone, email, service, d
 
 const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
   const phone = normalizePhone(booking.phone);
+  const whatsappTo = normalizeWhatsAppAddress(phone);
   const reviewUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/dashboard`;
 
   const smsBody = `Puja Samriddhi: Booking received for ${pooja.title} on ${booking.date} at ${booking.time}. Amount: Rs ${booking.paymentAmount}.`; 
@@ -115,13 +182,13 @@ const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
     sendBookingConfirmationEmail(booking, pooja),
     sendAdminBookingAlertEmail(booking, pooja),
     sendTwilioMessage({
-      from: process.env.TWILIO_SMS_FROM,
+      from: String(process.env.TWILIO_SMS_FROM || '').trim(),
       to: phone,
       body: smsBody,
     }),
     sendTwilioMessage({
-      from: process.env.TWILIO_WHATSAPP_FROM,
-      to: `whatsapp:${phone}`,
+      from: normalizeWhatsAppAddress(process.env.TWILIO_WHATSAPP_FROM),
+      to: whatsappTo,
       body: whatsappBody,
     }),
     sendOwnerLeadWhatsAppAlert({
@@ -167,6 +234,7 @@ const sendEnquiryCreatedNotifications = async (enquiry) => {
 
 const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
   const phone = normalizePhone(booking.phone);
+  const whatsappTo = normalizeWhatsAppAddress(phone);
   const poojaTitle = pooja?.title || 'your pooja';
   const reviewUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/dashboard?reviewBooking=${booking._id}#feedback`;
 
@@ -176,13 +244,13 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
   const [emailSent, smsSent, whatsappSent] = await Promise.all([
     sendPoojaCompletionReviewEmail(booking, pooja, reviewUrl),
     sendTwilioMessage({
-      from: process.env.TWILIO_SMS_FROM,
+      from: String(process.env.TWILIO_SMS_FROM || '').trim(),
       to: phone,
       body: smsBody,
     }),
     sendTwilioMessage({
-      from: process.env.TWILIO_WHATSAPP_FROM,
-      to: `whatsapp:${phone}`,
+      from: normalizeWhatsAppAddress(process.env.TWILIO_WHATSAPP_FROM),
+      to: whatsappTo,
       body: whatsappBody,
     }),
   ]);
@@ -203,9 +271,41 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
   return { emailSent, smsSent, whatsappSent };
 };
 
+const sendTestTwilioNotifications = async ({ to, body }) => {
+  const smsTo = normalizePhone(to);
+  const whatsappTo = normalizeWhatsAppAddress(to);
+  const smsFrom = String(process.env.TWILIO_SMS_FROM || '').trim();
+  const whatsappFrom = normalizeWhatsAppAddress(process.env.TWILIO_WHATSAPP_FROM);
+
+  const message = String(body || '').trim() || `Puja Samriddhi Twilio test at ${new Date().toISOString()}`;
+
+  const [smsSent, whatsappSent] = await Promise.all([
+    sendTwilioMessage({
+      from: smsFrom,
+      to: smsTo,
+      body: message,
+    }),
+    sendTwilioMessage({
+      from: whatsappFrom,
+      to: whatsappTo,
+      body: message,
+    }),
+  ]);
+
+  return {
+    smsSent,
+    whatsappSent,
+    smsTo,
+    whatsappTo,
+    smsFromConfigured: Boolean(smsFrom),
+    whatsappFromConfigured: Boolean(whatsappFrom),
+  };
+};
+
 module.exports = {
   sendBookingCreatedNotifications,
   sendCompletionReviewNotifications,
   sendEnquiryCreatedNotifications,
+  sendTestTwilioNotifications,
 };
 
