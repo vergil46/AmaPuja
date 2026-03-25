@@ -93,15 +93,6 @@ function Header() {
           )}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-          <a
-            href="https://wa.me/919739362962"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-2xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-700"
-          >
-            <span aria-hidden="true">🟢</span>
-            WhatsApp
-          </a>
           <div className="flex items-center gap-2 rounded-2xl border border-orange-200/80 bg-linear-to-r from-orange-50 via-amber-50 to-orange-50 px-2 py-1.5 shadow-sm animate-fade-up" style={{ animationDelay: '0.04s' }}>
             <div className="rounded-xl border border-orange-200/80 bg-white/90 px-1.5 py-1 shadow-xs">
               <LanguageSwitcher />
