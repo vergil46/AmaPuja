@@ -867,7 +867,7 @@ module.exports = [
             "addOns": [
               {
                 "name": "Flowers & Fruits",
-                "price": 1500
+                "price": 2000
               }
             ],
             "note": "All puja samagri such as Haldi, Abeer, Gulal, Mango Leaves, Tulasi, Darba, Kalash, Betel Leaves, Betel Nuts, Dravyas, Kapda, Ghee, etc., will be brought by us.\n\nThe Yajaman (host) must arrange household items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, and Photos. A detailed preparation checklist will be shared after booking confirmation."
