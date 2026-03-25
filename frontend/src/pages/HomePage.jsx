@@ -69,6 +69,32 @@ function HomePage() {
               Verified priests • Same-day booking
             </p>
 
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <a
+                href="https://wa.me/919739362962"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-linear-to-r from-green-600 to-green-500 px-7 py-3 text-base font-bold text-white shadow-[0_14px_28px_rgba(22,163,74,0.34)] transition hover:-translate-y-0.5 hover:brightness-105 sm:text-lg"
+              >
+                💬 Book on WhatsApp Now
+              </a>
+              <a
+                href="tel:+919739362962"
+                className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-[#d48a52] bg-white/90 px-7 py-3 text-base font-bold text-[#7a3c16] shadow-[0_10px_24px_rgba(122,60,22,0.18)] transition hover:-translate-y-0.5 hover:bg-white sm:text-lg"
+              >
+                📞 Call Pandit Instantly
+              </a>
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="rounded-full border border-[#f4b37f] bg-[#fff3e8] px-4 py-1.5 text-sm font-semibold text-[#9a4e1f]">
+                Available Today
+              </span>
+              <span className="rounded-full border border-[#f4b37f] bg-[#fff3e8] px-4 py-1.5 text-sm font-semibold text-[#9a4e1f]">
+                Quick Booking in 30 Minutes
+              </span>
+            </div>
+
             <form
               onSubmit={handleSearchSubmit}
               className="mt-8 rounded-3xl border border-[#e7d2bf] bg-white/80 p-4 shadow-[0_24px_60px_rgba(97,55,22,0.18)] backdrop-blur-md"
