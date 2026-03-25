@@ -849,11 +849,11 @@ module.exports = [
         "packages": [
           {
             "name": "Standard",
-            "price": 5800,
+            "price": 5200,
             "includesSamagri": true,
-            "pandits": "1 Panditji + All Puja Samagri",
+            "pandits": "1 Panditji + All Puja Samagries",
             "procedure": [
-              "Swasti Vachanam",
+              "Swasti vachanam",
               "Maha Sankalp",
               "Ganapathi Puja",
               "Punyaha Vachanam",
@@ -862,7 +862,7 @@ module.exports = [
             ],
             "inclusions": [
               "Dakshina",
-              "All Puja Samagri"
+              "All Puja Samagries"
             ],
             "addOns": [
               {
