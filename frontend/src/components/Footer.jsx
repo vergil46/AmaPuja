@@ -98,6 +98,10 @@ function Footer() {
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-orange-500/15 text-base">✉️</span>
                 support@pujasamriddhi.com
               </a>
+              <a href="mailto:pujasamriddhi@gmail.com" className="flex items-center gap-2.5 text-white/65 transition hover:text-orange-300">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-orange-500/15 text-base">✉️</span>
+                pujasamriddhi@gmail.com
+              </a>
               <a href="https://www.pujasamriddhi.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 text-white/65 transition hover:text-orange-300">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-orange-500/15 text-base">🌐</span>
                 www.pujasamriddhi.com
