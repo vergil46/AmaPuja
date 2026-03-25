@@ -59,7 +59,7 @@ function InactivityWarningModal() {
   const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/45 px-4">
+    <div className="fixed inset-0 z-120 flex items-center justify-center bg-black/45 px-4">
       <div className="w-full max-w-md rounded-2xl border border-amber-200 bg-white p-6 shadow-2xl">
         <h2 className="text-2xl font-semibold text-stone-900">Session Timeout Warning</h2>
         <p className="mt-3 text-sm text-stone-700">
@@ -127,11 +127,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route
             path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
+            element={<DashboardPage />}
           />
           <Route
             path="/admin"

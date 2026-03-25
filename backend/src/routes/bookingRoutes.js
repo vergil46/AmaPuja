@@ -388,6 +388,35 @@ router.get('/my', protect, async (req, res) => {
 });
 
 /**
+ * TRACK BOOKINGS (NO LOGIN REQUIRED)
+ */
+router.post('/track', async (req, res) => {
+  try {
+    const email = normalizeEmail(req.body?.email);
+    const phone = normalizePhone(req.body?.phone);
+
+    if (!email || !phone || phone.length < 10) {
+      return res.status(400).json({ message: 'Email and valid phone are required to track bookings' });
+    }
+
+    const bookings = await Booking.find({
+      email: new RegExp(`^${escapeRegex(email)}$`, 'i'),
+    })
+      .populate('poojaId')
+      .sort({ createdAt: -1 });
+
+    const matched = bookings.filter((booking) => normalizePhone(booking.phone) === phone);
+
+    return res.json(matched.map(withBookingDefaults));
+  } catch (error) {
+    console.error('Track booking error:', error);
+    return res
+      .status(500)
+      .json({ message: error.message || 'Failed to track bookings' });
+  }
+});
+
+/**
  * USER: CANCEL OWN BOOKING
  */
 router.patch('/:id/cancel', protect, async (req, res) => {

@@ -131,8 +131,6 @@ export function AuthProvider({ children }) {
         inactivityTimeoutRef.current = null
       }
       clearWarningTimers()
-      setShowInactivityWarning(false)
-      setSecondsUntilAutoLogout(WARNING_LEAD_MS / 1000)
       return
     }
 
@@ -142,12 +140,16 @@ export function AuthProvider({ children }) {
       window.addEventListener(eventName, resetInactivityTimer)
     })
 
-    resetInactivityTimer()
+    const initialResetTimeout = window.setTimeout(() => {
+      resetInactivityTimer()
+    }, 0)
 
     return () => {
       activityEvents.forEach((eventName) => {
         window.removeEventListener(eventName, resetInactivityTimer)
       })
+
+      clearTimeout(initialResetTimeout)
 
       if (inactivityTimeoutRef.current) {
         clearTimeout(inactivityTimeoutRef.current)

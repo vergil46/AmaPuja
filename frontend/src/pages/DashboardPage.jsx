@@ -1,20 +1,34 @@
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import Seo from '../components/Seo'
 import api from '../services/api'
 import { DashboardSkeleton } from '../components/LoadingSkeleton'
+import { useAuth } from '../context/useAuth'
 
 function DashboardPage() {
+  const { token } = useAuth()
+  const isLoggedIn = Boolean(token)
   const location = useLocation()
   const [bookings, setBookings] = useState([])
   const [feedbacks, setFeedbacks] = useState([])
   const [feedbackForm, setFeedbackForm] = useState({})
   const [feedbackSubmittingById, setFeedbackSubmittingById] = useState({})
   const [feedbackMessage, setFeedbackMessage] = useState({ type: '', text: '' })
+  const [trackForm, setTrackForm] = useState({ email: '', phone: '' })
+  const [trackError, setTrackError] = useState('')
+  const [tracking, setTracking] = useState(false)
+  const [hasTracked, setHasTracked] = useState(false)
   const [cancelLoadingById, setCancelLoadingById] = useState({})
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      setBookings([])
+      setFeedbacks([])
+      setIsLoading(false)
+      return
+    }
+
     setIsLoading(true)
     Promise.allSettled([api.get('/bookings/my'), api.get('/feedback/my')])
       .then(([bookingResult, feedbackResult]) => {
@@ -31,7 +45,7 @@ function DashboardPage() {
         }
       })
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [isLoggedIn])
 
   const feedbackByBookingId = Object.fromEntries(feedbacks.map((item) => [item.bookingId, item]))
 
@@ -137,6 +151,8 @@ function DashboardPage() {
   }
 
   const handleCancelBooking = async (bookingId) => {
+    if (!isLoggedIn) return
+
     setFeedbackMessage({ type: '', text: '' })
     setCancelLoadingById((prev) => ({ ...prev, [bookingId]: true }))
     try {
@@ -154,6 +170,35 @@ function DashboardPage() {
       setFeedbackMessage({ type: 'error', text: error?.response?.data?.message || 'Failed to cancel booking.' })
     } finally {
       setCancelLoadingById((prev) => ({ ...prev, [bookingId]: false }))
+    }
+  }
+
+  const handleGuestTrack = async (event) => {
+    event.preventDefault()
+    if (tracking) return
+
+    setTrackError('')
+    setFeedbackMessage({ type: '', text: '' })
+
+    const email = String(trackForm.email || '').trim().toLowerCase()
+    const phone = String(trackForm.phone || '').replace(/\D/g, '')
+
+    if (!email || !phone || phone.length < 10) {
+      setTrackError('Enter the same email and 10-digit phone number used at booking time.')
+      return
+    }
+
+    setTracking(true)
+    setHasTracked(true)
+
+    try {
+      const response = await api.post('/bookings/track', { email, phone })
+      setBookings(Array.isArray(response.data) ? response.data : [])
+    } catch (error) {
+      setBookings([])
+      setTrackError(error?.response?.data?.message || 'Unable to track booking right now. Please try again.')
+    } finally {
+      setTracking(false)
     }
   }
 
@@ -196,12 +241,81 @@ function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-stone-800">My Dashboard</h1>
-          <p className="text-stone-600 mt-1">Manage your bookings and feedback</p>
+          <h1 className="text-3xl font-bold text-stone-800">{isLoggedIn ? 'My Dashboard' : 'Track Booking Status'}</h1>
+          <p className="text-stone-600 mt-1">
+            {isLoggedIn
+              ? 'Manage your bookings and feedback'
+              : 'Login is optional. Track your booking with email and phone.'}
+          </p>
         </div>
       </div>
 
+      {!isLoggedIn && (
+        <div className="mb-8 overflow-hidden rounded-2xl border border-orange-200/80 bg-linear-to-br from-orange-50 via-amber-50 to-white shadow-sm">
+          <div className="border-b border-orange-200/70 bg-white/70 px-4 py-3 sm:px-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-orange-700">Guest Access</p>
+            <h2 className="mt-1 text-lg font-semibold text-stone-900 sm:text-xl">Track Your Booking Instantly</h2>
+            <p className="mt-1 text-sm text-stone-600">Use the same contact details used during booking. No login required.</p>
+          </div>
+
+          <div className="px-4 py-4 sm:px-5 sm:py-5">
+            <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]" onSubmit={handleGuestTrack}>
+              <label className="space-y-1.5">
+                <span className="text-xs font-semibold text-stone-700">Booking Email</span>
+                <input
+                  type="email"
+                  className="w-full rounded-xl border border-orange-200 bg-white px-3 py-2.5 text-sm text-stone-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+                  placeholder="you@example.com"
+                  value={trackForm.email}
+                  onChange={(event) => setTrackForm((prev) => ({ ...prev, email: event.target.value }))}
+                  required
+                />
+              </label>
+
+              <label className="space-y-1.5">
+                <span className="text-xs font-semibold text-stone-700">Booking Phone</span>
+                <input
+                  type="tel"
+                  className="w-full rounded-xl border border-orange-200 bg-white px-3 py-2.5 text-sm text-stone-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+                  placeholder="10-digit number"
+                  value={trackForm.phone}
+                  onChange={(event) => setTrackForm((prev) => ({ ...prev, phone: event.target.value }))}
+                  required
+                />
+              </label>
+
+              <button
+                type="submit"
+                disabled={tracking}
+                className="self-end rounded-xl bg-linear-to-r from-orange-700 via-orange-600 to-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-105 disabled:opacity-60"
+              >
+                {tracking ? 'Tracking...' : 'Track Status'}
+              </button>
+            </form>
+
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-stone-600">
+              <span className="rounded-full border border-orange-200 bg-white px-2.5 py-1">Private lookup</span>
+              <span className="rounded-full border border-orange-200 bg-white px-2.5 py-1">Real-time status</span>
+              <span className="rounded-full border border-orange-200 bg-white px-2.5 py-1">No account required</span>
+            </div>
+
+            {trackError && <p className="mt-3 text-sm font-medium text-red-700">{trackError}</p>}
+            {!trackError && hasTracked && bookings.length === 0 && (
+              <p className="mt-3 text-sm font-medium text-stone-700">No bookings found for the provided details.</p>
+            )}
+
+            <p className="mt-4 text-sm text-stone-600">
+              Want cancellation and feedback options?
+              <Link to="/login" className="ml-1 font-semibold text-orange-700 hover:text-orange-800">
+                Login to your dashboard
+              </Link>
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Stats Cards */}
+      {isLoggedIn && (
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white border border-stone-200 rounded-xl p-5 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
@@ -259,19 +373,39 @@ function DashboardPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Bookings Table */}
       <div id="bookings" className="bg-white border border-stone-200 rounded-xl overflow-hidden mb-8 scroll-mt-28">
-        <div className="bg-stone-50 px-6 py-4 border-b border-stone-200">
-          <h2 className="text-lg font-semibold text-stone-800">Recent Bookings</h2>
+        <div
+          className={`px-6 py-4 border-b ${
+            isLoggedIn
+              ? 'bg-stone-50 border-stone-200'
+              : 'bg-linear-to-r from-amber-50 via-orange-50 to-white border-orange-200/80'
+          }`}
+        >
+          <h2 className="text-lg font-semibold text-stone-800">
+            {isLoggedIn ? 'Recent Bookings' : 'Tracking Results'}
+          </h2>
+          {!isLoggedIn && (
+            <p className="mt-1 text-xs font-medium text-stone-600">
+              {hasTracked ? 'Showing bookings matched with your email and phone.' : 'Run a lookup above to see your booking timeline.'}
+            </p>
+          )}
         </div>
         {bookings.length === 0 ? (
           <div className="p-8 text-center">
             <svg className="w-16 h-16 mx-auto text-stone-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            <p className="text-stone-600">No bookings yet</p>
-            <p className="text-sm text-stone-500 mt-1">Start by booking a puja service</p>
+            <p className="text-stone-600">{isLoggedIn ? 'No bookings yet' : hasTracked ? 'No booking matched' : 'No lookup yet'}</p>
+            <p className="text-sm text-stone-500 mt-1">
+              {isLoggedIn
+                ? 'Start by booking a puja service'
+                : hasTracked
+                  ? 'Please verify email and phone entered above.'
+                  : 'Enter booking email and phone above to track status.'}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -328,7 +462,7 @@ function DashboardPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      {['pending', 'confirmed'].includes(normalizeBookingStatus(booking.bookingStatus)) ? (
+                      {isLoggedIn && ['pending', 'confirmed'].includes(normalizeBookingStatus(booking.bookingStatus)) ? (
                         <button
                           onClick={() => handleCancelBooking(booking._id)}
                           disabled={Boolean(cancelLoadingById[booking._id])}
@@ -349,6 +483,7 @@ function DashboardPage() {
       </div>
 
       {/* Feedback Section */}
+      {isLoggedIn && (
       <div id="feedback" className="bg-white border border-stone-200 rounded-xl p-6 scroll-mt-28">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -423,6 +558,7 @@ function DashboardPage() {
           </div>
         )}
       </div>
+      )}
     </section>
   )
 }

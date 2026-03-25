@@ -1,10 +1,9 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { getPoojaImage } from '../assets/poojaImageMap'
 import Seo from '../components/Seo'
 import api from '../services/api'
 import { PoojaDetailSkeleton } from '../components/LoadingSkeleton'
-import { useAuth } from '../context/useAuth'
 import { trackGoogleAdsConversion } from '../utils/googleAds'
 
 const FUNNEL_SESSION_KEY = 'pujasamriddhi_funnel_session'
@@ -51,8 +50,6 @@ function DetailInfoCard({ icon, title, items }) {
 function PoojaDetailPage() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
-  const { token } = useAuth()
 
   const languageQuery = String(
     searchParams.get('language') || ''
@@ -645,11 +642,6 @@ function PoojaDetailPage() {
     setBookingMessage('')
     if (isSubmitting) return
 
-    if (!token) {
-      navigate('/login')
-      return
-    }
-
     if (!isPrimaryFormValid) {
       setBookingMessage(quickValidationMessage || 'Please correct highlighted fields before continuing.')
       return
@@ -749,7 +741,7 @@ function PoojaDetailPage() {
 
       if (form.paymentOption === 'pay-after-pooja') {
         trackGoogleAdsConversion()
-        setBookingMessage('Booking placed successfully.')
+        setBookingMessage('Booking placed successfully. Track status from Dashboard using email + phone, or login for full account access.')
         trackFunnelEvent('payment_success', { flow: 'pay-after-pooja' })
         if (typeof window !== 'undefined') {
           localStorage.removeItem(draftStorageKey)
@@ -790,7 +782,7 @@ function PoojaDetailPage() {
           await api.post('/payments/verify', response)
           trackGoogleAdsConversion()
           setBookingMessage(
-            'Booking and payment completed successfully.'
+            'Booking and payment completed successfully. Track status from Dashboard using email + phone, or login for full account access.'
           )
           trackFunnelEvent('payment_success', { flow: form.paymentOption })
           if (typeof window !== 'undefined') {
