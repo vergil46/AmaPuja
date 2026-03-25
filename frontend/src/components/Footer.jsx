@@ -3,6 +3,36 @@ import api from '../services/api'
 import { useState } from 'react'
 import Logo from './Logo'
 
+const StarIcon = () => (
+  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M12 3.75L14.55 8.92L20.25 9.75L16.12 13.78L17.1 19.45L12 16.77L6.9 19.45L7.88 13.78L3.75 9.75L9.45 8.92L12 3.75Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+const RefundIcon = () => (
+  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M8 7H18C19.66 7 21 8.34 21 10V16C21 17.66 19.66 19 18 19H8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    <path d="M11 4L8 7L11 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M6 15H14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+)
+
+const ShieldIcon = () => (
+  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M12 3L19 6V11.5C19 16.1 15.95 20.35 12 21C8.05 20.35 5 16.1 5 11.5V6L12 3Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9.25 12.25L11 14L14.75 10.25" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+const DocumentIcon = () => (
+  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M8 3H14L19 8V20H8C6.9 20 6 19.1 6 18V5C6 3.9 6.9 3 8 3Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M14 3V8H19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9.5 12H15.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    <path d="M9.5 15.5H14" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+)
+
 function Footer() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
   const [submitStatus, setSubmitStatus] = useState({ type: '', text: '' })
@@ -53,8 +83,8 @@ function Footer() {
             className="rounded-2xl border border-white/10 p-5 backdrop-blur-sm sm:p-6"
             style={{ background: 'rgba(255,255,255,0.04)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)' }}
           >
-            <Logo variant="default" className="[&_path]:fill-orange-400 [&_circle]:fill-orange-300 [&_span]:text-orange-100" />
-            <p className="mt-4 text-sm leading-relaxed text-white/55">
+            <Logo variant="default" theme="light" />
+            <p className="mt-4 text-sm leading-relaxed text-white/72">
               Trusted priests, transparent packages, and smooth ritual booking for families across Bangalore &amp; Bhubaneswar.
             </p>
 
@@ -117,31 +147,31 @@ function Footer() {
             className="rounded-2xl border border-white/10 p-5 backdrop-blur-sm sm:p-6"
             style={{ background: 'rgba(255,255,255,0.04)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)' }}
           >
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-purple-400">Navigate</p>
-            <h4 className="text-base font-bold text-white sm:text-lg">Quick Links</h4>
+            <p className="mb-1 text-xs font-bold uppercase tracking-widest text-amber-300">Navigate</p>
+            <h4 className="text-base font-bold sm:text-lg" style={{ color: '#fff' }}>Quick Links</h4>
             <div className="mt-5 space-y-1.5">
               {[
-                { to: '/ratings', label: 'Ratings & Reviews', icon: '⭐' },
-                { to: '/refund-policy', label: 'Refund Policy', icon: '↩️' },
-                { to: '/privacy-policy', label: 'Privacy Policy', icon: '🔒' },
-                { to: '/terms-and-conditions', label: 'Terms & Conditions', icon: '📄' },
+                { to: '/ratings', label: 'Ratings & Reviews', icon: <StarIcon /> },
+                { to: '/refund-policy', label: 'Refund Policy', icon: <RefundIcon /> },
+                { to: '/privacy-policy', label: 'Privacy Policy', icon: <ShieldIcon /> },
+                { to: '/terms-and-conditions', label: 'Terms & Conditions', icon: <DocumentIcon /> },
               ].map(({ to, label, icon }) => (
                 <Link
                   key={to}
                   to={to}
-                  className="flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm text-white/60 transition hover:border-white/12 hover:bg-white/6 hover:text-white"
+                  className="group flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm text-white/78 transition hover:border-white/20 hover:bg-white/8 hover:text-white"
                 >
-                  <span className="text-base">{icon}</span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-amber-300/30 bg-amber-400/10 text-amber-200 transition group-hover:border-amber-200/60 group-hover:bg-amber-300/15 group-hover:text-amber-100">{icon}</span>
                   {label}
-                  <span className="ml-auto text-white/25">›</span>
+                  <span className="ml-auto text-white/35">›</span>
                 </Link>
               ))}
             </div>
 
             {/* Mini trust strip */}
             <div className="mt-6 rounded-xl border border-orange-400/20 p-4" style={{ background: 'rgba(234,88,12,0.07)' }}>
-              <p className="text-xs font-semibold text-orange-300">Why families trust us</p>
-              <ul className="mt-2 space-y-1.5 text-xs text-white/50">
+              <p className="text-xs font-semibold text-orange-200">Why families trust us</p>
+              <ul className="mt-2 space-y-1.5 text-xs text-white/72">
                 <li className="flex items-center gap-2"><span className="text-orange-400">✓</span> Verified &amp; experienced pandits</li>
                 <li className="flex items-center gap-2"><span className="text-orange-400">✓</span> Transparent package pricing</li>
                 <li className="flex items-center gap-2"><span className="text-orange-400">✓</span> Secure Razorpay payment</li>
@@ -154,8 +184,8 @@ function Footer() {
             className="rounded-2xl border border-white/10 p-5 backdrop-blur-sm sm:p-6"
             style={{ background: 'rgba(255,255,255,0.04)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)' }}
           >
-            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-purple-400">Get in touch</p>
-            <h4 className="text-base font-bold text-white sm:text-lg">Enquiry Form</h4>
+            <p className="mb-1 text-xs font-bold uppercase tracking-widest text-amber-300">Get in touch</p>
+            <h4 className="text-base font-bold sm:text-lg" style={{ color: '#fff' }}>Enquiry Form</h4>
             <form onSubmit={handleSubmit} className="mt-5 space-y-3">
               {[
                 { key: 'name',  placeholder: 'Your Name',     type: 'text'  },
@@ -169,7 +199,7 @@ function Footer() {
                   required
                   value={form[key]}
                   onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                  className="w-full rounded-xl border border-white/10 bg-white/6 px-3.5 py-2.5 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-purple-400/50 focus:ring-2 focus:ring-purple-400/20"
+                  className="w-full rounded-xl border border-white/20 bg-white/8 px-3.5 py-2.5 text-sm text-white placeholder:text-white/65 outline-none transition focus:border-amber-300/60 focus:ring-2 focus:ring-amber-300/25"
                 />
               ))}
               <textarea
@@ -178,7 +208,7 @@ function Footer() {
                 rows={3}
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                className="w-full resize-none rounded-xl border border-white/10 bg-white/6 px-3.5 py-2.5 text-sm text-white placeholder:text-white/35 outline-none transition focus:border-purple-400/50 focus:ring-2 focus:ring-purple-400/20"
+                className="w-full resize-none rounded-xl border border-white/20 bg-white/8 px-3.5 py-2.5 text-sm text-white placeholder:text-white/65 outline-none transition focus:border-amber-300/60 focus:ring-2 focus:ring-amber-300/25"
               />
               <button
                 disabled={isSubmitting}
@@ -200,10 +230,10 @@ function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/8 py-4" style={{ background: 'rgba(0,0,0,0.3)' }}>
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 sm:flex-row">
-          <p className="text-xs text-white/35">
+          <p className="text-sm text-white/65">
             © {new Date().getFullYear()} Puja Samriddhi. All rights reserved.
           </p>
-          <div className="flex items-center gap-1.5 text-xs text-white/30">
+          <div className="flex items-center gap-1.5 text-sm text-white/60">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
             All systems operational
           </div>

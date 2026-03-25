@@ -749,7 +749,7 @@ function ServicesPage() {
 
       <div className="overflow-hidden rounded-3xl border border-orange-100 bg-linear-to-br from-white via-orange-50/40 to-amber-50/60 shadow-sm">
         <div className="px-5 py-7 sm:px-7 sm:py-8">
-          <p className="text-xs font-medium uppercase tracking-widest text-orange-700">Sacred Services</p>
+          <p className="text-sm font-medium uppercase tracking-widest text-orange-700">Sacred Services</p>
           <h1 className="mt-2 text-2xl font-semibold leading-tight text-stone-900 sm:text-4xl">Find the Right Puja in Seconds</h1>
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-stone-600">
             Modern booking experience with verified priests, language preference, and city-wise availability.
@@ -757,19 +757,19 @@ function ServicesPage() {
 
           <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
             <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
-              <p className="text-xs text-stone-500">Available Services</p>
+              <p className="text-sm text-stone-600">Available Services</p>
               <p className="mt-1 text-lg font-semibold text-stone-900">{isLoading ? '...' : displayPoojas.length}</p>
             </div>
             <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
-              <p className="text-xs text-stone-500">Selected City</p>
+              <p className="text-sm text-stone-600">Selected City</p>
               <p className="mt-1 text-lg font-semibold text-stone-900">{selectedCity}</p>
             </div>
             <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
-              <p className="text-xs text-stone-500">Priest Language</p>
+              <p className="text-sm text-stone-600">Priest Language</p>
               <p className="mt-1 text-lg font-semibold text-stone-900">{priestPreference}</p>
             </div>
             <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
-              <p className="text-xs text-stone-500">Coverage</p>
+              <p className="text-sm text-stone-600">Coverage</p>
               <p className="mt-1 text-lg font-semibold text-stone-900">{selectedLanguageCount || 'All'} Poojas</p>
             </div>
           </div>
@@ -844,7 +844,7 @@ function ServicesPage() {
           <button
             type="button"
             onClick={() => setReloadNonce((value) => value + 1)}
-            className="self-start rounded-md border border-orange-300 bg-white px-3 py-1.5 text-xs font-semibold text-orange-700 transition-colors hover:bg-orange-100 sm:self-auto"
+            className="self-start rounded-md border border-orange-300 bg-white px-3 py-1.5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-100 sm:self-auto"
           >
             Retry now
           </button>

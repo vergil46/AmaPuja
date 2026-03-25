@@ -747,7 +747,7 @@ function PoojaSeoLandingPage({ slug }) {
         structuredData={structuredData}
       />
 
-      <p className="text-xs font-semibold uppercase tracking-widest text-orange-700">{content.badge}</p>
+      <p className="text-sm font-semibold uppercase tracking-widest text-orange-700">{content.badge}</p>
       <h1 className="mt-2 text-3xl font-extrabold text-stone-900 sm:text-4xl">{content.h1 || content.heading}</h1>
       <p className="mt-4 max-w-4xl text-base leading-relaxed text-stone-700 sm:text-lg">{content.description}</p>
       <p className="mt-3 max-w-4xl text-base leading-relaxed text-stone-700">{content.intro}</p>
@@ -798,9 +798,9 @@ function PoojaSeoLandingPage({ slug }) {
       </div>
 
       <div className="mt-10 rounded-3xl border border-orange-100 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 px-6 py-8 text-stone-900 shadow-lg sm:px-8">
-        <p className="text-xs font-semibold uppercase tracking-widest text-orange-700">Book With Puja Samriddhi</p>
+        <p className="text-sm font-semibold uppercase tracking-widest text-orange-700">Book With Puja Samriddhi</p>
         <h2 className="mt-2 text-2xl font-bold text-stone-900 sm:text-3xl">Plan your puja with clearer steps and faster support</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-stone-700 sm:text-base">
+        <p className="mt-3 max-w-3xl text-base leading-relaxed text-stone-700 sm:text-lg">
           Choose the ritual you need, check packages, and move forward with an easier priest booking flow for your family ceremony.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">

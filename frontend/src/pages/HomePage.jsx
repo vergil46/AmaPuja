@@ -186,7 +186,7 @@ function HomePage() {
         <div className="mx-auto max-w-6xl">
           <div className="flex items-end justify-between gap-4 animate-fade-up" style={{ animationDelay: '0.1s' }}>
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-orange-500">Why choose us</p>
+              <p className="text-sm font-semibold uppercase tracking-widest text-orange-600">Why choose us</p>
               <h2 className="mt-1 text-xl font-bold text-stone-900 sm:text-3xl">Why Families Choose Puja Samriddhi</h2>
             </div>
             <Link to="/services" className="hidden text-sm font-semibold text-orange-600 hover:text-orange-700 sm:inline-flex">
@@ -239,7 +239,7 @@ function HomePage() {
                   {icon}
                 </div>
                 <h3 className="mb-2 text-lg font-bold text-stone-900">{title}</h3>
-                <p className="text-sm leading-relaxed text-stone-500">{desc}</p>
+                <p className="text-base leading-relaxed text-stone-600">{desc}</p>
               </article>
             ))}
           </div>

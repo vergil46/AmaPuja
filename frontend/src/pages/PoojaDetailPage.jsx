@@ -935,13 +935,13 @@ function PoojaDetailPage() {
                       : 'border-white/10 bg-white/5 hover:border-white/20'
                   }`}
                 >
-                  <div className="mb-2 text-xs font-bold uppercase tracking-widest text-white/45">
+                  <div className="mb-2 text-sm font-bold uppercase tracking-widest text-white/72">
                     {pkg.name}
                   </div>
                   <div className="text-3xl font-extrabold text-white sm:text-4xl">
                     ₹{Number(pkg.price).toLocaleString('en-IN')}
                   </div>
-                  <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-white/55">
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-white/72">
                     {pkg.description || descriptionPreview || 'Premium pooja service with experienced pandit'}
                   </p>
                   <button
@@ -954,7 +954,7 @@ function PoojaDetailPage() {
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setSelectedPackage(pkg.name); scrollToBookingForm() }}
-                    className="mt-2 w-full text-center text-xs text-white/45 underline underline-offset-2 hover:text-white/80 transition"
+                    className="mt-2 w-full text-center text-sm text-white/72 underline underline-offset-2 hover:text-white transition"
                   >
                     Enquire
                   </button>
@@ -997,7 +997,7 @@ function PoojaDetailPage() {
                       }}
                     />
                     {addon.name}
-                    <span className="text-white/40">+₹{addon.price}</span>
+                    <span className="text-white/72">+₹{addon.price}</span>
                   </label>
                 )
               })}
@@ -1033,13 +1033,13 @@ function PoojaDetailPage() {
           <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
             {isBengaliVivahEnquiryOnly ? 'Send Enquiry' : 'Enter Your Details'}
           </h2>
-          <p className="mt-1 text-sm text-white/60">
+          <p className="mt-1 text-base text-white/75">
             {isBengaliVivahEnquiryOnly
               ? 'Share your event details and get a personalised quote.'
               : 'Secure your puja booking in just a few steps.'}
           </p>
 
-          <div className="mt-3 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-xs text-emerald-300 sm:text-sm">
+          <div className="mt-3 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-200 sm:text-base">
             Verified Priests • 1000+ Rituals Completed • Secure Payment
           </div>
 
@@ -1048,9 +1048,9 @@ function PoojaDetailPage() {
               <div className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm text-white/80">
                 Payable Now ({payableLabel}): <span className="font-bold text-white">₹{payableAmount.toLocaleString('en-IN')}</span>
               </div>
-              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/55">
+              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/75">
                 Package ₹{basePackagePrice.toLocaleString('en-IN')} + Add-ons ₹{addOnTotal.toLocaleString('en-IN')} =
-                <span className="font-semibold text-white/80"> ₹{packagePrice.toLocaleString('en-IN')}</span>
+                <span className="font-semibold text-white"> ₹{packagePrice.toLocaleString('en-IN')}</span>
               </div>
             </div>
           )}
@@ -1067,23 +1067,23 @@ function PoojaDetailPage() {
           >
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Full Name *</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">Full Name *</label>
                 <input className={fieldClass} placeholder="Full Name" required value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })} />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Phone Number *</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">Phone Number *</label>
                 <input className={fieldClass} placeholder="Phone Number" required value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })} />
               </div>
             </div>
 
             {quickValidationMessage && (
-              <p className="text-xs text-red-400">{quickValidationMessage}</p>
+              <p className="text-sm text-red-300">{quickValidationMessage}</p>
             )}
 
             <div>
-              <label className="mb-1 block text-xs font-medium text-white/55">Email *</label>
+              <label className="mb-1 block text-sm font-medium text-white/80">Email *</label>
               <input className={fieldClass} type="email" placeholder="Email Address" required value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </div>
@@ -1098,34 +1098,34 @@ function PoojaDetailPage() {
             </button>
 
             {locationMessage && (
-              <p className={`text-xs ${
+              <p className={`text-sm ${
                 locationMessage.toLowerCase().includes('successfully') ? 'text-green-400' : 'text-red-400'
               }`}>{locationMessage}</p>
             )}
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">House / Flat No. *</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">House / Flat No. *</label>
                 <input className={fieldClass} placeholder="House / Flat No." required value={form.house}
                   onChange={(e) => setForm({ ...form, house: e.target.value })} />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Street / Area *</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">Street / Area *</label>
                 <input className={fieldClass} placeholder="Street / Area" required value={form.street}
                   onChange={(e) => setForm({ ...form, street: e.target.value })} />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">City *</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">City *</label>
                 <input className={fieldClass} placeholder="City" required value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })} />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Pincode *</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">Pincode *</label>
                 <input className={fieldClass} placeholder="Pincode" required value={form.pincode}
                   onChange={(e) => setForm({ ...form, pincode: e.target.value })} />
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs font-medium text-white/55">State *</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">State *</label>
                 <input className={fieldClass} placeholder="State" required value={form.state}
                   onChange={(e) => setForm({ ...form, state: e.target.value })} />
               </div>
@@ -1133,7 +1133,7 @@ function PoojaDetailPage() {
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Priest Language</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">Priest Language</label>
                 <select className={fieldClass} value={form.priestPreference}
                   onChange={(e) => setForm({ ...form, priestPreference: e.target.value })}>
                   <option value="" className="bg-[#2a1709]">Select Language</option>
@@ -1143,7 +1143,7 @@ function PoojaDetailPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Preferred Time</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">Preferred Time</label>
                 <input className={fieldClass} type="time" value={form.time}
                   onChange={(e) => setForm({ ...form, time: e.target.value })} />
               </div>
@@ -1151,19 +1151,19 @@ function PoojaDetailPage() {
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Date *</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">Date *</label>
                 <input className={fieldClass} type="date" required value={form.date}
                   onChange={(e) => setForm({ ...form, date: e.target.value })} />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Full Address *</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">Full Address *</label>
                 <input className={fieldClass} placeholder="Full Address" required value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })} />
               </div>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-medium text-white/55">Special Requirements (optional)</label>
+              <label className="mb-1 block text-sm font-medium text-white/80">Special Requirements (optional)</label>
               <textarea className={fieldClass} rows={3} placeholder="Special requirements…"
                 value={form.specialNotes}
                 onChange={(e) => setForm({ ...form, specialNotes: e.target.value })} />
@@ -1171,7 +1171,7 @@ function PoojaDetailPage() {
 
             {!isBengaliVivahEnquiryOnly && (
               <div>
-                <label className="mb-1 block text-xs font-medium text-white/55">Payment Option</label>
+                <label className="mb-1 block text-sm font-medium text-white/80">Payment Option</label>
                 <select className={fieldClass} value={form.paymentOption}
                   onChange={(e) => setForm({ ...form, paymentOption: e.target.value })}>
                   <option value="full" className="bg-[#2a1709]">Full Payment</option>
