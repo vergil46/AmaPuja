@@ -18,8 +18,8 @@ function Header() {
   const accountInitial = (user?.name?.trim()?.[0] || user?.email?.trim()?.[0] || accountLabel?.[0] || 'A').toUpperCase()
 
   const navClass = ({ isActive }) =>
-    `text-sm md:text-[15px] font-medium px-2.5 py-1.5 rounded-md transition-colors ${
-      isActive ? 'text-orange-800 bg-orange-100/80' : 'text-stone-700 hover:text-orange-700 hover:bg-orange-50'
+    `whitespace-nowrap text-sm md:text-[14px] lg:text-[15px] font-medium px-2.5 py-1.5 rounded-lg transition-colors ${
+      isActive ? 'text-orange-800 bg-orange-100/90' : 'text-stone-700 hover:text-orange-700 hover:bg-orange-50'
     }`
 
   const mobileNavClass = ({ isActive }) =>
@@ -61,11 +61,11 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-orange-100/90 bg-white/92 backdrop-blur-xl shadow-sm transition-shadow">
-      <div className="max-w-6xl mx-auto px-3.5 sm:px-4 py-3.5 sm:py-4 flex items-center justify-between gap-3">
+      <div className="max-w-6xl mx-auto px-3.5 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3">
         <Link to="/" onClick={closeMobileMenu} className="shrink-0 flex items-center">
           <Logo variant="default" className="scale-95 origin-left" />
         </Link>
-        <nav className="hidden md:flex items-center gap-2 rounded-full border border-orange-100 bg-white px-3 py-2 shadow-sm">
+        <nav className="hidden md:flex items-center gap-1.5 rounded-full border border-orange-200/80 bg-white/95 px-3 py-1.5 shadow-sm">
           <NavLink to="/" className={navClass}>
             {t('home')}
           </NavLink>
@@ -93,8 +93,8 @@ function Header() {
           )}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-          <div className="flex items-center gap-2 rounded-2xl border border-orange-200/80 bg-linear-to-r from-orange-50 via-amber-50 to-orange-50 px-2 py-1.5 shadow-sm animate-fade-up" style={{ animationDelay: '0.04s' }}>
-            <div className="rounded-xl border border-orange-200/80 bg-white/90 px-1.5 py-1 shadow-xs">
+          <div className="flex items-center gap-2 rounded-2xl border border-orange-200/80 bg-white/95 px-1.5 py-1.5 shadow-sm animate-fade-up" style={{ animationDelay: '0.04s' }}>
+            <div className="rounded-xl border border-orange-200/80 bg-white px-1.5 py-1 shadow-xs">
               <LanguageSwitcher />
             </div>
             {user ? (
@@ -171,13 +171,13 @@ function Header() {
               <>
                 <Link
                   to="/login"
-                  className="px-4 py-2 rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 text-white text-sm font-semibold shadow-md shadow-orange-400/30 hover:from-orange-700 hover:via-amber-600 hover:to-orange-600 transition-all"
+                  className="whitespace-nowrap px-4 py-2 rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 text-white text-sm font-semibold shadow-md shadow-orange-400/30 hover:from-orange-700 hover:via-amber-600 hover:to-orange-600 transition-all"
                 >
                   {t('login')} / {t('signup')}
                 </Link>
                 <Link
                   to="/admin-login"
-                  className="px-4 py-2 rounded-xl border border-stone-300 bg-white text-stone-700 text-sm font-semibold hover:bg-stone-50 transition-colors"
+                  className="whitespace-nowrap px-4 py-2 rounded-xl border border-stone-300 bg-white text-stone-700 text-sm font-semibold hover:bg-stone-50 transition-colors"
                 >
                   {t('admin')} {t('login')}
                 </Link>
