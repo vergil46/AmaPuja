@@ -28,7 +28,7 @@ function DetailInfoCard({ icon, title, items }) {
         <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-orange-500/20 text-lg" aria-hidden="true">
           {icon}
         </span>
-        <h3 className="text-base font-semibold text-white sm:text-lg">{title}</h3>
+        <h3 className="text-base font-semibold text-white! sm:text-lg">{title}</h3>
       </div>
       <ul className="space-y-2 text-sm leading-relaxed text-white/70 sm:text-[15px]">
         {items.map((item) => (
@@ -864,6 +864,50 @@ function PoojaDetailPage() {
     .filter(Boolean)
     .slice(0, 6)
 
+  const getPackageTier = (pkg, index) => {
+    const packageName = String(pkg?.name || '').toLowerCase()
+    const hasEliteKeyword = /premium|elite|signature|royal|grand|platinum|gold/i.test(packageName)
+    const hasClassicKeyword = /classic|standard|regular|silver/i.test(packageName)
+
+    if (hasEliteKeyword) {
+      return {
+        label: 'Premium Tier',
+        cardClass: 'border-amber-300/45 bg-linear-to-b from-amber-100/18 via-orange-200/8 to-white/6',
+        labelClass: 'border-amber-200/50 bg-amber-300/20 text-amber-100',
+        priceClass: 'text-amber-100',
+        ctaClass: 'bg-linear-to-r from-amber-500 via-orange-500 to-amber-400 hover:from-amber-400 hover:via-orange-400 hover:to-amber-300',
+      }
+    }
+
+    if (hasClassicKeyword) {
+      return {
+        label: 'Classic Tier',
+        cardClass: 'border-orange-300/35 bg-linear-to-b from-orange-200/12 via-orange-100/7 to-white/6',
+        labelClass: 'border-orange-200/45 bg-orange-300/20 text-orange-100',
+        priceClass: 'text-orange-50',
+        ctaClass: 'bg-linear-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400',
+      }
+    }
+
+    if (index === 0) {
+      return {
+        label: 'Essential Tier',
+        cardClass: 'border-slate-200/25 bg-linear-to-b from-slate-200/12 via-white/6 to-white/5',
+        labelClass: 'border-slate-200/35 bg-slate-300/15 text-slate-100',
+        priceClass: 'text-white',
+        ctaClass: 'bg-linear-to-r from-stone-600 to-stone-500 hover:from-stone-500 hover:to-stone-400',
+      }
+    }
+
+    return {
+      label: 'Enhanced Tier',
+      cardClass: 'border-orange-300/35 bg-linear-to-b from-orange-200/12 via-orange-100/7 to-white/6',
+      labelClass: 'border-orange-200/45 bg-orange-300/20 text-orange-100',
+      priceClass: 'text-orange-50',
+      ctaClass: 'bg-linear-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400',
+    }
+  }
+
   const fieldClass =
     'w-full rounded-xl border border-white/15 bg-white/10 px-3.5 py-3 text-base text-white placeholder:text-white/50 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-400/30 backdrop-blur-sm'
 
@@ -919,35 +963,69 @@ function PoojaDetailPage() {
             <p className="mt-2 leading-relaxed">Share your requirements and our team will contact you with package details, pandit availability, and final quote.</p>
           </div>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <>
+            <div className="mb-4 rounded-2xl border border-orange-200/20 bg-linear-to-r from-amber-500/10 via-orange-500/8 to-transparent p-4 text-sm text-white/82">
+              <p className="font-semibold text-amber-100">Choose Your Package</p>
+              <p className="mt-1 leading-relaxed">Each tier offers a different level of samagri, ritual depth, and pandit support. Compare inclusions and select the one that fits your family's ceremony needs.</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {activePackages.map((pkg, index) => {
               const isSelected = selectedPackage === pkg.name
-              const btnGradient = index === 0
-                ? 'bg-linear-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400'
-                : 'bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 hover:from-orange-500 hover:via-amber-500 hover:to-orange-400'
+              const tier = getPackageTier(pkg, index)
+              const inclusionsCount = Array.isArray(pkg?.inclusions) ? pkg.inclusions.filter(Boolean).length : 0
+              const stepsCount = Array.isArray(pkg?.procedure) ? pkg.procedure.filter(Boolean).length : 0
+              const hasAddOns = Array.isArray(pkg?.addOns) && pkg.addOns.length > 0
               return (
                 <div
                   key={pkg.name}
                   onClick={() => setSelectedPackage(pkg.name)}
-                  className={`relative cursor-pointer rounded-2xl border p-5 transition backdrop-blur-sm ${
+                  className={`relative cursor-pointer rounded-2xl border p-5 transition backdrop-blur-sm ${tier.cardClass} ${
                     isSelected
-                      ? 'border-white/30 bg-white/12 ring-2 ring-white/20'
-                      : 'border-white/10 bg-white/5 hover:border-white/20'
+                      ? 'ring-2 ring-amber-200/45 shadow-[0_10px_30px_rgba(251,191,36,0.14)]'
+                      : 'hover:border-white/30 hover:shadow-[0_8px_24px_rgba(255,255,255,0.08)]'
                   }`}
                 >
-                  <div className="mb-2 text-sm font-bold uppercase tracking-widest text-white/72">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest ${tier.labelClass}`}>
+                      {tier.label}
+                    </span>
+                    {isSelected && <span className="text-xs font-semibold text-emerald-300">Selected</span>}
+                  </div>
+
+                  <div className="mb-2 text-lg font-bold leading-tight text-white">
                     {pkg.name}
                   </div>
-                  <div className="text-3xl font-extrabold text-white sm:text-4xl">
+
+                  <div className={`text-3xl font-extrabold sm:text-4xl ${tier.priceClass}`}>
                     ₹{Number(pkg.price).toLocaleString('en-IN')}
                   </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                    {inclusionsCount > 0 && (
+                      <span className="rounded-full border border-white/20 bg-white/8 px-2.5 py-1 text-white/80">
+                        {inclusionsCount} inclusions
+                      </span>
+                    )}
+                    {stepsCount > 0 && (
+                      <span className="rounded-full border border-white/20 bg-white/8 px-2.5 py-1 text-white/80">
+                        {stepsCount} ritual steps
+                      </span>
+                    )}
+                    {hasAddOns && (
+                      <span className="rounded-full border border-orange-300/35 bg-orange-300/15 px-2.5 py-1 text-orange-100">
+                        Add-ons available
+                      </span>
+                    )}
+                  </div>
+
                   <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-white/72">
                     {pkg.description || descriptionPreview || 'Premium pooja service with experienced pandit'}
                   </p>
+
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); setSelectedPackage(pkg.name); scrollToBookingForm() }}
-                    className={`mt-4 w-full rounded-xl py-2.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition ${btnGradient}`}
+                    className={`mt-4 w-full rounded-xl py-2.5 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition ${tier.ctaClass}`}
                   >
                     Book Puja Now
                   </button>
@@ -961,14 +1039,23 @@ function PoojaDetailPage() {
                 </div>
               )
             })}
-          </div>
+            </div>
+          </>
         )}
 
         {/* Add-ons */}
         {!isBengaliVivahEnquiryOnly && availableAddOns.length > 0 && (
-          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-            <div className="mb-3 font-semibold text-white">Add-ons</div>
-            <div className="flex flex-wrap gap-2">
+          <div className="mt-5 rounded-2xl border border-white/12 bg-linear-to-br from-white/10 via-white/6 to-transparent p-4 backdrop-blur-sm sm:p-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-200/90">Customization</p>
+                <p className="text-base font-bold text-white">Enhance Your Puja</p>
+              </div>
+              <span className="rounded-full border border-orange-200/30 bg-orange-400/15 px-3 py-1 text-xs font-semibold text-orange-100">
+                Optional add-ons
+              </span>
+            </div>
+            <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
               {availableAddOns.map((addon) => {
                 const checked = selectedAddOns.some(
                   (item) => normalizeName(item) === normalizeName(addon.name)
@@ -976,28 +1063,36 @@ function PoojaDetailPage() {
                 return (
                   <label
                     key={addon.name}
-                    className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition ${
+                    className={`group flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 text-sm transition ${
                       checked
-                        ? 'border-orange-400 bg-orange-500/20 text-orange-200'
-                        : 'border-white/10 bg-white/5 text-white/65 hover:border-white/20'
+                        ? 'border-orange-300/70 bg-linear-to-r from-orange-500/25 to-amber-400/20 text-orange-100 shadow-[0_6px_18px_rgba(249,115,22,0.18)]'
+                        : 'border-white/12 bg-white/5 text-white/75 hover:border-white/30 hover:bg-white/8'
                     }`}
                   >
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-orange-500"
-                      checked={checked}
-                      onChange={() => {
-                        const addonName = String(addon.name || '').trim()
-                        const addonKey = normalizeName(addonName)
-                        setSelectedAddOns((previous) => {
-                          const exists = previous.some((item) => normalizeName(item) === addonKey)
-                          if (exists) return previous.filter((item) => normalizeName(item) !== addonKey)
-                          return [...previous, addonName]
-                        })
-                      }}
-                    />
-                    {addon.name}
-                    <span className="text-white/72">+₹{addon.price}</span>
+                    <div className="flex items-center gap-2.5">
+                      <input
+                        type="checkbox"
+                        className="h-3.5 w-3.5 accent-orange-500"
+                        checked={checked}
+                        onChange={() => {
+                          const addonName = String(addon.name || '').trim()
+                          const addonKey = normalizeName(addonName)
+                          setSelectedAddOns((previous) => {
+                            const exists = previous.some((item) => normalizeName(item) === addonKey)
+                            if (exists) return previous.filter((item) => normalizeName(item) !== addonKey)
+                            return [...previous, addonName]
+                          })
+                        }}
+                      />
+                      <span className="leading-tight">{addon.name}</span>
+                    </div>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                      checked
+                        ? 'bg-white/16 text-white'
+                        : 'bg-white/10 text-white/85 group-hover:bg-white/14'
+                    }`}>
+                      +₹{Number(addon.price).toLocaleString('en-IN')}
+                    </span>
                   </label>
                 )
               })}
@@ -1015,8 +1110,12 @@ function PoojaDetailPage() {
         )}
 
         {!isBengaliVivahEnquiryOnly && (
-          <div className="mt-4 text-sm font-semibold text-green-400">
-            Total Amount (Package + Add-ons): ₹{packagePrice.toLocaleString('en-IN')}
+          <div className="mt-4 rounded-xl border border-emerald-300/30 bg-emerald-500/12 px-4 py-3 text-sm text-emerald-100 shadow-[0_6px_18px_rgba(16,185,129,0.16)]">
+            <p className="font-medium text-emerald-200/95">Current Booking Total</p>
+            <p className="mt-0.5 text-base font-bold text-emerald-100">
+              ₹{packagePrice.toLocaleString('en-IN')}
+              <span className="ml-2 text-xs font-medium text-emerald-200/90">(Package + Add-ons)</span>
+            </p>
           </div>
         )}
       </section>
@@ -1029,8 +1128,8 @@ function PoojaDetailPage() {
           <div className="absolute inset-0 bg-linear-to-b from-black/55 via-black/65 to-black/85" />
         </div>
 
-        <div className="relative z-10 px-5 py-8 sm:px-8">
-          <h2 className="text-2xl font-extrabold text-white sm:text-3xl">
+        <div className="relative z-10 mx-auto max-w-5xl px-5 py-8 sm:px-8">
+          <h2 className="text-2xl font-extrabold text-white! sm:text-3xl">
             {isBengaliVivahEnquiryOnly ? 'Send Enquiry' : 'Enter Your Details'}
           </h2>
           <p className="mt-1 text-base text-white/75">
@@ -1039,25 +1138,45 @@ function PoojaDetailPage() {
               : 'Secure your puja booking in just a few steps.'}
           </p>
 
-          <div className="mt-3 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-200 sm:text-base">
+          <div className="mt-3 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-3.5 py-2.5 text-sm text-emerald-200 sm:text-base">
             Verified Priests • 1000+ Rituals Completed • Secure Payment
           </div>
 
+          <div className="mt-3 grid gap-2 text-xs sm:grid-cols-3">
+            <span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-center font-semibold uppercase tracking-[0.12em] text-white/85">Step 1: Select package</span>
+            <span className="rounded-full border border-orange-300/35 bg-orange-400/15 px-2.5 py-1 text-center font-semibold uppercase tracking-[0.12em] text-orange-100">Step 2: Fill details</span>
+            <span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-center font-semibold uppercase tracking-[0.12em] text-white/85">Step 3: Confirm booking</span>
+          </div>
+
+          <div className="mt-5 rounded-3xl border border-white/15 bg-white/7 p-4 shadow-[0_18px_45px_rgba(0,0,0,0.28)] backdrop-blur-md sm:p-6">
+
           {!isBengaliVivahEnquiryOnly && (
-            <div className="mt-3 flex flex-wrap gap-3">
-              <div className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm text-white/80">
-                Payable Now ({payableLabel}): <span className="font-bold text-white">₹{payableAmount.toLocaleString('en-IN')}</span>
+            <div className="mt-4 space-y-3">
+              <div className="rounded-2xl border border-orange-200/30 bg-linear-to-r from-amber-500/18 via-orange-500/14 to-amber-500/8 p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-amber-100/90">Selected Plan</p>
+                <div className="mt-1 flex flex-wrap items-center gap-2">
+                  <span className="text-base font-bold text-white">{selectedPackage || 'Package selected'}</span>
+                  <span className="rounded-full border border-white/20 bg-white/12 px-2.5 py-0.5 text-xs font-semibold text-white/90">
+                    {selectedAddOns.length} add-on{selectedAddOns.length === 1 ? '' : 's'} selected
+                  </span>
+                </div>
               </div>
-              <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/75">
-                Package ₹{basePackagePrice.toLocaleString('en-IN')} + Add-ons ₹{addOnTotal.toLocaleString('en-IN')} =
-                <span className="font-semibold text-white"> ₹{packagePrice.toLocaleString('en-IN')}</span>
+
+              <div className="grid gap-2 sm:grid-cols-2">
+                <div className="rounded-xl border border-white/15 bg-white/10 px-3.5 py-2.5 text-sm text-white/85">
+                  Payable Now ({payableLabel}): <span className="font-bold text-white">₹{payableAmount.toLocaleString('en-IN')}</span>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm text-white/80">
+                  Package ₹{basePackagePrice.toLocaleString('en-IN')} + Add-ons ₹{addOnTotal.toLocaleString('en-IN')} =
+                  <span className="font-semibold text-white"> ₹{packagePrice.toLocaleString('en-IN')}</span>
+                </div>
               </div>
             </div>
           )}
 
           <form
             onSubmit={handleBook}
-            className="mt-5 space-y-4"
+            className="mt-5 space-y-5"
             onFocus={() => {
               if (!formStartedRef.current) {
                 formStartedRef.current = true
@@ -1065,6 +1184,7 @@ function PoojaDetailPage() {
               }
             }}
           >
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-white/65">Contact Information</div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-sm font-medium text-white/80">Full Name *</label>
@@ -1082,12 +1202,15 @@ function PoojaDetailPage() {
               <p className="text-sm text-red-300">{quickValidationMessage}</p>
             )}
 
+            <div className="border-t border-white/10" />
+
             <div>
               <label className="mb-1 block text-sm font-medium text-white/80">Email *</label>
               <input className={fieldClass} type="email" placeholder="Email Address" required value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })} />
             </div>
 
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-white/65">Location Information</div>
             <button
               type="button"
               onClick={handleUseCurrentLocation}
@@ -1183,7 +1306,7 @@ function PoojaDetailPage() {
 
             <button
               type="submit"
-              className={`w-full rounded-2xl py-4 text-base font-extrabold uppercase tracking-wide text-white shadow-2xl transition disabled:cursor-not-allowed disabled:opacity-60 ${
+              className={`w-full rounded-2xl py-4 text-base font-extrabold uppercase tracking-wide text-white shadow-[0_14px_30px_rgba(234,88,12,0.35)] transition disabled:cursor-not-allowed disabled:opacity-60 ${
                 isBengaliVivahEnquiryOnly
                   ? 'bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 hover:from-orange-500 hover:via-amber-500 hover:to-orange-400'
                   : 'bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 hover:from-orange-500 hover:via-amber-500 hover:to-orange-400'
@@ -1205,6 +1328,7 @@ function PoojaDetailPage() {
               {bookingMessage}
             </p>
           )}
+          </div>
         </div>
       </section>
 
@@ -1212,7 +1336,7 @@ function PoojaDetailPage() {
       <button
         type="button"
         onClick={scrollToBookingForm}
-        className="md:hidden fixed bottom-20 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-2xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-lg transition"
+        className="md:hidden fixed bottom-20 left-1/2 z-40 w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-amber-200/35 bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 px-4 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-[0_14px_30px_rgba(234,88,12,0.42)] transition hover:brightness-110"
       >
         {isBengaliVivahEnquiryOnly ? 'Send Enquiry' : `Book Now • ₹${payableAmount.toLocaleString('en-IN')}`}
       </button>
