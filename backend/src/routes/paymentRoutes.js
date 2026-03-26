@@ -4,7 +4,7 @@ const Razorpay = require('razorpay');
 const Payment = require('../models/Payment');
 const Booking = require('../models/Booking');
 const Pooja = require('../models/Pooja');
-const { protect, adminOnly } = require('../middleware/auth');
+const { protect, adminOnly, optionalAuth } = require('../middleware/auth');
 const { alertCriticalIssue } = require('../services/monitoringService');
 
 const router = express.Router();
@@ -28,6 +28,37 @@ const computePaymentAmount = (price, paymentOption) => {
   if (paymentOption === 'advance') return Math.round(price * 0.3);
   if (paymentOption === 'pay-after-pooja') return 0;
   return price;
+};
+
+const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
+
+const normalizePhone = (value) => String(value || '').replace(/\D/g, '');
+
+const canAccessBookingForPayment = (booking, reqUser, rawEmail, rawPhone) => {
+  if (!booking) return false;
+
+  if (reqUser?._id && booking.userId && String(booking.userId) === String(reqUser._id)) {
+    return true;
+  }
+
+  const bookingEmail = normalizeEmail(booking.email);
+  const bookingPhone = normalizePhone(booking.phone);
+
+  if (reqUser) {
+    const userEmail = normalizeEmail(reqUser.email);
+    const userPhone = normalizePhone(reqUser.phone);
+    if ((userEmail && bookingEmail === userEmail) || (userPhone && bookingPhone === userPhone)) {
+      return true;
+    }
+  }
+
+  const bodyEmail = normalizeEmail(rawEmail);
+  const bodyPhone = normalizePhone(rawPhone);
+  if ((bodyEmail && bookingEmail === bodyEmail) || (bodyPhone && bookingPhone === bodyPhone)) {
+    return true;
+  }
+
+  return false;
 };
 
 const normalizeName = (value) => String(value || '').trim().toLowerCase();
@@ -126,7 +157,7 @@ const recalculateBookingAmount = async (booking) => {
   return { finalAmount, paymentAmount };
 };
 
-router.post('/create-order', protect, async (req, res) => {
+router.post('/create-order', optionalAuth, async (req, res) => {
   try {
     const razorpay = getRazorpayClient();
     const { keyId } = getRazorpayConfig();
@@ -135,11 +166,27 @@ router.post('/create-order', protect, async (req, res) => {
       return res.status(500).json({ message: 'Payment gateway is not configured on server' });
     }
 
-    const { bookingId, finalAmount: requestedFinalAmount } = req.body;
+    const {
+      bookingId,
+      finalAmount: requestedFinalAmount,
+      customerEmail,
+      customerPhone,
+    } = req.body;
     const booking = await Booking.findById(bookingId);
 
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    const hasAccess = canAccessBookingForPayment(
+      booking,
+      req.user,
+      customerEmail,
+      customerPhone
+    );
+
+    if (!hasAccess) {
+      return res.status(401).json({ message: 'Unauthorized payment request for this booking' });
     }
 
     const recalculated = await recalculateBookingAmount(booking);
@@ -202,7 +249,7 @@ router.post('/create-order', protect, async (req, res) => {
   }
 });
 
-router.post('/verify', protect, async (req, res) => {
+router.post('/verify', optionalAuth, async (req, res) => {
   try {
     const { keySecret } = getRazorpayConfig();
     if (!keySecret) {

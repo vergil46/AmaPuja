@@ -807,6 +807,8 @@ function PoojaDetailPage() {
         {
           bookingId: booking._id,
           finalAmount: packagePrice,
+          customerEmail: form.email,
+          customerPhone: form.phone,
         }
       )
 
