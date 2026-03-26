@@ -4,7 +4,7 @@ const funnelEventSchema = new mongoose.Schema(
   {
     eventName: {
       type: String,
-      enum: ['service_view', 'form_started', 'booking_submitted', 'payment_success'],
+      enum: ['service_view', 'form_started', 'booking_submitted', 'payment_success', 'payment_failed'],
       required: true,
     },
     sessionId: { type: String, trim: true, default: '' },

@@ -35,6 +35,19 @@ const parseAmount = (value) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
+
+const isValidDate = (value) => {
+  const raw = String(value || '').trim();
+  if (!raw) return false;
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) return false;
+  parsed.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return parsed >= today;
+};
+
 const composeAddress = (addressDetails = {}) => {
   return [
     addressDetails.house,
@@ -197,17 +210,34 @@ router.post('/', optionalAuth, async (req, res) => {
       resolvedAddressDetails.formattedAddress = resolvedAddress;
     }
 
-    if (
-      !poojaId ||
-      !packageName ||
-      !name ||
-      !phone ||
-      !email ||
-      !resolvedCity ||
-      !date ||
-      !resolvedAddress
-    ) {
-      return res.status(400).json({ message: 'Missing required fields' });
+    const missingFields = [];
+    if (!String(poojaId || '').trim()) missingFields.push('poojaId');
+    if (!String(packageName || '').trim()) missingFields.push('package');
+    if (!String(name || '').trim()) missingFields.push('name');
+    if (!String(phone || '').trim()) missingFields.push('phone');
+    if (!String(email || '').trim()) missingFields.push('email');
+    if (!String(resolvedCity || '').trim()) missingFields.push('city');
+    if (!String(date || '').trim()) missingFields.push('date');
+    if (!String(resolvedAddress || '').trim()) missingFields.push('address');
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: `Missing required fields: ${missingFields.join(', ')}`,
+        missingFields,
+      });
+    }
+
+    const normalizedPhone = normalizePhone(phone);
+    if (normalizedPhone.length !== 10) {
+      return res.status(400).json({ message: 'Phone number must be exactly 10 digits' });
+    }
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: 'Please enter a valid email address' });
+    }
+
+    if (!isValidDate(date)) {
+      return res.status(400).json({ message: 'Please choose today or a future date' });
     }
 
     const pooja = await Pooja.findById(poojaId);
@@ -268,9 +298,9 @@ router.post('/', optionalAuth, async (req, res) => {
     const bookingData = {
       poojaId,
       package: packageName,
-      name,
-      phone,
-      email,
+      name: String(name || '').trim(),
+      phone: normalizedPhone,
+      email: normalizeEmail(email),
       city: resolvedCity,
       priestPreference,
       date,

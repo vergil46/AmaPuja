@@ -122,6 +122,21 @@ function PoojaDetailPage() {
     return Number.isFinite(parsed) ? parsed : 0
   }
 
+  const getMissingFieldLabels = useCallback((isEnquiryOnlyFlow) => {
+    const requiredEntries = [
+      { label: 'Full Name', value: form.name },
+      { label: 'Phone Number', value: form.phone },
+      { label: 'Email', value: form.email },
+      { label: 'City', value: form.city },
+      { label: 'Full Address', value: form.address || buildAddressFromParts(form) },
+      ...(isEnquiryOnlyFlow ? [] : [{ label: 'Date', value: form.date }]),
+    ]
+
+    return requiredEntries
+      .filter((entry) => !String(entry.value || '').trim())
+      .map((entry) => entry.label)
+  }, [form])
+
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -599,7 +614,7 @@ function PoojaDetailPage() {
   )
 
   const normalizedPhone = String(form.phone || '').replace(/\D/g, '')
-  const hasValidPhone = normalizedPhone.length >= 10
+  const hasValidPhone = normalizedPhone.length === 10
   const hasValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(form.email || '').trim())
   const enquiryFlowTitle =
     activeLanguagePricing?.title ||
@@ -630,6 +645,18 @@ function PoojaDetailPage() {
 
   const loadRazorpayScript = () =>
     new Promise((resolve) => {
+      if (typeof window !== 'undefined' && window.Razorpay) {
+        resolve(true)
+        return
+      }
+
+      const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')
+      if (existingScript) {
+        existingScript.addEventListener('load', () => resolve(true), { once: true })
+        existingScript.addEventListener('error', () => resolve(false), { once: true })
+        return
+      }
+
       const script = document.createElement('script')
       script.src = 'https://checkout.razorpay.com/v1/checkout.js'
       script.onload = () => resolve(true)
@@ -659,17 +686,9 @@ function PoojaDetailPage() {
       activeLanguageKey === 'bengali' &&
       /vivah/i.test(String(enquiryTitle || ''))
 
-    const requiredFields = [
-      form.name,
-      form.phone,
-      form.email,
-      form.city,
-      form.address,
-      ...(isEnquiryOnly ? [] : [form.date]),
-    ]
-
-    if (requiredFields.some((v) => !String(v || '').trim())) {
-      setBookingMessage('Please fill all required fields.')
+    const missingFields = getMissingFieldLabels(isEnquiryOnly)
+    if (missingFields.length > 0) {
+      setBookingMessage(`Please fill: ${missingFields.join(', ')}.`)
       return
     }
 
@@ -751,7 +770,11 @@ function PoojaDetailPage() {
 
       const loaded = await loadRazorpayScript()
       if (!loaded) {
-        setBookingMessage('Razorpay failed to load.')
+        trackFunnelEvent('payment_failed', { reason: 'razorpay_script_load_failed' })
+        setBookingMessage(
+          `Booking created (ID: ${booking._id}), but online payment is temporarily unavailable. ` +
+          'Please choose Pay After Pooja in a new booking attempt or contact support at +91 9739362962.'
+        )
         return
       }
 
@@ -767,7 +790,11 @@ function PoojaDetailPage() {
       const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || keyId
 
       if (!razorpayKey) {
-        setBookingMessage('Payment is unavailable: missing Razorpay key configuration.')
+        trackFunnelEvent('payment_failed', { reason: 'missing_razorpay_key' })
+        setBookingMessage(
+          `Booking created (ID: ${booking._id}), but payment configuration is missing. ` +
+          'Please contact support at +91 9739362962 to complete your booking.'
+        )
         return
       }
 
@@ -794,14 +821,36 @@ function PoojaDetailPage() {
           email: form.email,
           contact: form.phone,
         },
+        modal: {
+          ondismiss: () => {
+            trackFunnelEvent('payment_failed', { reason: 'payment_modal_closed' })
+            setBookingMessage(
+              `Booking created (ID: ${booking._id}) but payment was not completed. ` +
+              'You can retry payment from dashboard or contact support at +91 9739362962.'
+            )
+          },
+        },
       }
 
       const rz = new window.Razorpay(options)
+      rz.on('payment.failed', (response) => {
+        trackFunnelEvent('payment_failed', {
+          reason: response?.error?.description || 'payment_failed',
+          code: response?.error?.code || '',
+        })
+        setBookingMessage(
+          `Booking created (ID: ${booking._id}), but payment failed. ` +
+          'Please retry or contact support at +91 9739362962.'
+        )
+      })
       rz.open()
     } catch (error) {
+      trackFunnelEvent('payment_failed', {
+        reason: error?.response?.data?.message || error?.message || 'booking_or_payment_error',
+      })
       setBookingMessage(
         error?.response?.data?.message ||
-          'Booking failed. Try again.'
+          'Booking failed. Please check your details and try again, or contact support at +91 9739362962.'
       )
     } finally {
       setIsSubmitting(false)

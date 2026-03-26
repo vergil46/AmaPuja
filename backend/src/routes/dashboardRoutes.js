@@ -154,6 +154,7 @@ router.get('/admin/stats', protect, adminOnly, async (req, res) => {
       form_started: 0,
       booking_submitted: 0,
       payment_success: 0,
+      payment_failed: 0,
     }
   );
 

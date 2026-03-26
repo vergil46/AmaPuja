@@ -68,6 +68,9 @@ function HomePage() {
             <p className="mt-4 text-lg font-medium text-[#5b3c24] sm:text-[38px] sm:leading-tight">
               Verified priests • Same-day booking
             </p>
+            <p className="mt-2 max-w-3xl text-base font-medium text-[#6a4223] sm:text-xl">
+              Transparent pricing, direct confirmation support, and secure payment with pay-after-pooja option.
+            </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
               <a
@@ -92,6 +95,12 @@ function HomePage() {
               </span>
               <span className="rounded-full border border-[#f4b37f] bg-[#fff3e8] px-4 py-1.5 text-sm font-semibold text-[#9a4e1f]">
                 Quick Booking in 30 Minutes
+              </span>
+              <span className="rounded-full border border-[#f4b37f] bg-[#fff3e8] px-4 py-1.5 text-sm font-semibold text-[#9a4e1f]">
+                No Hidden Charges
+              </span>
+              <span className="rounded-full border border-[#f4b37f] bg-[#fff3e8] px-4 py-1.5 text-sm font-semibold text-[#9a4e1f]">
+                Pay After Pooja Available
               </span>
             </div>
 
@@ -166,7 +175,7 @@ function HomePage() {
                 { label: '25+ Poojas', icon: '🪔' },
                 { label: city, icon: '📍' },
                 { label: language, icon: '💬' },
-                { label: '4.5★ Rating', icon: '⭐' },
+                { label: '1000+ Rituals Done', icon: '✅' },
               ].map(({ label, icon }) => (
                 <div
                   key={label}
@@ -176,6 +185,14 @@ function HomePage() {
                   <span className="text-xl font-medium text-[#332116]">{label}</span>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-[#ebd5c5] bg-white/85 p-4 shadow-[0_12px_30px_rgba(95,56,27,0.1)]">
+              <div className="grid gap-2 text-sm font-semibold text-[#6b3d1e] sm:grid-cols-3 sm:text-base">
+                <p>Secure online payment</p>
+                <p>Verified priest assignment</p>
+                <p>Call support: +91 97393 62962</p>
+              </div>
             </div>
           </div>
         </div>
