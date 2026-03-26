@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSP Check - Puja Samriddhi</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(180deg, #fff8ef 0%, #fff 100%);
+        color: #2a1709;
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 40px auto;
+        padding: 0 16px;
+      }
+      .card {
+        border: 1px solid #efd7bf;
+        background: #fff;
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 10px 28px rgba(80, 44, 14, 0.08);
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+      }
+      p {
+        margin: 0 0 14px;
+        color: #6b3c1d;
+      }
+      .pill {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #fff2e5;
+        border: 1px solid #f1c8a0;
+        color: #8c4717;
+        margin-bottom: 12px;
+      }
+      pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #1d140e;
+        color: #ffe8cf;
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 13px;
+        line-height: 1.45;
+        overflow: auto;
+      }
+      .ok {
+        color: #177245;
+        font-weight: 700;
+      }
+      .warn {
+        color: #9c2a16;
+        font-weight: 700;
+      }
+      button {
+        appearance: none;
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(90deg, #e3731f, #f2992f);
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <div class="card">
+        <h1>CSP Debug</h1>
+        <p>This page fetches response headers from your live domain and displays the active CSP.</p>
+        <div id="status" class="pill">Loading...</div>
+        <button id="refreshBtn" type="button">Refresh Header Check</button>
+        <h3>Active Content-Security-Policy</h3>
+        <pre id="csp">Loading...</pre>
+        <h3>Quick Result</h3>
+        <pre id="result">Checking...</pre>
+      </div>
+    </main>
+
+    <script>
+      const cspNode = document.getElementById('csp');
+      const resultNode = document.getElementById('result');
+      const statusNode = document.getElementById('status');
+      const refreshBtn = document.getElementById('refreshBtn');
+
+      function setStatus(text) {
+        statusNode.textContent = text;
+      }
+
+      function evaluateCsp(csp) {
+        const required = [
+          'https://checkout.razorpay.com',
+          'https://api.razorpay.com',
+          'https://lumberjack.razorpay.com'
+        ];
+
+        const missing = required.filter((item) => !String(csp || '').includes(item));
+        if (missing.length === 0) {
+          return 'OK: Razorpay CSP entries are present.';
+        }
+
+        return 'Missing CSP entries: ' + missing.join(', ');
+      }
+
+      async function runCheck() {
+        try {
+          setStatus('Checking live headers...');
+          const url = new URL(window.location.href);
+          url.searchParams.set('t', Date.now().toString());
+
+          const res = await fetch(url.toString(), {
+            method: 'HEAD',
+            cache: 'no-store',
+            credentials: 'same-origin'
+          });
+
+          const csp = res.headers.get('content-security-policy') || '';
+          cspNode.textContent = csp || 'No CSP header found.';
+
+          const evaluation = evaluateCsp(csp);
+          resultNode.textContent = evaluation;
+
+          if (evaluation.startsWith('OK:')) {
+            setStatus('CSP check passed');
+            resultNode.className = 'ok';
+          } else {
+            setStatus('CSP check needs update');
+            resultNode.className = 'warn';
+          }
+        } catch (error) {
+          setStatus('CSP check failed');
+          cspNode.textContent = 'Unable to fetch response headers.';
+          resultNode.textContent = error && error.message ? error.message : 'Unknown error';
+          resultNode.className = 'warn';
+        }
+      }
+
+      refreshBtn.addEventListener('click', runCheck);
+      runCheck();
+    </script>
+  </body>
+</html>

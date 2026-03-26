@@ -1,6 +1,15 @@
 {
   "headers": [
     {
+      "source": "/csp-check.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
