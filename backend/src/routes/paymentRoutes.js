@@ -61,6 +61,31 @@ const canAccessBookingForPayment = (booking, reqUser, rawEmail, rawPhone) => {
   return false;
 };
 
+const isRecentGuestBookingAllowed = async (booking, rawEmail, rawPhone) => {
+  const hasIdentityInPayload = Boolean(normalizeEmail(rawEmail) || normalizePhone(rawPhone));
+  if (hasIdentityInPayload) {
+    return false;
+  }
+
+  const createdAtTime = new Date(booking?.createdAt || 0).getTime();
+  if (!Number.isFinite(createdAtTime)) {
+    return false;
+  }
+
+  const ageMs = Date.now() - createdAtTime;
+  const withinGraceWindow = ageMs >= 0 && ageMs <= 30 * 60 * 1000;
+  if (!withinGraceWindow) {
+    return false;
+  }
+
+  const existingPaid = await Payment.exists({
+    bookingId: booking._id,
+    status: 'paid',
+  });
+
+  return !existingPaid;
+};
+
 const normalizeName = (value) => String(value || '').trim().toLowerCase();
 
 const parseAmount = (value) => {
@@ -185,7 +210,11 @@ router.post('/create-order', optionalAuth, async (req, res) => {
       customerPhone
     );
 
-    if (!hasAccess) {
+    const recentGuestAccess = hasAccess
+      ? false
+      : await isRecentGuestBookingAllowed(booking, customerEmail, customerPhone);
+
+    if (!hasAccess && !recentGuestAccess) {
       return res.status(401).json({ message: 'Unauthorized payment request for this booking' });
     }
 
