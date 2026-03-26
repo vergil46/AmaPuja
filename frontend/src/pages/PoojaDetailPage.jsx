@@ -124,21 +124,6 @@ function PoojaDetailPage() {
     return Number.isFinite(parsed) ? parsed : 0
   }
 
-  const getMissingFieldLabels = useCallback((isEnquiryOnlyFlow) => {
-    const requiredEntries = [
-      { label: 'Full Name', value: form.name },
-      { label: 'Phone Number', value: form.phone },
-      { label: 'Email', value: form.email },
-      { label: 'City', value: form.city },
-      { label: 'Full Address', value: form.address || buildAddressFromParts(form) },
-      ...(isEnquiryOnlyFlow ? [] : [{ label: 'Date', value: form.date }]),
-    ]
-
-    return requiredEntries
-      .filter((entry) => !String(entry.value || '').trim())
-      .map((entry) => entry.label)
-  }, [form])
-
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -173,6 +158,21 @@ function PoojaDetailPage() {
       .filter(Boolean)
       .join(', ')
   }
+
+  const getMissingFieldLabels = useCallback((isEnquiryOnlyFlow) => {
+    const requiredEntries = [
+      { label: 'Full Name', value: form.name },
+      { label: 'Phone Number', value: form.phone },
+      { label: 'Email', value: form.email },
+      { label: 'City', value: form.city },
+      { label: 'Full Address', value: form.address || buildAddressFromParts(form) },
+      ...(isEnquiryOnlyFlow ? [] : [{ label: 'Date', value: form.date }]),
+    ]
+
+    return requiredEntries
+      .filter((entry) => !String(entry.value || '').trim())
+      .map((entry) => entry.label)
+  }, [form])
 
   const parseGoogleAddress = (geocodeResult) => {
     const components = Array.isArray(geocodeResult?.address_components)
