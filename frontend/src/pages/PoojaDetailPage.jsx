@@ -1,5 +1,5 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { getPoojaImage } from '../assets/poojaImageMap'
 import Seo from '../components/Seo'
 import api from '../services/api'
@@ -72,6 +72,8 @@ function PoojaDetailPage() {
       : 'Bangalore'
 
   const [pooja, setPooja] = useState(null)
+  const [isLoadingPooja, setIsLoadingPooja] = useState(true)
+  const [poojaLoadError, setPoojaLoadError] = useState('')
   const [selectedPackage, setSelectedPackage] = useState('')
   const [selectedAddOns, setSelectedAddOns] = useState([])
   const [bookingMessage, setBookingMessage] = useState('')
@@ -345,11 +347,33 @@ function PoojaDetailPage() {
   }
 
   useEffect(() => {
-    api.get(`/poojas/${id}`).then((res) => {
-      setPooja(res.data)
-      setSelectedPackage('')
-      setSelectedAddOns([])
-    })
+    if (!id) {
+      setPooja(null)
+      setPoojaLoadError('Invalid service link. Please open a valid puja page.')
+      setIsLoadingPooja(false)
+      return
+    }
+
+    setIsLoadingPooja(true)
+    setPoojaLoadError('')
+
+    api.get(`/poojas/${id}`)
+      .then((res) => {
+        setPooja(res.data)
+        setSelectedPackage('')
+        setSelectedAddOns([])
+      })
+      .catch((error) => {
+        setPooja(null)
+        setPoojaLoadError(
+          error?.response?.status === 404
+            ? 'This puja is unavailable right now. Please choose another service.'
+            : 'Unable to load service details. Please refresh or open Services page.'
+        )
+      })
+      .finally(() => {
+        setIsLoadingPooja(false)
+      })
   }, [id])
 
   useEffect(() => {
@@ -857,7 +881,34 @@ function PoojaDetailPage() {
     }
   }
 
-  if (!pooja) return <PoojaDetailSkeleton />
+  if (isLoadingPooja) return <PoojaDetailSkeleton />
+
+  if (!pooja) {
+    return (
+      <div className="min-h-screen bg-linear-to-b from-[#1a1207] via-[#2a1709] to-[#3b220b] px-4 py-16">
+        <div className="mx-auto max-w-2xl rounded-3xl border border-white/15 bg-white/8 p-6 text-center backdrop-blur-md sm:p-8">
+          <h1 className="text-2xl font-bold text-white sm:text-3xl">Service Not Available</h1>
+          <p className="mt-3 text-base text-white/75">{poojaLoadError || 'We could not load this puja right now.'}</p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link
+              to="/services"
+              className="inline-flex items-center justify-center rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-[0_10px_24px_rgba(234,88,12,0.35)]"
+            >
+              Browse Services
+            </Link>
+            <a
+              href="https://wa.me/919739362962"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center rounded-xl border border-emerald-300/40 bg-emerald-500/15 px-5 py-3 text-sm font-bold uppercase tracking-wide text-emerald-200"
+            >
+              Book on WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const displayImage = getPoojaImage(
     pooja?.title,
