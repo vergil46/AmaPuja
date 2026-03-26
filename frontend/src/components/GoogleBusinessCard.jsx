@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const GoogleBusinessCard = ({ variant = 'full' }) => {
-  const [rating, setRating] = useState(4.8)
-  const [reviewCount, setReviewCount] = useState(347)
+  const [rating] = useState(4.8)
+  const [reviewCount] = useState(347)
   
   // Google Business Profile info
   const businessData = {
@@ -82,19 +82,19 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
           <p className="text-xs font-semibold text-orange-300 mb-2">Why choose us</p>
           <ul className="space-y-1.5 text-xs text-white/70">
             <li className="flex items-center gap-2">
-              <svg className="h-3 w-3 text-orange-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="h-3 w-3 text-orange-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
               Google verified service
             </li>
             <li className="flex items-center gap-2">
-              <svg className="h-3 w-3 text-orange-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="h-3 w-3 text-orange-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
               {businessData.reviewCount}+ verified reviews
             </li>
             <li className="flex items-center gap-2">
-              <svg className="h-3 w-3 text-orange-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="h-3 w-3 text-orange-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
               {businessData.rating} star rating
@@ -165,7 +165,7 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
                 href={businessData.googleProfileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold shadow-lg hover:shadow-xl transition hover:brightness-110"
+                className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl bg-linear-to-r from-blue-600 to-blue-500 text-white font-semibold shadow-lg hover:shadow-xl transition hover:brightness-110"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -179,7 +179,7 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
                 href="https://wa.me/919739362962"
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold shadow-lg hover:shadow-xl transition hover:brightness-110"
+                className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl bg-linear-to-r from-green-600 to-green-500 text-white font-semibold shadow-lg hover:shadow-xl transition hover:brightness-110"
               >
                 📱 Book Now on WhatsApp
               </a>
