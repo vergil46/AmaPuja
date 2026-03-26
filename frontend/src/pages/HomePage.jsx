@@ -163,10 +163,10 @@ function HomePage() {
 
             <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { label: '11 Services', icon: '🪔' },
+                { label: '25+ Poojas', icon: '🪔' },
                 { label: city, icon: '📍' },
                 { label: language, icon: '💬' },
-                { label: '12 Packages', icon: '📦' },
+                { label: '4.5★ Rating', icon: '⭐' },
               ].map(({ label, icon }) => (
                 <div
                   key={label}
