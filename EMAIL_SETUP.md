@@ -21,6 +21,8 @@ TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=your_twilio_auth_token
 TWILIO_SMS_FROM=+1234567890
 TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+TWILIO_WHATSAPP_BOOKING_CONTENT_SID=HXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_WHATSAPP_REVIEW_CONTENT_SID=HXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ## Gmail Setup (Recommended)
@@ -112,6 +114,23 @@ If emails aren't sending, check backend console for:
 	- SMS via Twilio (if configured)
 	- WhatsApp via Twilio WhatsApp sender (if configured)
 3. If Twilio is not configured, booking still succeeds and email continues to work
+
+### Twilio WhatsApp Template Messages (Optional)
+1. Keep `TWILIO_WHATSAPP_FROM` configured as usual
+2. Add template SIDs (from Twilio Content Template Builder):
+	 - `TWILIO_WHATSAPP_BOOKING_CONTENT_SID` for booking confirmation WhatsApp messages
+	 - `TWILIO_WHATSAPP_REVIEW_CONTENT_SID` for completion/review WhatsApp messages
+3. If these are not set, the app automatically falls back to plain text WhatsApp body messages
+
+Admin test endpoint supports template testing with this payload shape:
+
+```json
+{
+	"to": "whatsapp:+919999999999",
+	"contentSid": "HXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+	"contentVariables": { "1": "12/1", "2": "3pm" }
+}
+```
 
 ### Review Request After Pooja Completion
 1. Admin updates booking status to `completed`

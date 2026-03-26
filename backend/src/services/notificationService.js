@@ -13,17 +13,42 @@ const normalizePhone = (phone) => {
   return `+${cleaned}`;
 };
 
-const sendTwilioMessage = async ({ from, to, body }) => {
+const parseContentVariables = (contentVariables) => {
+  if (!contentVariables) return '';
+
+  if (typeof contentVariables === 'string') {
+    const trimmed = contentVariables.trim();
+    return trimmed || '';
+  }
+
+  if (typeof contentVariables === 'object') {
+    try {
+      return JSON.stringify(contentVariables);
+    } catch (error) {
+      console.warn('Invalid Twilio content variables payload', error);
+      return '';
+    }
+  }
+
+  return '';
+};
+
+const sendTwilioMessage = async ({ from, to, body, contentSid, contentVariables }) => {
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const normalizedBody = String(body || '').trim();
+  const normalizedContentSid = String(contentSid || '').trim();
+  const normalizedContentVariables = parseContentVariables(contentVariables);
+  const hasMessagePayload = Boolean(normalizedBody) || Boolean(normalizedContentSid);
 
-  if (!accountSid || !authToken || !from || !to || !body) {
+  if (!accountSid || !authToken || !from || !to || !hasMessagePayload) {
     console.warn('Twilio message skipped due to missing config/params', {
       hasAccountSid: Boolean(accountSid),
       hasAuthToken: Boolean(authToken),
       hasFrom: Boolean(from),
       hasTo: Boolean(to),
-      hasBody: Boolean(body),
+      hasBody: Boolean(normalizedBody),
+      hasContentSid: Boolean(normalizedContentSid),
     });
     return false;
   }
@@ -32,11 +57,18 @@ const sendTwilioMessage = async ({ from, to, body }) => {
   const authHeader = Buffer.from(`${accountSid}:${authToken}`).toString('base64');
 
   try {
-    const payload = new URLSearchParams({
-      From: from,
-      To: to,
-      Body: body,
-    });
+    const payload = new URLSearchParams();
+    payload.set('From', from);
+    payload.set('To', to);
+
+    if (normalizedContentSid) {
+      payload.set('ContentSid', normalizedContentSid);
+      if (normalizedContentVariables) {
+        payload.set('ContentVariables', normalizedContentVariables);
+      }
+    } else {
+      payload.set('Body', normalizedBody);
+    }
 
     const response = await fetch(url, {
       method: 'POST',
@@ -107,9 +139,28 @@ const sendOwnerLeadWhatsAppAlert = async ({ type, name, phone, email, service, d
 const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
   const phone = normalizePhone(booking.phone);
   const reviewUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/dashboard`;
+  const bookingWhatsappContentSid = String(process.env.TWILIO_WHATSAPP_BOOKING_CONTENT_SID || '').trim();
 
   const smsBody = `Puja Samriddhi: Booking received for ${pooja.title} on ${booking.date} at ${booking.time}. Amount: Rs ${booking.paymentAmount}.`; 
   const whatsappBody = `Namaste ${booking.name}, your booking for ${pooja.title} is received on Puja Samriddhi. Date: ${booking.date}, Time: ${booking.time}. Track details in your dashboard.`;
+
+  const whatsappBookingRequest = bookingWhatsappContentSid
+    ? {
+        from: process.env.TWILIO_WHATSAPP_FROM,
+        to: `whatsapp:${phone}`,
+        contentSid: bookingWhatsappContentSid,
+        contentVariables: {
+          '1': String(booking?.date || ''),
+          '2': String(booking?.time || ''),
+          '3': String(booking?.name || ''),
+          '4': String(pooja?.title || ''),
+        },
+      }
+    : {
+        from: process.env.TWILIO_WHATSAPP_FROM,
+        to: `whatsapp:${phone}`,
+        body: whatsappBody,
+      };
 
   const [emailSent, adminAlertSent, smsSent, whatsappSent, ownerLeadWhatsAppSent] = await Promise.all([
     sendBookingConfirmationEmail(booking, pooja),
@@ -119,11 +170,7 @@ const sendBookingCreatedNotifications = async ({ booking, pooja }) => {
       to: phone,
       body: smsBody,
     }),
-    sendTwilioMessage({
-      from: process.env.TWILIO_WHATSAPP_FROM,
-      to: `whatsapp:${phone}`,
-      body: whatsappBody,
-    }),
+    sendTwilioMessage(whatsappBookingRequest),
     sendOwnerLeadWhatsAppAlert({
       type: 'Booking',
       name: booking?.name,
@@ -169,9 +216,27 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
   const phone = normalizePhone(booking.phone);
   const poojaTitle = pooja?.title || 'your pooja';
   const reviewUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/dashboard?reviewBooking=${booking._id}#feedback`;
+  const reviewWhatsappContentSid = String(process.env.TWILIO_WHATSAPP_REVIEW_CONTENT_SID || '').trim();
 
   const smsBody = `Puja Samriddhi: Your ${poojaTitle} booking is marked completed. Please share your review: ${reviewUrl}`;
   const whatsappBody = `Namaste ${booking.name}, we hope your ${poojaTitle} went well. Please share your review here: ${reviewUrl}`;
+
+  const whatsappReviewRequest = reviewWhatsappContentSid
+    ? {
+        from: process.env.TWILIO_WHATSAPP_FROM,
+        to: `whatsapp:${phone}`,
+        contentSid: reviewWhatsappContentSid,
+        contentVariables: {
+          '1': String(booking?.name || ''),
+          '2': String(poojaTitle),
+          '3': String(reviewUrl),
+        },
+      }
+    : {
+        from: process.env.TWILIO_WHATSAPP_FROM,
+        to: `whatsapp:${phone}`,
+        body: whatsappBody,
+      };
 
   const [emailSent, smsSent, whatsappSent] = await Promise.all([
     sendPoojaCompletionReviewEmail(booking, pooja, reviewUrl),
@@ -180,11 +245,7 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
       to: phone,
       body: smsBody,
     }),
-    sendTwilioMessage({
-      from: process.env.TWILIO_WHATSAPP_FROM,
-      to: `whatsapp:${phone}`,
-      body: whatsappBody,
-    }),
+    sendTwilioMessage(whatsappReviewRequest),
   ]);
 
   if (!emailSent) {
@@ -203,9 +264,11 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
   return { emailSent, smsSent, whatsappSent };
 };
 
-const sendTestTwilioNotifications = async ({ to, body }) => {
+const sendTestTwilioNotifications = async ({ to, body, contentSid, contentVariables }) => {
   const normalizedTo = String(to || '').trim();
   const messageBody = String(body || '').trim() || 'Twilio test message from Puja Samriddhi';
+  const normalizedContentSid = String(contentSid || '').trim();
+  const normalizedContentVariables = parseContentVariables(contentVariables);
 
   if (!normalizedTo) {
     return {
@@ -235,13 +298,16 @@ const sendTestTwilioNotifications = async ({ to, body }) => {
   const whatsappSent = await sendTwilioMessage({
     from: whatsappFrom,
     to: whatsappTo,
-    body: messageBody,
+    body: normalizedContentSid ? '' : messageBody,
+    contentSid: normalizedContentSid,
+    contentVariables: normalizedContentVariables,
   });
 
   return {
     ok: smsSent || whatsappSent,
     smsSent,
     whatsappSent,
+    usedContentSid: normalizedContentSid,
     destination,
     smsTo,
     whatsappTo,

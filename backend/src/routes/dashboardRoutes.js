@@ -12,12 +12,19 @@ router.post('/admin/test-twilio', protect, adminOnly, async (req, res) => {
   try {
     const to = String(req.body?.to || '').trim();
     const body = String(req.body?.body || '').trim();
+    const contentSid = String(req.body?.contentSid || '').trim();
+    const contentVariables = req.body?.contentVariables;
 
     if (!to) {
       return res.status(400).json({ message: 'Field "to" is required' });
     }
 
-    const result = await sendTestTwilioNotifications({ to, body });
+    const result = await sendTestTwilioNotifications({
+      to,
+      body,
+      contentSid,
+      contentVariables,
+    });
     return res.json(result);
   } catch (error) {
     console.error('Twilio admin test failed:', error);

@@ -66,7 +66,7 @@ function AdminPage() {
   const [selectedBookingDetails, setSelectedBookingDetails] = useState(null)
   const [detailsBookingStatus, setDetailsBookingStatus] = useState('pending')
   const [updatingDetailsStatus, setUpdatingDetailsStatus] = useState(false)
-  const [twilioTestForm, setTwilioTestForm] = useState({ to: '', body: '' })
+  const [twilioTestForm, setTwilioTestForm] = useState({ to: '', body: '', contentSid: '', contentVariables: '' })
   const [twilioTesting, setTwilioTesting] = useState(false)
   const [twilioTestResult, setTwilioTestResult] = useState(null)
   const [twilioTestError, setTwilioTestError] = useState('')
@@ -668,6 +668,9 @@ function AdminPage() {
     event.preventDefault()
     const to = String(twilioTestForm.to || '').trim()
     const body = String(twilioTestForm.body || '').trim()
+    const contentSid = String(twilioTestForm.contentSid || '').trim()
+    const contentVariablesRaw = String(twilioTestForm.contentVariables || '').trim()
+    let parsedContentVariables
 
     if (!to) {
       setTwilioTestError('Recipient number is required.')
@@ -675,12 +678,29 @@ function AdminPage() {
       return
     }
 
+    if (contentVariablesRaw) {
+      try {
+        parsedContentVariables = JSON.parse(contentVariablesRaw)
+      } catch {
+        setTwilioTestError('Content Variables must be valid JSON (example: {"1":"12/1","2":"3pm"}).')
+        setTwilioTestResult(null)
+        return
+      }
+    }
+
     setTwilioTesting(true)
     setTwilioTestError('')
     setTwilioTestResult(null)
 
     try {
-      const response = await api.post('/dashboard/admin/test-twilio', { to, body })
+      const payload = {
+        to,
+        body,
+        contentSid,
+        contentVariables: parsedContentVariables,
+      }
+
+      const response = await api.post('/dashboard/admin/test-twilio', payload)
       setTwilioTestResult(response.data)
     } catch (error) {
       setTwilioTestError(error.response?.data?.message || 'Twilio test failed.')
@@ -688,6 +708,36 @@ function AdminPage() {
       setTwilioTesting(false)
     }
   }
+
+  useEffect(() => {
+    const raw = String(twilioTestForm.contentVariables || '')
+    const trimmed = raw.trim()
+
+    if (!trimmed) return
+
+    const timer = window.setTimeout(() => {
+      try {
+        const parsed = JSON.parse(trimmed)
+        const formatted = JSON.stringify(parsed, null, 2)
+
+        if (formatted !== raw) {
+          setTwilioTestForm((prev) =>
+            prev.contentVariables === raw
+              ? { ...prev, contentVariables: formatted }
+              : prev
+          )
+        }
+
+        if (twilioTestError.startsWith('Content Variables')) {
+          setTwilioTestError('')
+        }
+      } catch {
+        // Keep user input unchanged while JSON is incomplete.
+      }
+    }, 500)
+
+    return () => window.clearTimeout(timer)
+  }, [twilioTestForm.contentVariables, twilioTestError])
 
   const completionRate = stats.totalBookings
     ? Math.round((bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'completed').length / stats.totalBookings) * 100)
@@ -1216,11 +1266,11 @@ function AdminPage() {
 
                 <div ref={settingsSectionRef} className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
                   <h2 className="text-2xl font-semibold text-stone-900">Twilio Test</h2>
-                  <p className="mt-1 text-xs text-stone-500">Admin-only tool to test SMS and WhatsApp delivery.</p>
+                  <p className="mt-1 text-xs text-stone-500">Admin-only tool to test SMS and WhatsApp delivery (plain text or template).</p>
                   <form className="mt-3 space-y-2" onSubmit={runTwilioTest}>
                     <input
                       className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
-                      placeholder="Recipient number (example: +919999999999)"
+                      placeholder="Recipient (example: +919999999999 or whatsapp:+919999999999)"
                       value={twilioTestForm.to}
                       onChange={(e) => setTwilioTestForm((prev) => ({ ...prev, to: e.target.value }))}
                       disabled={twilioTesting}
@@ -1231,6 +1281,21 @@ function AdminPage() {
                       rows={3}
                       value={twilioTestForm.body}
                       onChange={(e) => setTwilioTestForm((prev) => ({ ...prev, body: e.target.value }))}
+                      disabled={twilioTesting}
+                    />
+                    <input
+                      className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
+                      placeholder="Optional Twilio Content SID (example: HXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx)"
+                      value={twilioTestForm.contentSid}
+                      onChange={(e) => setTwilioTestForm((prev) => ({ ...prev, contentSid: e.target.value }))}
+                      disabled={twilioTesting}
+                    />
+                    <textarea
+                      className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
+                      placeholder='Optional Content Variables JSON (example: {"1":"12/1","2":"3pm"})'
+                      rows={2}
+                      value={twilioTestForm.contentVariables}
+                      onChange={(e) => setTwilioTestForm((prev) => ({ ...prev, contentVariables: e.target.value }))}
                       disabled={twilioTesting}
                     />
                     <button
@@ -1248,6 +1313,7 @@ function AdminPage() {
                       <p>WhatsApp: {twilioTestResult.whatsappSent ? 'Sent' : 'Failed'}</p>
                       <p>SMS To: {twilioTestResult.smsTo || '-'}</p>
                       <p>WhatsApp To: {twilioTestResult.whatsappTo || '-'}</p>
+                      <p>Used Template SID: {twilioTestResult.usedContentSid || '-'}</p>
                     </div>
                   )}
                 </div>
