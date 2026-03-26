@@ -221,18 +221,20 @@ const sendTestTwilioNotifications = async ({ to, body }) => {
 
   const smsFrom = String(process.env.TWILIO_SMS_FROM || '').trim();
   const whatsappFrom = String(process.env.TWILIO_WHATSAPP_FROM || '').trim();
+  const smsTo = isWhatsApp ? '' : destination;
+  const whatsappTo = isWhatsApp ? destination : `whatsapp:${destination}`;
 
   const smsSent = isWhatsApp
     ? false
     : await sendTwilioMessage({
         from: smsFrom,
-        to: destination,
+        to: smsTo,
         body: messageBody,
       });
 
   const whatsappSent = await sendTwilioMessage({
     from: whatsappFrom,
-    to: isWhatsApp ? destination : `whatsapp:${destination}`,
+    to: whatsappTo,
     body: messageBody,
   });
 
@@ -241,6 +243,8 @@ const sendTestTwilioNotifications = async ({ to, body }) => {
     smsSent,
     whatsappSent,
     destination,
+    smsTo,
+    whatsappTo,
     isWhatsAppDestination: isWhatsApp,
     hasSmsFrom: Boolean(smsFrom),
     hasWhatsAppFrom: Boolean(whatsappFrom),
