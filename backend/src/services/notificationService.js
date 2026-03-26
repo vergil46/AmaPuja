@@ -203,9 +203,54 @@ const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
   return { emailSent, smsSent, whatsappSent };
 };
 
+const sendTestTwilioNotifications = async ({ to, body }) => {
+  const normalizedTo = String(to || '').trim();
+  const messageBody = String(body || '').trim() || 'Twilio test message from Puja Samriddhi';
+
+  if (!normalizedTo) {
+    return {
+      ok: false,
+      message: 'Missing destination number',
+      smsSent: false,
+      whatsappSent: false,
+    };
+  }
+
+  const isWhatsApp = normalizedTo.toLowerCase().startsWith('whatsapp:');
+  const destination = isWhatsApp ? normalizedTo : normalizePhone(normalizedTo);
+
+  const smsFrom = String(process.env.TWILIO_SMS_FROM || '').trim();
+  const whatsappFrom = String(process.env.TWILIO_WHATSAPP_FROM || '').trim();
+
+  const smsSent = isWhatsApp
+    ? false
+    : await sendTwilioMessage({
+        from: smsFrom,
+        to: destination,
+        body: messageBody,
+      });
+
+  const whatsappSent = await sendTwilioMessage({
+    from: whatsappFrom,
+    to: isWhatsApp ? destination : `whatsapp:${destination}`,
+    body: messageBody,
+  });
+
+  return {
+    ok: smsSent || whatsappSent,
+    smsSent,
+    whatsappSent,
+    destination,
+    isWhatsAppDestination: isWhatsApp,
+    hasSmsFrom: Boolean(smsFrom),
+    hasWhatsAppFrom: Boolean(whatsappFrom),
+  };
+};
+
 module.exports = {
   sendBookingCreatedNotifications,
   sendCompletionReviewNotifications,
   sendEnquiryCreatedNotifications,
+  sendTestTwilioNotifications,
 };
 
