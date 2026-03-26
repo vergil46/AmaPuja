@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import api from '../services/api'
 import { useState } from 'react'
 import Logo from './Logo'
+import GoogleBusinessCard from './GoogleBusinessCard'
 
 const StarIcon = () => (
   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -76,7 +77,7 @@ function Footer() {
       />
 
       <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-16">
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
 
           {/* ── Brand card ── */}
           <div
@@ -228,6 +229,9 @@ function Footer() {
               )}
             </form>
           </div>
+
+          {/* ── Google Business Profile ── */}
+          <GoogleBusinessCard variant="compact" />
         </div>
       </div>
 
