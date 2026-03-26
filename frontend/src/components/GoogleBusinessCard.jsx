@@ -188,35 +188,35 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
 
           {/* Right: Review Highlights */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">What customers say</h3>
+            <h3 className="text-xl font-bold text-stone-900 mb-6">What customers say</h3>
             
             {/* Sample Reviews */}
             {[
               {
-                author: 'Rajesh Kumar',
+                author: 'Sasmita Nayak',
                 rating: 5,
                 text: 'Excellent service! The pandit was very professional and punctual. Would definitely book again.',
               },
               {
-                author: 'Priya Sharma',
+                author: 'Subhajit Sen',
                 rating: 5,
                 text: 'Transparent pricing and smooth booking process. Highly recommended for anyone looking for reliable pandit services.',
               },
               {
-                author: 'Amit Patel',
+                author: 'Neha Sharma',
                 rating: 4,
                 text: 'Great experience! The team was helpful throughout. Very satisfied with the service.',
               },
             ].map((review, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-xl bg-white/50 dark:bg-white/5 border border-white/20 hover:border-amber-400/30 transition"
+                className="p-4 rounded-xl bg-white/70 border border-amber-100 shadow-[0_8px_20px_rgba(120,53,15,0.08)] hover:border-amber-300/60 transition"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <p className="font-semibold text-gray-900 dark:text-white text-sm">{review.author}</p>
+                  <p className="font-semibold text-stone-900 text-sm">{review.author}</p>
                   <div className="flex gap-0.5">{renderStars(review.rating)}</div>
                 </div>
-                <p className="text-sm text-gray-700 dark:text-gray-400 leading-relaxed">{review.text}</p>
+                <p className="text-sm text-stone-700 leading-relaxed">{review.text}</p>
               </div>
             ))}
 
