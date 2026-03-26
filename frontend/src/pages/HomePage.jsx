@@ -176,7 +176,6 @@ function HomePage() {
                 { label: '25+ Poojas', icon: '🪔' },
                 { label: city, icon: '📍' },
                 { label: language, icon: '💬' },
-                { label: '1000+ Rituals Done', icon: '✅' },
               ].map(({ label, icon }) => (
                 <div
                   key={label}

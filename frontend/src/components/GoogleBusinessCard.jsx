@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 const GoogleBusinessCard = ({ variant = 'full' }) => {
   const [rating] = useState(4.8)
-  const [reviewCount] = useState(347)
+  const [reviewCount] = useState(25)
   
   // Google Business Profile info
   const businessData = {
