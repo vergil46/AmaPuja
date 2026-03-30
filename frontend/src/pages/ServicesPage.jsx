@@ -859,10 +859,10 @@ function ServicesPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <a
-              href="tel:+919000012345"
+              href="tel:+919739362962"
               className="rounded-lg border border-stone-300 px-3.5 py-2 text-sm font-semibold text-stone-800"
             >
-              Call Now
+              Call Now: +91 97393 62962
             </a>
             <a
               href="https://wa.me/919739362962"
