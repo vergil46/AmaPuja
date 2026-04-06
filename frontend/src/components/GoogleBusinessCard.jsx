@@ -111,8 +111,8 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
       <div
         className="rounded-3xl border border-white/10 p-8 backdrop-blur-sm sm:p-12"
         style={{
-          background: 'linear-gradient(135deg, rgba(234,88,12,0.08) 0%, rgba(217,119,6,0.05) 100%)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07), 0 8px 32px rgba(234,88,12,0.15)',
+          background: 'linear-gradient(135deg, rgba(255,250,243,0.98) 0%, rgba(255,245,231,0.98) 100%)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.65), 0 10px 34px rgba(234,88,12,0.12)',
         }}
       >
         {/* Header */}
@@ -144,7 +144,7 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
             </div>
 
             {/* Business Info */}
-            <div className="space-y-4 p-6 rounded-2xl bg-white/50 dark:bg-white/5 border border-white/20">
+            <div className="space-y-4 p-6 rounded-2xl bg-white/80 dark:bg-white/8 border border-amber-200/70">
               <div>
                 <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Business</p>
                 <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">{businessData.name}</p>
@@ -215,7 +215,7 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
             ].map((review, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-xl bg-white/70 border border-amber-100 shadow-[0_8px_20px_rgba(120,53,15,0.08)] hover:border-amber-300/60 transition"
+                className="p-4 rounded-xl bg-white/92 border border-amber-200/70 shadow-[0_10px_24px_rgba(120,53,15,0.10)] hover:border-amber-300/80 transition"
               >
                 <div className="flex items-center justify-between mb-2">
                   <p className="font-semibold text-stone-900 text-sm">{review.author}</p>
