@@ -5,6 +5,27 @@ import Seo from '../components/Seo'
 import WorkProofGallery from '../components/WorkProofGallery'
 import GoogleBusinessCard from '../components/GoogleBusinessCard'
 
+const MapPinIcon = ({ className = 'h-4 w-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M12 21C12 21 19 14.8 19 10C19 6.13 15.87 3 12 3C8.13 3 5 6.13 5 10C5 14.8 12 21 12 21Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+  </svg>
+)
+
+const LanguageIcon = ({ className = 'h-4 w-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M4.75 6.5H19.25C19.94 6.5 20.5 7.06 20.5 7.75V15.75C20.5 16.44 19.94 17 19.25 17H11L7 20V17H4.75C4.06 17 3.5 16.44 3.5 15.75V7.75C3.5 7.06 4.06 6.5 4.75 6.5Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M8 11H16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+)
+
+const DiyaIcon = ({ className = 'h-4 w-4' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M12 4.5C12.9 5.68 13.43 6.62 13.43 7.6C13.43 8.56 12.73 9.34 12 9.34C11.27 9.34 10.57 8.56 10.57 7.6C10.57 6.62 11.1 5.68 12 4.5Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M4.5 14.25C5.66 12.24 8.47 10.75 12 10.75C15.53 10.75 18.34 12.24 19.5 14.25C18.34 16.26 15.53 17.75 12 17.75C8.47 17.75 5.66 16.26 4.5 14.25Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
 function HomePage() {
   const navigate = useNavigate()
   const [city, setCity] = useState('Bangalore')
@@ -78,15 +99,25 @@ function HomePage() {
                 href="https://wa.me/919739362962"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-14 items-center justify-center rounded-2xl bg-linear-to-r from-green-600 to-green-500 px-7 py-3 text-base font-bold text-white shadow-[0_14px_28px_rgba(22,163,74,0.34)] transition hover:-translate-y-0.5 hover:brightness-105 sm:text-lg"
+                className="inline-flex min-h-14 items-center justify-center gap-2.5 rounded-2xl bg-linear-to-r from-green-600 to-green-500 px-7 py-3 text-base font-bold text-white shadow-[0_14px_28px_rgba(22,163,74,0.34)] transition hover:-translate-y-0.5 hover:brightness-105 sm:text-lg"
               >
-                💬 Book on WhatsApp Now
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/16" aria-hidden="true">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.05 4.94A9.82 9.82 0 0 0 12.05 2a9.94 9.94 0 0 0-8.61 14.93L2 22l5.24-1.38A9.93 9.93 0 0 0 12.05 22 9.95 9.95 0 0 0 22 12.07a9.83 9.83 0 0 0-2.95-7.13ZM12.05 20.3a8.25 8.25 0 0 1-4.2-1.15l-.3-.18-3.1.81.83-3.02-.2-.31a8.25 8.25 0 1 1 6.97 3.85Zm4.52-6.2c-.25-.13-1.5-.74-1.73-.82-.23-.09-.4-.13-.56.12-.17.25-.65.82-.8.98-.15.17-.3.19-.56.06-.25-.12-1.08-.4-2.06-1.27-.76-.67-1.27-1.5-1.42-1.75-.15-.25-.02-.38.11-.5.11-.11.25-.3.38-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.45-.07-.13-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.42.06-.64.31-.22.25-.84.82-.84 2.01 0 1.19.86 2.35.98 2.51.12.17 1.69 2.58 4.08 3.62.57.25 1.02.4 1.37.51.58.18 1.1.15 1.52.09.46-.07 1.5-.61 1.71-1.2.21-.59.21-1.1.15-1.2-.06-.1-.23-.16-.48-.29Z" />
+                  </svg>
+                </span>
+                <span>Book on WhatsApp Now</span>
               </a>
               <a
                 href="tel:+919739362962"
-                className="inline-flex min-h-14 items-center justify-center rounded-2xl border border-[#d48a52] bg-white/90 px-7 py-3 text-base font-bold text-[#7a3c16] shadow-[0_10px_24px_rgba(122,60,22,0.18)] transition hover:-translate-y-0.5 hover:bg-white sm:text-lg"
+                className="inline-flex min-h-14 items-center justify-center gap-2.5 rounded-2xl border border-[#d48a52] bg-white/90 px-7 py-3 text-base font-bold text-[#7a3c16] shadow-[0_10px_24px_rgba(122,60,22,0.18)] transition hover:-translate-y-0.5 hover:bg-white sm:text-lg"
               >
-                📞 Call Pandit Instantly
+                <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[#d9a179] bg-[#fff3e8]" aria-hidden="true">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 4.75H8.3C8.78 4.75 9.19 5.09 9.28 5.56L9.88 8.7C9.96 9.14 9.8 9.58 9.46 9.86L7.93 11.13C9.2 13.93 11.44 16.17 14.24 17.44L15.51 15.91C15.79 15.57 16.23 15.41 16.67 15.49L19.81 16.09C20.28 16.18 20.62 16.59 20.62 17.07V20.37C20.62 20.86 20.23 21.25 19.74 21.25H18.5C10.49 21.25 3.99 14.75 3.99 6.74V5.5C3.99 5.01 4.38 4.62 4.87 4.62H5V4.75Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <span>Call Pandit Instantly</span>
               </a>
             </div>
 
@@ -111,7 +142,9 @@ function HomePage() {
             >
               <div className="grid grid-cols-1 gap-3 md:grid-cols-12">
                 <label className="relative md:col-span-3">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orange-500">📍</span>
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" aria-hidden="true">
+                    <MapPinIcon />
+                  </span>
                   <select
                     value={city}
                     onChange={(event) => setCity(event.target.value)}
@@ -123,7 +156,9 @@ function HomePage() {
                 </label>
 
                 <label className="relative md:col-span-3">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orange-500">💬</span>
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" aria-hidden="true">
+                    <LanguageIcon />
+                  </span>
                   <select
                     value={language}
                     onChange={(event) => setLanguage(event.target.value)}
@@ -173,15 +208,15 @@ function HomePage() {
 
             <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { label: '25+ Poojas', icon: '🪔' },
-                { label: city, icon: '📍' },
-                { label: language, icon: '💬' },
+                { label: '25+ Poojas', icon: <DiyaIcon className="h-5 w-5" /> },
+                { label: city, icon: <MapPinIcon className="h-5 w-5" /> },
+                { label: language, icon: <LanguageIcon className="h-5 w-5" /> },
               ].map(({ label, icon }) => (
                 <div
                   key={label}
                   className="flex items-center gap-3 rounded-2xl border border-[#eadacc] bg-white/88 px-4 py-3 shadow-[0_10px_24px_rgba(95,56,27,0.12)] backdrop-blur"
                 >
-                  <span className="text-xl" aria-hidden="true">{icon}</span>
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#e3c6ad] bg-[#fff3e8] text-[#a55b2a]" aria-hidden="true">{icon}</span>
                   <span className="text-xl font-medium text-[#332116]">{label}</span>
                 </div>
               ))}
