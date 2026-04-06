@@ -249,7 +249,7 @@ function Footer() {
               <button
                 disabled={isSubmitting}
                 className="w-full rounded-xl py-3 text-sm font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg, #ea580c 0%, #d97706 100%)', boxShadow: '0 4px 16px rgba(234,88,12,0.35)' }}
+                style={{ background: 'linear-gradient(135deg, #D84315 0%, #FF6F00 100%)', boxShadow: '0 4px 16px rgba(216,67,21,0.35)' }}
               >
                 {isSubmitting ? 'Sending…' : 'Send Enquiry →'}
               </button>

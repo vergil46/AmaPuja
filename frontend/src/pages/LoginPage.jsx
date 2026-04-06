@@ -60,8 +60,8 @@ function LoginPage() {
   return (
     <section className="max-w-md mx-auto px-4 py-8 sm:py-10">
       <Seo title="Customer Login | Puja Samriddhi" description="Login to your customer Puja Samriddhi account." />
-      <h1 className="text-2xl sm:text-3xl font-semibold">Customer Login</h1>
-      <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white border border-stone-200 rounded-xl p-4 sm:p-5">
+      <h1 className="text-2xl sm:text-3xl font-semibold text-[#333333]">Customer Login</h1>
+      <form onSubmit={handleSubmit} className="mt-4 space-y-3 bg-white border border-[#FFE0A3] rounded-xl p-4 sm:p-5">
         <input className="w-full px-3 py-2 rounded border border-stone-300" type="email" placeholder="Email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         <div>
           <input
@@ -72,7 +72,7 @@ function LoginPage() {
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
           />
-          <label className="mt-2 inline-flex items-center gap-2 text-sm text-stone-700">
+          <label className="mt-2 inline-flex items-center gap-2 text-sm text-[#333333]/78">
             <input
               type="checkbox"
               checked={showPassword}
@@ -83,15 +83,15 @@ function LoginPage() {
         </div>
         {error && <p className="text-red-700 text-sm">{error}</p>}
         {!error && isWarmingServer && (
-          <p className="text-amber-700 text-sm">Waking server... first login may take a few seconds.</p>
+          <p className="text-[#D84315] text-sm">Waking server... first login may take a few seconds.</p>
         )}
-        <button className="w-full py-2 rounded-lg bg-orange-700 text-white disabled:opacity-60" disabled={isSubmitting}>
+        <button className="w-full py-2 rounded-lg bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white disabled:opacity-60" disabled={isSubmitting}>
           {isSubmitting ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      <p className="text-sm mt-3 wrap-break-word">No customer account? <Link to="/signup" className="text-orange-700">Sign up</Link></p>
+      <p className="text-sm mt-3 wrap-break-word">No customer account? <Link to="/signup" className="text-[#FF6F00]">Sign up</Link></p>
       <p className="text-sm mt-2 wrap-break-word">Admin account? <Link to="/admin-login" className="text-stone-800">Admin login</Link></p>
-      <p className="text-sm mt-2 wrap-break-word"><Link to="/forgot-password" className="text-orange-700">Forgot Password?</Link></p>
+      <p className="text-sm mt-2 wrap-break-word"><Link to="/forgot-password" className="text-[#FF6F00]">Forgot Password?</Link></p>
     </section>
   )
 }

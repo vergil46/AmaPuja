@@ -38,16 +38,16 @@ function VerifyEmailPage() {
   }, [searchParams, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-orange-50 to-amber-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#FFF8E1] to-[#FFF3C4] px-4">
       <Seo title="Verify Email | Puja Samriddhi" />
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center border border-[#FFE0A3]">
         {status === 'verifying' && (
           <>
             <div className="flex justify-center mb-6">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-orange-200 border-t-orange-600" />
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-[#FFE0A3] border-t-[#FF6F00]" />
             </div>
-            <h2 className="text-2xl font-bold text-stone-800 mb-2">Verifying Your Email</h2>
-            <p className="text-stone-600">Please wait while we verify your account...</p>
+            <h2 className="text-2xl font-bold text-[#333333] mb-2">Verifying Your Email</h2>
+            <p className="text-[#333333]/78">Please wait while we verify your account...</p>
           </>
         )}
 
@@ -59,7 +59,7 @@ function VerifyEmailPage() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-green-700 mb-2">Email Verified! ✅</h2>
-            <p className="text-stone-600 mb-4">{message}</p>
+            <p className="text-[#333333]/78 mb-4">{message}</p>
             <p className="text-sm text-stone-500">Redirecting to login page...</p>
           </>
         )}
@@ -75,7 +75,7 @@ function VerifyEmailPage() {
             <p className="text-stone-600 mb-6">{message}</p>
             <button
               onClick={() => navigate('/login')}
-              className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition"
+              className="px-6 py-2 bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white rounded-lg hover:brightness-110 transition"
             >
               Go to Login
             </button>

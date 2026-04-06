@@ -222,8 +222,8 @@ function HomePage() {
               ))}
             </div>
 
-            <div className="mt-4 rounded-2xl border border-[#ebd5c5] bg-white/85 p-4 shadow-[0_12px_30px_rgba(95,56,27,0.1)]">
-              <div className="grid gap-2 text-sm font-semibold text-[#6b3d1e] sm:grid-cols-3 sm:text-base">
+            <div className="mt-4 rounded-2xl border border-[#FFE0A3] bg-white/88 p-4 shadow-[0_12px_30px_rgba(95,56,27,0.1)]">
+              <div className="grid gap-2 text-sm font-semibold text-[#333333] sm:grid-cols-3 sm:text-base">
                 <p>Secure online payment</p>
                 <p>Verified priest assignment</p>
                 <p>Call support: +91 97393 62962</p>
@@ -234,14 +234,14 @@ function HomePage() {
       </section>
 
       {/* ── Why Us ── */}
-      <section className="bg-[#fdf8f3] px-4 py-12 sm:py-16">
+      <section className="bg-[#FFF8E1] px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-6xl">
           <div className="flex items-end justify-between gap-4 animate-fade-up" style={{ animationDelay: '0.1s' }}>
             <div>
-              <p className="text-sm font-semibold uppercase tracking-widest text-orange-600">Why choose us</p>
-              <h2 className="mt-1 text-xl font-bold text-stone-900 sm:text-3xl">Why Families Choose Puja Samriddhi</h2>
+              <p className="text-sm font-semibold uppercase tracking-widest text-[#FF6F00]">Why choose us</p>
+              <h2 className="mt-1 text-xl font-bold text-[#333333] sm:text-3xl">Why Families Choose Puja Samriddhi</h2>
             </div>
-            <Link to="/services" className="hidden text-sm font-semibold text-orange-600 hover:text-orange-700 sm:inline-flex">
+            <Link to="/services" className="hidden text-sm font-semibold text-[#FF6F00] hover:text-[#D84315] sm:inline-flex">
               Explore Services →
             </Link>
           </div>
@@ -255,7 +255,7 @@ function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 ),
-                iconBg: 'from-orange-500 to-red-500',
+                iconBg: 'from-[#D84315] to-[#FF6F00]',
                 title: 'Verified Priests',
                 desc: 'Experienced pandits for all major rituals in your preferred language — Odia, Hindi, Bengali, Kannada.',
               },
@@ -266,7 +266,7 @@ function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 ),
-                iconBg: 'from-amber-500 to-yellow-500',
+                iconBg: 'from-[#FF6F00] to-[#FF8F00]',
                 title: 'Transparent Packages',
                 desc: 'Clear prices, no hidden charges — choose Standard or Premium and book with full confidence.',
               },
@@ -277,21 +277,21 @@ function HomePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 ),
-                iconBg: 'from-emerald-500 to-teal-500',
+                iconBg: 'from-[#FF8F00] to-[#F9A825]',
                 title: 'City-Wise Service',
                 desc: 'Available in Bangalore and Bhubaneswar with on-time arrival and dedicated support.',
               },
             ].map(({ delay, icon, iconBg, title, desc }) => (
               <article
                 key={title}
-                className="group flex flex-col rounded-2xl border border-stone-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl animate-fade-up"
+                className="group flex flex-col rounded-2xl border border-[#FFE0A3] bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl animate-fade-up"
                 style={{ animationDelay: delay }}
               >
                 <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br ${iconBg} shadow-md`}>
                   {icon}
                 </div>
-                <h3 className="mb-2 text-lg font-bold text-stone-900">{title}</h3>
-                <p className="text-base leading-relaxed text-stone-600">{desc}</p>
+                <h3 className="mb-2 text-lg font-bold text-[#333333]">{title}</h3>
+                <p className="text-base leading-relaxed text-[#333333]/78">{desc}</p>
               </article>
             ))}
           </div>

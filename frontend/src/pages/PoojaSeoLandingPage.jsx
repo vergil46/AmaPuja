@@ -747,16 +747,16 @@ function PoojaSeoLandingPage({ slug }) {
         structuredData={structuredData}
       />
 
-      <p className="text-sm font-semibold uppercase tracking-widest text-orange-700">{content.badge}</p>
-      <h1 className="mt-2 text-3xl font-extrabold text-stone-900 sm:text-4xl">{content.h1 || content.heading}</h1>
-      <p className="mt-4 max-w-4xl text-base leading-relaxed text-stone-700 sm:text-lg">{content.description}</p>
-      <p className="mt-3 max-w-4xl text-base leading-relaxed text-stone-700">{content.intro}</p>
+      <p className="text-sm font-semibold uppercase tracking-widest text-[#FF6F00]">{content.badge}</p>
+      <h1 className="mt-2 text-3xl font-extrabold text-[#333333] sm:text-4xl">{content.h1 || content.heading}</h1>
+      <p className="mt-4 max-w-4xl text-base leading-relaxed text-[#333333]/84 sm:text-lg">{content.description}</p>
+      <p className="mt-3 max-w-4xl text-base leading-relaxed text-[#333333]/84">{content.intro}</p>
 
       <div className="mt-6 flex flex-wrap gap-2.5">
         {content.keywords.map((keyword) => (
           <span
             key={keyword}
-            className="rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-sm font-medium text-orange-800"
+            className="rounded-full border border-[#FFE0A3] bg-[#FFF8E1] px-3 py-1 text-sm font-medium text-[#D84315]"
           >
             {keyword}
           </span>
@@ -766,13 +766,13 @@ function PoojaSeoLandingPage({ slug }) {
       <div className="mt-8 flex flex-wrap gap-3">
         <Link
           to={servicesSearchLink}
-          className="rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-orange-700 hover:via-amber-600 hover:to-orange-600"
+          className="rounded-xl bg-linear-to-r from-[#D84315] via-[#FF6F00] to-[#FF8F00] px-5 py-3 text-sm font-semibold text-white transition hover:from-[#C63B12] hover:via-[#F57C00] hover:to-[#FB8C00]"
         >
           View Packages
         </Link>
         <Link
           to="/services"
-          className="rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-800 transition hover:bg-stone-50"
+          className="rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-[#333333] transition hover:bg-stone-50"
         >
           Browse All Services
         </Link>
@@ -780,14 +780,14 @@ function PoojaSeoLandingPage({ slug }) {
 
       <div className="mt-10 space-y-4">
         {content.sections.map((section) => (
-          <article key={section.title} className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-stone-900 sm:text-2xl">{section.title}</h2>
-            <p className="mt-3 text-base leading-relaxed text-stone-700">{section.body}</p>
+          <article key={section.title} className="rounded-2xl border border-[#FFE0A3] bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-[#333333] sm:text-2xl">{section.title}</h2>
+            <p className="mt-3 text-base leading-relaxed text-[#333333]/84">{section.body}</p>
             {Array.isArray(section.points) && section.points.length > 0 && (
-              <ul className="mt-4 space-y-2 text-sm leading-relaxed text-stone-700 sm:text-base">
+              <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[#333333]/84 sm:text-base">
                 {section.points.map((point) => (
                   <li key={point} className="flex items-start gap-2">
-                    <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-orange-500" aria-hidden="true" />
+                    <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#FF6F00]" aria-hidden="true" />
                     <span>{point}</span>
                   </li>
                 ))}
@@ -797,22 +797,22 @@ function PoojaSeoLandingPage({ slug }) {
         ))}
       </div>
 
-      <div className="mt-10 rounded-3xl border border-orange-100 bg-linear-to-br from-orange-50 via-amber-50 to-rose-50 px-6 py-8 text-stone-900 shadow-lg sm:px-8">
-        <p className="text-sm font-semibold uppercase tracking-widest text-orange-700">Book With Puja Samriddhi</p>
-        <h2 className="mt-2 text-2xl font-bold text-stone-900 sm:text-3xl">Plan your puja with clearer steps and faster support</h2>
-        <p className="mt-3 max-w-3xl text-base leading-relaxed text-stone-700 sm:text-lg">
+      <div className="mt-10 rounded-3xl border border-[#FFE0A3] bg-linear-to-br from-[#FFF8E1] via-[#FFF3C4] to-[#FFF9EE] px-6 py-8 text-[#333333] shadow-lg sm:px-8">
+        <p className="text-sm font-semibold uppercase tracking-widest text-[#FF6F00]">Book With Puja Samriddhi</p>
+        <h2 className="mt-2 text-2xl font-bold text-[#333333] sm:text-3xl">Plan your puja with clearer steps and faster support</h2>
+        <p className="mt-3 max-w-3xl text-base leading-relaxed text-[#333333]/84 sm:text-lg">
           Choose the ritual you need, check packages, and move forward with an easier priest booking flow for your family ceremony.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link
             to={servicesSearchLink}
-            className="rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-orange-700 hover:via-amber-600 hover:to-orange-600"
+            className="rounded-xl bg-linear-to-r from-[#D84315] via-[#FF6F00] to-[#FF8F00] px-5 py-3 text-sm font-semibold text-white transition hover:from-[#C63B12] hover:via-[#F57C00] hover:to-[#FB8C00]"
           >
             Check {content.searchTerm || content.heading} Packages
           </Link>
           <Link
             to="/contact"
-            className="rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-stone-900 transition hover:bg-white/70"
+            className="rounded-xl border border-stone-300 px-5 py-3 text-sm font-semibold text-[#333333] transition hover:bg-white/70"
           >
             Contact Booking Support
           </Link>
@@ -820,12 +820,12 @@ function PoojaSeoLandingPage({ slug }) {
       </div>
 
       <div className="mt-10">
-        <h2 className="text-2xl font-bold text-stone-900 sm:text-3xl">Frequently Asked Questions</h2>
+        <h2 className="text-2xl font-bold text-[#333333] sm:text-3xl">Frequently Asked Questions</h2>
         <div className="mt-5 space-y-3">
           {content.faqItems.map((item) => (
-            <article key={item.question} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-              <h3 className="text-base font-semibold text-stone-900 sm:text-lg">{item.question}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-stone-700 sm:text-base">{item.answer}</p>
+            <article key={item.question} className="rounded-2xl border border-[#FFE0A3] bg-white p-5 shadow-sm">
+              <h3 className="text-base font-semibold text-[#333333] sm:text-lg">{item.question}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#333333]/84 sm:text-base">{item.answer}</p>
             </article>
           ))}
         </div>

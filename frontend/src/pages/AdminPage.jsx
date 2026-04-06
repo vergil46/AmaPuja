@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Seo from '../components/Seo'
 import api from '../services/api'
 
-function OverviewMetricCard({ title, value, caption, className = 'rounded-xl border border-orange-100 bg-white p-4 shadow-sm' }) {
+function OverviewMetricCard({ title, value, caption, className = 'rounded-xl border border-[#FFE0A3] bg-white p-4 shadow-sm' }) {
   return (
     <div className={className}>
-      <p className="text-sm text-stone-600">{title}</p>
-      <p className="mt-1 text-4xl font-bold text-stone-900">{value}</p>
+      <p className="text-sm text-[#333333]/75">{title}</p>
+      <p className="mt-1 text-4xl font-bold text-[#333333]">{value}</p>
       <p className="mt-1 text-xs">{caption}</p>
     </div>
   )
@@ -15,12 +15,12 @@ function OverviewMetricCard({ title, value, caption, className = 'rounded-xl bor
 function DetailFieldCard({
   label,
   value,
-  className = 'rounded-xl border border-stone-300 bg-white p-3.5',
-  valueClassName = 'text-2xl font-medium text-stone-900 mt-1',
+  className = 'rounded-xl border border-[#FFE0A3] bg-white p-3.5',
+  valueClassName = 'text-2xl font-medium text-[#333333] mt-1',
 }) {
   return (
     <div className={className}>
-      <p className="text-xs text-stone-500">{label}</p>
+      <p className="text-xs text-[#333333]/65">{label}</p>
       <p className={valueClassName}>{value || '-'}</p>
     </div>
   )
@@ -97,10 +97,10 @@ function AdminPage() {
     const pending = bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length
 
     const metrics = [
-      { label: 'Earning (₹)', value: Number(stats.revenue) || 0, tone: 'bg-orange-600' },
+      { label: 'Earning (₹)', value: Number(stats.revenue) || 0, tone: 'bg-[#D84315]' },
       { label: 'Work Done', value: workDone, tone: 'bg-green-600' },
       { label: 'Rejected', value: rejected, tone: 'bg-red-600' },
-      { label: 'Pending', value: pending, tone: 'bg-amber-500' },
+      { label: 'Pending', value: pending, tone: 'bg-[#FF6F00]' },
     ]
 
     const maxValue = Math.max(...metrics.map((item) => item.value), 1)
@@ -399,14 +399,14 @@ function AdminPage() {
       return {
         label: 'Paid',
         icon: '✅',
-        badgeClass: 'bg-green-100 text-green-800 border-green-200',
+        badgeClass: 'bg-green-50 text-green-700 border-green-200',
       }
     }
 
     return {
       label: 'Pending',
       icon: '❌',
-      badgeClass: 'bg-red-100 text-red-700 border-red-200',
+      badgeClass: 'bg-[#FFF8E1] text-[#D84315] border-[#FFE0A3]',
     }
   }
 
@@ -416,27 +416,27 @@ function AdminPage() {
     if (normalizedStatus === 'completed') {
       return {
         label: 'Completed',
-        badgeClass: 'bg-green-100 text-green-800 border-green-200',
+        badgeClass: 'bg-green-50 text-green-700 border-green-200',
       }
     }
 
     if (normalizedStatus === 'confirmed') {
       return {
         label: 'Confirmed',
-        badgeClass: 'bg-blue-100 text-blue-800 border-blue-200',
+        badgeClass: 'bg-[#FFF0C2] text-[#FF6F00] border-[#FFE0A3]',
       }
     }
 
     if (normalizedStatus === 'cancelled') {
       return {
         label: 'Cancelled',
-        badgeClass: 'bg-red-100 text-red-700 border-red-200',
+        badgeClass: 'bg-red-50 text-red-700 border-red-200',
       }
     }
 
     return {
       label: 'Pending',
-      badgeClass: 'bg-amber-100 text-amber-800 border-amber-200',
+      badgeClass: 'bg-[#FFF8E1] text-[#D84315] border-[#FFE0A3]',
     }
   }
 
@@ -809,26 +809,26 @@ function AdminPage() {
   }, [sidebarSections])
 
   const getSidebarButtonClass = (section) => {
-    const base = 'w-full rounded-md px-3 py-2 text-left'
+    const base = 'w-full rounded-md px-3 py-2 text-left transition-colors'
     const active = activeSidebarSection === section
 
     if (active) {
-      return `${base} border-l-2 border-orange-600 bg-orange-100 font-medium text-orange-800`
+      return `${base} border-l-2 border-[#D84315] bg-[#FFF0C2] font-medium text-[#D84315]`
     }
 
-    return `${base} text-stone-700 hover:bg-orange-50`
+    return `${base} text-stone-700 hover:bg-[#FFF8E1] hover:text-[#FF6F00]`
   }
 
   return (
-    <section className={`min-h-screen p-3 sm:p-4 ${isDarkMode ? 'bg-stone-950' : 'bg-orange-50/50'}`}>
+    <section className={`min-h-screen p-3 sm:p-4 ${isDarkMode ? 'bg-stone-950' : 'bg-[#FFF8E1]'}`}>
       <Seo title="Admin Panel | Puja Samriddhi" description="Manage poojas, bookings, enquiries, and payments." />
 
-      <div className={`mx-auto max-w-362.5 rounded-2xl border shadow-md ${isDarkMode ? 'border-stone-700 bg-stone-900 text-stone-100' : 'border-orange-100 bg-white/95'}`}>
+      <div className={`mx-auto max-w-362.5 rounded-2xl border shadow-md ${isDarkMode ? 'border-stone-700 bg-stone-900 text-stone-100' : 'border-[#FFE0A3] bg-white/96'}`}>
         <div className="grid lg:grid-cols-[230px_minmax(0,1fr)]">
-          <aside className={`hidden lg:flex flex-col border-r p-4 ${isDarkMode ? 'border-stone-700 bg-stone-900' : 'border-orange-100 bg-stone-50/40'}`}>
-            <div className="rounded-lg border border-orange-200 bg-orange-100/70 px-3 py-3 shadow-sm">
-              <p className="text-2xl font-bold text-stone-900">Puja Samriddhi</p>
-              <p className="text-xs text-stone-500">Sacred Rituals</p>
+          <aside className={`hidden lg:flex flex-col border-r p-4 ${isDarkMode ? 'border-stone-700 bg-stone-900' : 'border-[#FFE0A3] bg-[#FFFDF5]'}`}>
+            <div className="rounded-lg border border-[#FFE0A3] bg-[#FFF8E1] px-3 py-3 shadow-sm">
+              <p className="text-2xl font-bold text-[#333333]">Puja Samriddhi</p>
+              <p className="text-xs text-[#333333]/60">Sacred Rituals</p>
             </div>
 
             <nav className="mt-5 space-y-1 text-sm">
@@ -843,23 +843,23 @@ function AdminPage() {
             <button
               type="button"
               onClick={() => setIsDarkMode((prev) => !prev)}
-              className={`mt-4 w-full rounded-lg border p-3 ${isDarkMode ? 'border-stone-600 bg-stone-800 text-stone-100' : 'border-stone-200 bg-white text-stone-700'}`}
+              className={`mt-4 w-full rounded-lg border p-3 ${isDarkMode ? 'border-stone-600 bg-stone-800 text-stone-100' : 'border-[#FFE0A3] bg-white text-[#333333]'}`}
             >
               <div className="flex items-center justify-between text-sm">
                 <span>🌙 Dark Mode</span>
                 <div className="flex items-center gap-2">
                   <span className={`text-xs ${isDarkMode ? 'text-stone-300' : 'text-stone-500'}`}>{isDarkMode ? 'On' : 'Off'}</span>
-                  <span className={`relative h-5 w-9 rounded-full transition-colors ${isDarkMode ? 'bg-orange-600' : 'bg-stone-300'}`}>
+                  <span className={`relative h-5 w-9 rounded-full transition-colors ${isDarkMode ? 'bg-[#D84315]' : 'bg-stone-300'}`}>
                     <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${isDarkMode ? 'translate-x-4.5' : 'translate-x-0.5'}`} />
                   </span>
                 </div>
               </div>
             </button>
 
-            <div className="mt-auto rounded-lg border border-stone-200 bg-white p-3">
-              <p className="text-sm font-semibold text-stone-900">Lokanath Panda</p>
-              <p className="text-xs text-stone-500">lokanathpanda46@gmail.com</p>
-              <button type="button" className="mt-3 w-full rounded-lg border border-stone-200 px-3 py-2 text-left text-sm text-stone-700 hover:bg-stone-50">⏻ Logout</button>
+            <div className="mt-auto rounded-lg border border-[#FFE0A3] bg-white p-3">
+              <p className="text-sm font-semibold text-[#333333]">Lokanath Panda</p>
+              <p className="text-xs text-[#333333]/60">lokanathpanda46@gmail.com</p>
+              <button type="button" className="mt-3 w-full rounded-lg border border-stone-200 px-3 py-2 text-left text-sm text-[#333333] hover:bg-[#FFF8E1]">⏻ Logout</button>
             </div>
           </aside>
 

@@ -16,7 +16,7 @@ function ScrollToTop() {
 
 function Layout({ children }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#FFF8E1] text-[#333333]">
       <ScrollToTop />
       <Header />
       <main className="flex-1 pb-20 sm:pb-0">{children}</main>

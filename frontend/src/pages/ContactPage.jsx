@@ -54,48 +54,48 @@ function ContactPage() {
     <section className="max-w-4xl mx-auto px-4 py-10">
       <Seo title="Contact Puja Samriddhi" description="Contact Puja Samriddhi for bookings and support." />
       
-      <h1 className="text-3xl sm:text-4xl font-bold text-stone-800 mb-6">Contact Us</h1>
+      <h1 className="text-3xl sm:text-4xl font-bold text-[#333333] mb-6">Contact Us</h1>
       
       <div className="grid md:grid-cols-2 gap-8 mb-10">
         {/* Contact Information */}
-        <div className="bg-linear-to-br from-red-50 to-orange-50 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold text-stone-800 mb-4">Get in Touch</h2>
+        <div className="bg-linear-to-br from-[#FFF8E1] to-[#FFF3C4] p-6 rounded-lg border border-[#FFE0A3]">
+          <h2 className="text-xl font-semibold text-[#333333] mb-4">Get in Touch</h2>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#FF6F00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
               <div>
-                <p className="text-sm text-stone-600">Helpline</p>
-                <p className="font-semibold text-stone-800">9739362962</p>
+                <p className="text-sm text-[#333333]/70">Helpline</p>
+                <p className="font-semibold text-[#333333]">9739362962</p>
               </div>
             </div>
             
             <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#FF6F00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <div>
-                <p className="text-sm text-stone-600">Email</p>
-                <p className="font-semibold text-stone-800">support@pujasamriddhi.com</p>
+                <p className="text-sm text-[#333333]/70">Email</p>
+                <p className="font-semibold text-[#333333]">support@pujasamriddhi.com</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#FF6F00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <p className="text-sm text-stone-600">Working Hours</p>
-                <p className="font-semibold text-stone-800">Mon - Sun: 9 AM - 9 PM</p>
+                <p className="text-sm text-[#333333]/70">Working Hours</p>
+                <p className="font-semibold text-[#333333]">Mon - Sun: 9 AM - 9 PM</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Enquiry Form */}
-        <div className="bg-white border border-stone-200 p-6 rounded-lg shadow-sm">
-          <h2 className="text-xl font-semibold text-stone-800 mb-4">Send us an Enquiry</h2>
+        <div className="bg-white border border-[#FFE0A3] p-6 rounded-lg shadow-sm">
+          <h2 className="text-xl font-semibold text-[#333333] mb-4">Send us an Enquiry</h2>
           
           {success && (
             <div className="mb-4 p-3 bg-green-100 border border-green-300 text-green-800 rounded">
@@ -111,7 +111,7 @@ function ContactPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-stone-700 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-[#333333]/78 mb-1">
                 Full Name *
               </label>
               <input
@@ -121,13 +121,13 @@ function ContactPage() {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-stone-300 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+                className="w-full px-3 py-2 border border-stone-300 rounded focus:ring-2 focus:ring-[#FF6F00] focus:border-[#FF6F00] outline-none"
                 placeholder="Enter your name"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-[#333333]/78 mb-1">
                 Email Address *
               </label>
               <input
@@ -137,13 +137,13 @@ function ContactPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-stone-300 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+                className="w-full px-3 py-2 border border-stone-300 rounded focus:ring-2 focus:ring-[#FF6F00] focus:border-[#FF6F00] outline-none"
                 placeholder="your@email.com"
               />
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-stone-700 mb-1">
+              <label htmlFor="phone" className="block text-sm font-medium text-[#333333]/78 mb-1">
                 Phone Number *
               </label>
               <input
@@ -154,13 +154,13 @@ function ContactPage() {
                 onChange={handleChange}
                 required
                 pattern="[0-9]{10}"
-                className="w-full px-3 py-2 border border-stone-300 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+                className="w-full px-3 py-2 border border-stone-300 rounded focus:ring-2 focus:ring-[#FF6F00] focus:border-[#FF6F00] outline-none"
                 placeholder="10-digit mobile number"
               />
             </div>
 
             <div>
-              <label htmlFor="service" className="block text-sm font-medium text-stone-700 mb-1">
+              <label htmlFor="service" className="block text-sm font-medium text-[#333333]/78 mb-1">
                 Select Service (Optional)
               </label>
               <select
@@ -168,7 +168,7 @@ function ContactPage() {
                 name="service"
                 value={formData.service}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-stone-300 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none bg-white"
+                className="w-full px-3 py-2 border border-stone-300 rounded focus:ring-2 focus:ring-[#FF6F00] focus:border-[#FF6F00] outline-none bg-white"
               >
                 <option value="">-- Select a Pooja/Service --</option>
                 {services.map((service) => (
@@ -180,7 +180,7 @@ function ContactPage() {
             </div>
 
             <div>
-              <label htmlFor="message" className="block text-sm font-medium text-stone-700 mb-1">
+              <label htmlFor="message" className="block text-sm font-medium text-[#333333]/78 mb-1">
                 Message *
               </label>
               <textarea
@@ -190,7 +190,7 @@ function ContactPage() {
                 onChange={handleChange}
                 required
                 rows="4"
-                className="w-full px-3 py-2 border border-stone-300 rounded focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none resize-none"
+                className="w-full px-3 py-2 border border-stone-300 rounded focus:ring-2 focus:ring-[#FF6F00] focus:border-[#FF6F00] outline-none resize-none"
                 placeholder="Tell us about your requirements..."
               />
             </div>
@@ -198,7 +198,7 @@ function ContactPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-linear-to-r from-[#D84315] to-[#FF6F00] hover:brightness-110 text-white font-medium py-2.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Submitting...' : 'Submit Enquiry'}
             </button>
@@ -207,23 +207,23 @@ function ContactPage() {
       </div>
 
       {/* Additional Info */}
-      <div className="bg-linear-to-r from-orange-50 to-red-50 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold text-stone-800 mb-3">Why Choose Puja Samriddhi?</h3>
-        <ul className="grid sm:grid-cols-2 gap-2 text-stone-700">
+      <div className="bg-linear-to-r from-[#FFF8E1] to-[#FFF3C4] p-6 rounded-lg border border-[#FFE0A3]">
+        <h3 className="text-lg font-semibold text-[#333333] mb-3">Why Choose Puja Samriddhi?</h3>
+        <ul className="grid sm:grid-cols-2 gap-2 text-[#333333]/82">
           <li className="flex items-start gap-2">
-            <span className="text-red-600 mt-1">✓</span>
+            <span className="text-[#FF6F00] mt-1">✓</span>
             <span>Experienced and authentic pandits</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-red-600 mt-1">✓</span>
+            <span className="text-[#FF6F00] mt-1">✓</span>
             <span>Traditional rituals with modern convenience</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-red-600 mt-1">✓</span>
+            <span className="text-[#FF6F00] mt-1">✓</span>
             <span>Available across Odia, Bengali, and Kannada traditions</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-red-600 mt-1">✓</span>
+            <span className="text-[#FF6F00] mt-1">✓</span>
             <span>Flexible booking and personalized services</span>
           </li>
         </ul>

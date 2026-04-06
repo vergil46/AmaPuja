@@ -25,11 +25,11 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-orange-50 to-amber-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#FFF8E1] to-[#FFF3C4] px-4">
       <Seo title="Forgot Password | Puja Samriddhi" />
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-stone-800 text-center mb-2">Forgot Password?</h2>
-        <p className="text-stone-600 text-center mb-2">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-[#FFE0A3]">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#333333] text-center mb-2">Forgot Password?</h2>
+        <p className="text-[#333333]/78 text-center mb-2">
           Enter your email and we'll send you a reset link
         </p>
         <p className="text-xs text-stone-500 text-center mb-4">
@@ -50,7 +50,7 @@ function ForgotPasswordPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-[#333333]/78 mb-1">
               Email Address
             </label>
             <input
@@ -59,7 +59,7 @@ function ForgotPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#FF6F00] focus:border-transparent"
               placeholder="your@email.com"
               disabled={status === 'loading'}
             />
@@ -68,19 +68,19 @@ function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={status === 'loading'}
-            className="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white py-3 rounded-lg font-semibold hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {status === 'loading' ? 'Sending...' : 'Send Reset Link'}
           </button>
         </form>
 
         <div className="mt-6 text-center space-y-2">
-          <Link to="/login" className="block text-orange-600 hover:text-orange-700 font-medium">
+          <Link to="/login" className="block text-[#FF6F00] hover:text-[#D84315] font-medium">
             ← Back to Login
           </Link>
           <p className="text-sm text-stone-600">
             Don't have an account?{' '}
-            <Link to="/signup" className="text-orange-600 hover:text-orange-700 font-medium">
+            <Link to="/signup" className="text-[#FF6F00] hover:text-[#D84315] font-medium">
               Sign up
             </Link>
           </p>

@@ -109,19 +109,19 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
   return (
     <div className="relative mx-auto max-w-4xl px-4 py-12 sm:py-16">
       <div
-        className="rounded-3xl border border-white/10 p-8 backdrop-blur-sm sm:p-12"
+        className="rounded-3xl border border-[#FFE0A3]/80 p-8 backdrop-blur-sm sm:p-12"
         style={{
-          background: 'linear-gradient(135deg, rgba(255,250,243,0.98) 0%, rgba(255,245,231,0.98) 100%)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.65), 0 10px 34px rgba(234,88,12,0.12)',
+          background: 'linear-gradient(135deg, rgba(255,248,225,0.98) 0%, rgba(255,243,196,0.98) 100%)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.72), 0 10px 34px rgba(216,67,21,0.10)',
         }}
       >
         {/* Header */}
         <div className="text-center mb-8">
-          <p className="text-sm font-bold uppercase tracking-widest text-amber-400 mb-2">Google Verified</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <p className="text-sm font-bold uppercase tracking-widest text-[#FF6F00] mb-2">Google Verified</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#333333] dark:text-white mb-2">
             Trusted by Families
           </h2>
-          <p className="text-gray-700 dark:text-gray-300">
+          <p className="text-[#333333]/80 dark:text-gray-300">
             Join hundreds of satisfied customers who've booked with us
           </p>
         </div>
@@ -133,10 +133,10 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
             {/* Large Rating */}
             <div className="text-center">
               <div className="flex justify-center mb-4">
-                <div className="text-5xl font-bold text-amber-600">{businessData.rating}</div>
+                <div className="text-5xl font-bold text-[#D84315]">{businessData.rating}</div>
                 <div className="flex flex-col justify-center ml-4">
                   <div className="flex gap-1">{renderStars(businessData.rating)}</div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-[#333333]/75 dark:text-gray-400 mt-1">
                     Based on {businessData.reviewCount} reviews
                   </p>
                 </div>
@@ -144,18 +144,18 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
             </div>
 
             {/* Business Info */}
-            <div className="space-y-4 p-6 rounded-2xl bg-white/80 dark:bg-white/8 border border-amber-200/70">
+            <div className="space-y-4 p-6 rounded-2xl bg-white/88 dark:bg-white/8 border border-[#FFE0A3]/80">
               <div>
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Business</p>
-                <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">{businessData.name}</p>
+                <p className="text-sm font-semibold text-[#333333]/70 dark:text-gray-400 uppercase tracking-wide">Business</p>
+                <p className="text-lg font-bold text-[#333333] dark:text-white mt-1">{businessData.name}</p>
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Category</p>
-                <p className="text-gray-700 dark:text-gray-300 mt-1">{businessData.categories}</p>
+                <p className="text-sm font-semibold text-[#333333]/70 dark:text-gray-400 uppercase tracking-wide">Category</p>
+                <p className="text-[#333333]/80 dark:text-gray-300 mt-1">{businessData.categories}</p>
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Location</p>
-                <p className="text-gray-700 dark:text-gray-300 mt-1">{businessData.address}</p>
+                <p className="text-sm font-semibold text-[#333333]/70 dark:text-gray-400 uppercase tracking-wide">Location</p>
+                <p className="text-[#333333]/80 dark:text-gray-300 mt-1">{businessData.address}</p>
               </div>
             </div>
 
@@ -165,7 +165,7 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
                 href={businessData.googleProfileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl bg-linear-to-r from-blue-600 to-blue-500 text-white font-semibold shadow-lg hover:shadow-xl transition hover:brightness-110"
+                className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white font-semibold shadow-lg hover:shadow-xl transition hover:brightness-110"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -179,7 +179,7 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
                 href="https://wa.me/919739362962"
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl bg-linear-to-r from-green-600 to-green-500 text-white font-semibold shadow-lg hover:shadow-xl transition hover:brightness-110"
+                className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white font-semibold shadow-lg hover:shadow-xl transition hover:brightness-110"
               >
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/16" aria-hidden="true">
                   <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -193,7 +193,7 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
 
           {/* Right: Review Highlights */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-stone-900 mb-6">What customers say</h3>
+            <h3 className="text-xl font-bold text-[#333333] mb-6">What customers say</h3>
             
             {/* Sample Reviews */}
             {[
@@ -215,13 +215,13 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
             ].map((review, idx) => (
               <div
                 key={idx}
-                className="p-4 rounded-xl bg-white/92 border border-amber-200/70 shadow-[0_10px_24px_rgba(120,53,15,0.10)] hover:border-amber-300/80 transition"
+                className="p-4 rounded-xl bg-white/94 border border-[#FFE0A3]/85 shadow-[0_10px_24px_rgba(120,53,15,0.10)] hover:border-[#FF6F00]/55 transition"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <p className="font-semibold text-stone-900 text-sm">{review.author}</p>
+                  <p className="font-semibold text-[#333333] text-sm">{review.author}</p>
                   <div className="flex gap-0.5">{renderStars(review.rating)}</div>
                 </div>
-                <p className="text-sm text-stone-700 leading-relaxed">{review.text}</p>
+                <p className="text-sm text-[#333333]/82 leading-relaxed">{review.text}</p>
               </div>
             ))}
 
@@ -229,7 +229,7 @@ const GoogleBusinessCard = ({ variant = 'full' }) => {
               href={businessData.googleProfileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-center mt-6 px-6 py-2 text-amber-600 dark:text-amber-400 font-semibold hover:text-amber-700 transition"
+              className="block text-center mt-6 px-6 py-2 text-[#FF6F00] dark:text-amber-400 font-semibold hover:text-[#D84315] transition"
             >
               View all {businessData.reviewCount} reviews on Google →
             </a>

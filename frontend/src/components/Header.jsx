@@ -19,14 +19,14 @@ function Header() {
 
   const navClass = ({ isActive }) =>
     `whitespace-nowrap text-sm md:text-[14px] lg:text-[15px] font-medium px-2.5 py-1.5 rounded-lg transition-colors ${
-      isActive ? 'text-orange-800 bg-orange-100/90' : 'text-stone-700 hover:text-orange-700 hover:bg-orange-50'
+      isActive ? 'text-[#FF6F00] bg-[#FFF8E1]' : 'text-stone-700 hover:text-[#FF6F00] hover:bg-[#FFF8E1]'
     }`
 
   const mobileNavClass = ({ isActive }) =>
     `w-full text-sm font-medium px-3.5 py-2.5 rounded-xl border transition-colors ${
       isActive
-        ? 'text-orange-100 border-orange-400/50 bg-orange-800/60'
-        : 'text-stone-200 border-stone-700/70 bg-stone-900/60 hover:text-orange-100 hover:border-orange-400/45 hover:bg-orange-700/20'
+        ? 'text-[#FFF8E1] border-[#D84315]/50 bg-[#D84315]/85'
+        : 'text-stone-200 border-stone-700/70 bg-stone-900/60 hover:text-[#FFF8E1] hover:border-[#FF6F00]/45 hover:bg-[#D84315]/25'
     }`
 
   const closeMobileMenu = () => setMobileMenuOpen(false)
@@ -56,12 +56,12 @@ function Header() {
   }, [accountMenuOpen])
 
   return (
-    <header className="sticky top-0 z-50 border-b border-orange-100/90 bg-white/92 backdrop-blur-xl shadow-sm transition-shadow">
+    <header className="sticky top-0 z-50 border-b border-[#FFF0C2]/90 bg-[#FFF8E1]/94 backdrop-blur-xl shadow-sm transition-shadow">
       <div className="max-w-6xl mx-auto px-3.5 sm:px-4 py-3 sm:py-3.5 flex items-center justify-between gap-3">
         <Link to="/" onClick={closeMobileMenu} className="shrink-0 flex items-center">
           <Logo variant="default" className="scale-95 origin-left" />
         </Link>
-        <nav className="hidden md:flex items-center gap-1.5 rounded-full border border-orange-200/80 bg-white/95 px-3 py-1.5 shadow-sm">
+        <nav className="hidden md:flex items-center gap-1.5 rounded-full border border-[#FFE0A3]/80 bg-white/95 px-3 py-1.5 shadow-sm">
           <NavLink to="/" className={navClass}>
             {t('home')}
           </NavLink>
@@ -89,8 +89,8 @@ function Header() {
           )}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-          <div className="flex items-center gap-2 rounded-2xl border border-orange-200/80 bg-white/95 px-1.5 py-1.5 shadow-sm animate-fade-up" style={{ animationDelay: '0.04s' }}>
-            <div className="rounded-xl border border-orange-200/80 bg-white px-1.5 py-1 shadow-xs">
+          <div className="flex items-center gap-2 rounded-2xl border border-[#FFE0A3]/80 bg-white/95 px-1.5 py-1.5 shadow-sm animate-fade-up" style={{ animationDelay: '0.04s' }}>
+            <div className="rounded-xl border border-[#FFE0A3]/80 bg-white px-1.5 py-1 shadow-xs">
               <LanguageSwitcher />
             </div>
             {user ? (
@@ -98,33 +98,33 @@ function Header() {
                 <button
                   type="button"
                   onClick={() => setAccountMenuOpen((prev) => !prev)}
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-orange-300 bg-white text-orange-800 text-sm font-semibold hover:bg-orange-50 transition-colors"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-[#FF6F00]/35 bg-white text-[#FF6F00] text-sm font-semibold hover:bg-[#FFF8E1] transition-colors"
                   aria-haspopup="menu"
                   aria-expanded={accountMenuOpen}
                 >
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-orange-600 to-amber-500 text-[11px] font-bold text-white shadow-sm">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-[#D84315] to-[#FF6F00] text-[11px] font-bold text-white shadow-sm">
                     {accountInitial}
                   </span>
                   {accountLabel}
-                  <span className="text-xs text-orange-700/80">▾</span>
+                  <span className="text-xs text-[#FF6F00]/80">▾</span>
                 </button>
 
                 {accountMenuOpen && (
                   <div
-                    className="absolute right-0 top-[calc(100%+8px)] z-50 min-w-55 overflow-hidden rounded-2xl border border-orange-200/90 bg-white shadow-xl shadow-orange-900/10 animate-fade-up"
+                    className="absolute right-0 top-[calc(100%+8px)] z-50 min-w-55 overflow-hidden rounded-2xl border border-[#FFE0A3]/90 bg-white shadow-xl shadow-orange-900/10 animate-fade-up"
                     style={{ animationDelay: '0.02s' }}
                     role="menu"
                     aria-label="Account menu"
                   >
-                    <div className="border-b border-orange-100 bg-linear-to-r from-orange-50 to-amber-50 px-4 py-3">
-                      <p className="text-[11px] font-semibold tracking-wide text-orange-700/80">SIGNED IN</p>
+                    <div className="border-b border-[#FFF0C2] bg-linear-to-r from-[#FFF8E1] to-[#FFF3C4] px-4 py-3">
+                      <p className="text-[11px] font-semibold tracking-wide text-[#FF6F00]/80">SIGNED IN</p>
                       <p className="mt-0.5 text-sm font-semibold text-stone-900">{user?.name || user?.email || 'Account'}</p>
                     </div>
                     <div className="p-2">
                       <Link
                         to={bookingsRoute}
                         onClick={() => setAccountMenuOpen(false)}
-                        className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-stone-800 hover:bg-orange-50 hover:text-orange-800 transition-colors"
+                        className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-stone-800 hover:bg-[#FFF8E1] hover:text-[#FF6F00] transition-colors"
                         role="menuitem"
                       >
                         My Bookings
@@ -132,7 +132,7 @@ function Header() {
                       <Link
                         to={feedbackRoute}
                         onClick={() => setAccountMenuOpen(false)}
-                        className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-stone-800 hover:bg-orange-50 hover:text-orange-800 transition-colors"
+                        className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-stone-800 hover:bg-[#FFF8E1] hover:text-[#FF6F00] transition-colors"
                         role="menuitem"
                       >
                         My Feedback
@@ -140,10 +140,10 @@ function Header() {
                       <Link
                         to={accountRoute}
                         onClick={() => setAccountMenuOpen(false)}
-                        className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-stone-800 hover:bg-orange-50 hover:text-orange-800 transition-colors inline-flex items-center gap-2"
+                        className="w-full rounded-xl px-3 py-2 text-left text-sm font-medium text-stone-800 hover:bg-[#FFF8E1] hover:text-[#FF6F00] transition-colors inline-flex items-center gap-2"
                         role="menuitem"
                       >
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-100 text-[10px] font-bold text-orange-700">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FFF0C2] text-[10px] font-bold text-[#FF6F00]">
                           {accountInitial}
                         </span>
                         {accountLabel}
@@ -167,7 +167,7 @@ function Header() {
               <>
                 <Link
                   to="/login"
-                  className="whitespace-nowrap px-4 py-2 rounded-xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 text-white text-sm font-semibold shadow-md shadow-orange-400/30 hover:from-orange-700 hover:via-amber-600 hover:to-orange-600 transition-all"
+                  className="whitespace-nowrap px-4 py-2 rounded-xl bg-linear-to-r from-[#D84315] via-[#FF6F00] to-[#FF8F00] text-white text-sm font-semibold shadow-md shadow-orange-400/30 hover:from-[#C63B12] hover:via-[#F57C00] hover:to-[#FB8C00] transition-all"
                 >
                   {t('login')} / {t('signup')}
                 </Link>
@@ -184,7 +184,7 @@ function Header() {
 
         <button
           type="button"
-          className="md:hidden px-3.5 py-2.5 rounded-2xl border border-orange-300/70 bg-linear-to-r from-orange-50 to-amber-50 text-orange-900 text-sm font-semibold shadow-sm hover:from-orange-100 hover:to-amber-100 transition-colors"
+          className="md:hidden px-3.5 py-2.5 rounded-2xl border border-[#FF6F00]/35 bg-linear-to-r from-[#FFF8E1] to-[#FFF3C4] text-[#FF6F00] text-sm font-semibold shadow-sm hover:from-[#FFF3C4] hover:to-[#FFE0A3] transition-colors"
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-label="Toggle navigation menu"
           aria-expanded={mobileMenuOpen}
@@ -194,9 +194,9 @@ function Header() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-orange-100/80 bg-orange-50/85 backdrop-blur animate-fade-up">
+        <div className="md:hidden border-t border-[#FFF0C2]/80 bg-[#FFF8E1]/92 backdrop-blur animate-fade-up">
           <nav className="max-w-6xl mx-auto px-3.5 py-4" style={{ animationDelay: '0.05s' }}>
-            <div className="rounded-2xl border border-orange-300/40 bg-stone-900/95 shadow-lg shadow-orange-900/20 p-4 flex flex-col gap-2.5">
+            <div className="rounded-2xl border border-[#FF6F00]/30 bg-stone-900/95 shadow-lg shadow-orange-900/20 p-4 flex flex-col gap-2.5">
             <NavLink to="/" className={mobileNavClass} onClick={closeMobileMenu}>
               {t('home')}
             </NavLink>
@@ -235,23 +235,23 @@ function Header() {
                   <Link
                     to={bookingsRoute}
                     onClick={closeMobileMenu}
-                    className="w-full px-4 py-2.5 rounded-2xl border border-orange-400/40 bg-orange-100 text-orange-900 text-sm font-semibold text-center hover:bg-orange-50 transition-colors"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-[#FF6F00]/35 bg-[#FFF0C2] text-[#D84315] text-sm font-semibold text-center hover:bg-[#FFF8E1] transition-colors"
                   >
                     My Bookings
                   </Link>
                   <Link
                     to={feedbackRoute}
                     onClick={closeMobileMenu}
-                    className="w-full px-4 py-2.5 rounded-2xl border border-orange-400/40 bg-orange-100 text-orange-900 text-sm font-semibold text-center hover:bg-orange-50 transition-colors"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-[#FF6F00]/35 bg-[#FFF0C2] text-[#D84315] text-sm font-semibold text-center hover:bg-[#FFF8E1] transition-colors"
                   >
                     My Feedback
                   </Link>
                   <Link
                     to={accountRoute}
                     onClick={closeMobileMenu}
-                    className="w-full px-4 py-2.5 rounded-2xl border border-amber-400/60 bg-amber-100 text-amber-900 text-sm font-semibold text-center hover:bg-amber-50 transition-colors inline-flex items-center justify-center gap-2"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-[#FF6F00]/35 bg-[#FFF0C2] text-[#D84315] text-sm font-semibold text-center hover:bg-[#FFF8E1] transition-colors inline-flex items-center justify-center gap-2"
                   >
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-orange-600 to-amber-500 text-[11px] font-bold text-white shadow-sm">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-linear-to-br from-[#D84315] to-[#FF6F00] text-[11px] font-bold text-white shadow-sm">
                       {accountInitial}
                     </span>
                     {accountLabel}
@@ -271,7 +271,7 @@ function Header() {
                   <Link
                     to="/login"
                     onClick={closeMobileMenu}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-linear-to-r from-orange-600 via-amber-500 to-orange-500 text-white text-sm font-semibold text-center shadow-md shadow-orange-500/30 hover:from-orange-700 hover:via-amber-600 hover:to-orange-600 transition-all"
+                    className="w-full px-4 py-2.5 rounded-2xl bg-linear-to-r from-[#D84315] via-[#FF6F00] to-[#FF8F00] text-white text-sm font-semibold text-center shadow-md shadow-orange-500/30 hover:from-[#C63B12] hover:via-[#F57C00] hover:to-[#FB8C00] transition-all"
                   >
                     {t('login')} / {t('signup')}
                   </Link>

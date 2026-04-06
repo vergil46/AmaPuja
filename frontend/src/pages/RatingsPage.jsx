@@ -167,37 +167,37 @@ function RatingsPage() {
       <Seo title="Ratings & Reviews | Puja Samriddhi" description="Share feedback for your completed pooja bookings." />
 
       <div className="rounded-3xl border border-orange-100 bg-white/90 p-6 shadow-sm sm:p-7">
-        <p className="text-xs font-medium uppercase tracking-widest text-orange-700">Customer Trust</p>
-        <h1 className="mt-2 text-3xl font-semibold text-stone-800 sm:text-4xl">Ratings & Reviews</h1>
-        <p className="mt-3 text-base leading-relaxed text-stone-600">
+        <p className="text-xs font-medium uppercase tracking-widest text-[#FF6F00]">Customer Trust</p>
+        <h1 className="mt-2 text-3xl font-semibold text-[#333333] sm:text-4xl">Ratings & Reviews</h1>
+        <p className="mt-3 text-base leading-relaxed text-[#333333]/78">
           Share your experience and help us improve our puja service quality.
         </p>
       </div>
 
       {!token ? (
-        <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-7">
-          <h2 className="text-xl font-semibold text-stone-800 sm:text-2xl">Login required to submit a review</h2>
-          <p className="mt-2 text-base leading-relaxed text-stone-600">
+        <div className="rounded-2xl border border-[#FFE0A3] bg-white p-6 shadow-sm sm:p-7">
+          <h2 className="text-xl font-semibold text-[#333333] sm:text-2xl">Login required to submit a review</h2>
+          <p className="mt-2 text-base leading-relaxed text-[#333333]/78">
             You can add a rating after completing a booking from your account dashboard.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
               to="/login"
-              className="rounded-xl bg-linear-to-r from-orange-600 to-amber-600 px-4 py-2.5 text-sm font-semibold text-white"
+              className="rounded-xl bg-linear-to-r from-[#D84315] to-[#FF6F00] px-4 py-2.5 text-sm font-semibold text-white"
             >
               Login
             </Link>
-            <Link to="/signup" className="rounded-xl border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-700">
+            <Link to="/signup" className="rounded-xl border border-stone-300 px-4 py-2.5 text-sm font-semibold text-[#333333]">
               Create Account
             </Link>
           </div>
         </div>
       ) : (
         <>
-          <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-7">
+          <div className="rounded-2xl border border-[#FFE0A3] bg-white p-6 shadow-sm sm:p-7">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-xl font-semibold text-stone-800 sm:text-2xl">📝 Pending reviews</h2>
-              <span className="rounded-full border border-orange-100 bg-orange-50 px-3 py-1 text-sm text-orange-700">
+              <h2 className="text-xl font-semibold text-[#333333] sm:text-2xl">📝 Pending reviews</h2>
+              <span className="rounded-full border border-[#FFE0A3] bg-[#FFF8E1] px-3 py-1 text-sm text-[#D84315]">
                 {completedBookingsWithoutFeedback.length} pending
               </span>
             </div>
@@ -213,11 +213,11 @@ function RatingsPage() {
                     id={`rating-booking-${booking._id}`}
                     key={booking._id}
                     className={`rounded-xl border p-4 animate-fade-up ${
-                      reviewBookingId === booking._id ? 'border-orange-300 ring-2 ring-orange-100' : 'border-stone-200'
+                        reviewBookingId === booking._id ? 'border-[#FF6F00] ring-2 ring-[#FF6F00]/15' : 'border-stone-200'
                     }`}
                     style={{ animationDelay: `${Math.min(index * 0.06, 0.36)}s` }}
                   >
-                    <p className="text-lg font-semibold text-stone-800">{booking.poojaId?.title}</p>
+                      <p className="text-lg font-semibold text-[#333333]">{booking.poojaId?.title}</p>
                     <p className="mt-1 text-sm text-stone-600">
                       {booking.date} • {booking.time}
                     </p>
@@ -247,7 +247,7 @@ function RatingsPage() {
                     <button
                       onClick={() => submitFeedback(booking._id)}
                       disabled={Boolean(submittingByBookingId[booking._id])}
-                      className="mt-3 rounded-lg bg-orange-700 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                      className="mt-3 rounded-lg bg-linear-to-r from-[#D84315] to-[#FF6F00] px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {submittingByBookingId[booking._id] ? 'Submitting...' : 'Submit review'}
                     </button>
@@ -269,8 +269,8 @@ function RatingsPage() {
             )}
           </div>
 
-          <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-7">
-            <h2 className="text-xl font-semibold text-stone-800 sm:text-2xl">✅ My submitted reviews</h2>
+          <div className="rounded-2xl border border-[#FFE0A3] bg-white p-6 shadow-sm sm:p-7">
+            <h2 className="text-xl font-semibold text-[#333333] sm:text-2xl">✅ My submitted reviews</h2>
             {feedbacks.length === 0 ? (
               <p className="mt-3 text-sm text-stone-600">You have not submitted any review yet.</p>
             ) : (
@@ -278,14 +278,14 @@ function RatingsPage() {
                 {feedbacks.map((feedback, index) => (
                   <article
                     key={feedback._id}
-                    className="rounded-xl border border-stone-200 p-4 bg-stone-50/70 animate-fade-up"
+                    className="rounded-xl border border-[#FFE0A3] p-4 bg-[#FFFDF5] animate-fade-up"
                     style={{ animationDelay: `${Math.min(index * 0.05, 0.3)}s` }}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <p className="text-base font-semibold text-stone-800">{feedback.poojaId?.title || 'Pooja Service'}</p>
+                      <p className="text-base font-semibold text-[#333333]">{feedback.poojaId?.title || 'Pooja Service'}</p>
                       <StarRow rating={feedback.rating} />
                     </div>
-                    <p className="mt-2 text-sm leading-relaxed text-stone-700 sm:text-base">{feedback.comment}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-[#333333]/82 sm:text-base">{feedback.comment}</p>
                   </article>
                 ))}
               </div>
@@ -294,9 +294,9 @@ function RatingsPage() {
         </>
       )}
 
-      <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-7">
+      <div className="rounded-2xl border border-[#FFE0A3] bg-white p-6 shadow-sm sm:p-7">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-semibold text-stone-800 sm:text-2xl">🌟 Customer reviews</h2>
+          <h2 className="text-xl font-semibold text-[#333333] sm:text-2xl">🌟 Customer reviews</h2>
           <div className="flex items-center gap-2 text-sm text-stone-700">
             <StarRow rating={Math.round(Number(averageRating))} />
             <span>{averageRating} / 5</span>
@@ -304,11 +304,11 @@ function RatingsPage() {
           </div>
         </div>
 
-        <div className="mt-5 rounded-xl border border-orange-100 bg-linear-to-r from-orange-50/70 to-amber-50/60 p-4">
+        <div className="mt-5 rounded-xl border border-[#FFE0A3] bg-linear-to-r from-[#FFF8E1]/70 to-[#FFF3C4]/60 p-4">
           <div className="grid gap-3 sm:grid-cols-[140px_1fr] sm:items-center">
             <div>
-              <p className="text-[11px] uppercase tracking-widest text-orange-700">Overall Score</p>
-              <p className="mt-1 text-3xl font-semibold text-stone-900">{averageRating}</p>
+              <p className="text-[11px] uppercase tracking-widest text-[#FF6F00]">Overall Score</p>
+              <p className="mt-1 text-3xl font-semibold text-[#333333]">{averageRating}</p>
               <p className="text-sm text-stone-600">Based on {feedbackCount} verified reviews</p>
             </div>
             <div className="space-y-2">
@@ -317,7 +317,7 @@ function RatingsPage() {
                   <span className="text-stone-700">{item.rating} stars</span>
                   <div className="h-2.5 overflow-hidden rounded-full bg-stone-200">
                     <div
-                      className="h-full rounded-full bg-linear-to-r from-orange-500 to-amber-500 transition-all duration-500"
+                      className="h-full rounded-full bg-linear-to-r from-[#D84315] to-[#FF6F00] transition-all duration-500"
                       style={{ width: `${item.percent}%` }}
                     />
                   </div>
@@ -337,17 +337,17 @@ function RatingsPage() {
             {publicFeedbacks.map((feedback, index) => (
               <article
                 key={feedback._id}
-                className="rounded-xl border border-orange-100 bg-orange-50/30 p-4 shadow-sm animate-fade-up"
+                    className="rounded-xl border border-[#FFE0A3] bg-[#FFFDF5] p-4 shadow-sm animate-fade-up"
                 style={{ animationDelay: `${Math.min(index * 0.06, 0.42)}s` }}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-base font-semibold text-stone-800">{feedback.customerName}</p>
+                        <p className="text-base font-semibold text-[#333333]">{feedback.customerName}</p>
                     <p className="text-xs text-stone-500 mt-0.5">{feedback.poojaTitle}</p>
                   </div>
                   <StarRow rating={feedback.rating} />
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-stone-700 sm:text-base">{feedback.comment}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-[#333333]/82 sm:text-base">{feedback.comment}</p>
               </article>
             ))}
           </div>

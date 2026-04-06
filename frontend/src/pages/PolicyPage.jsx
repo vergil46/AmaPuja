@@ -86,12 +86,12 @@ const RefundPolicyContent = () => (
     />
     
     <div className="mb-10">
-      <h1 className="text-4xl font-bold text-stone-900 mb-2">Refund Policy</h1>
+      <h1 className="text-4xl font-bold text-[#333333] mb-2">Refund Policy</h1>
       <p className="text-stone-600">Last updated: March 2026</p>
     </div>
 
-    <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-8 rounded">
-      <p className="text-stone-800">
+    <div className="bg-[#FFF8E1] border-l-4 border-[#FF6F00] p-4 mb-8 rounded">
+      <p className="text-[#333333]">
         We're committed to fair and transparent refund policies. Please review the sections below to understand your cancellation and refund options.
       </p>
     </div>
@@ -221,11 +221,11 @@ const RefundPolicyContent = () => (
           <p>If you face any issue with the service:</p>
           <ul className="space-y-2 ml-4">
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold">1.</span>
+              <span className="text-[#FF6F00] font-bold">1.</span>
               <span className="text-stone-700"><strong>Report within 24 hours</strong></span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-blue-600 font-bold">2.</span>
+              <span className="text-[#FF6F00] font-bold">2.</span>
               <span className="text-stone-700"><strong>Our team will review</strong> and may provide a partial refund if applicable</span>
             </li>
           </ul>

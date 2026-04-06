@@ -251,20 +251,20 @@ function DashboardPage() {
       </div>
 
       {!isLoggedIn && (
-        <div className="mb-8 overflow-hidden rounded-2xl border border-orange-200/80 bg-linear-to-br from-orange-50 via-amber-50 to-white shadow-sm">
-          <div className="border-b border-orange-200/70 bg-white/70 px-4 py-3 sm:px-5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-orange-700">Guest Access</p>
-            <h2 className="mt-1 text-lg font-semibold text-stone-900 sm:text-xl">Track Your Booking Instantly</h2>
-            <p className="mt-1 text-sm text-stone-600">Use the same contact details used during booking. No login required.</p>
+        <div className="mb-8 overflow-hidden rounded-2xl border border-[#FFE0A3]/80 bg-linear-to-br from-[#FFF8E1] via-[#FFF3C4] to-white shadow-sm">
+          <div className="border-b border-[#FFE0A3]/70 bg-white/70 px-4 py-3 sm:px-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#FF6F00]">Guest Access</p>
+            <h2 className="mt-1 text-lg font-semibold text-[#333333] sm:text-xl">Track Your Booking Instantly</h2>
+            <p className="mt-1 text-sm text-[#333333]/78">Use the same contact details used during booking. No login required.</p>
           </div>
 
           <div className="px-4 py-4 sm:px-5 sm:py-5">
             <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_auto]" onSubmit={handleGuestTrack}>
               <label className="space-y-1.5">
-                <span className="text-xs font-semibold text-stone-700">Booking Email</span>
+                <span className="text-xs font-semibold text-[#333333]/75">Booking Email</span>
                 <input
                   type="email"
-                  className="w-full rounded-xl border border-orange-200 bg-white px-3 py-2.5 text-sm text-stone-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+                  className="w-full rounded-xl border border-[#FFE0A3] bg-white px-3 py-2.5 text-sm text-[#333333] outline-none transition focus:border-[#FF6F00] focus:ring-2 focus:ring-[#FF6F00]/20"
                   placeholder="you@example.com"
                   value={trackForm.email}
                   onChange={(event) => setTrackForm((prev) => ({ ...prev, email: event.target.value }))}
@@ -273,10 +273,10 @@ function DashboardPage() {
               </label>
 
               <label className="space-y-1.5">
-                <span className="text-xs font-semibold text-stone-700">Booking Phone</span>
+                <span className="text-xs font-semibold text-[#333333]/75">Booking Phone</span>
                 <input
                   type="tel"
-                  className="w-full rounded-xl border border-orange-200 bg-white px-3 py-2.5 text-sm text-stone-800 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+                  className="w-full rounded-xl border border-[#FFE0A3] bg-white px-3 py-2.5 text-sm text-[#333333] outline-none transition focus:border-[#FF6F00] focus:ring-2 focus:ring-[#FF6F00]/20"
                   placeholder="10-digit number"
                   value={trackForm.phone}
                   onChange={(event) => setTrackForm((prev) => ({ ...prev, phone: event.target.value }))}
@@ -287,16 +287,16 @@ function DashboardPage() {
               <button
                 type="submit"
                 disabled={tracking}
-                className="self-end rounded-xl bg-linear-to-r from-orange-700 via-orange-600 to-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-105 disabled:opacity-60"
+                className="self-end rounded-xl bg-linear-to-r from-[#D84315] via-[#FF6F00] to-[#FF8F00] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:brightness-105 disabled:opacity-60"
               >
                 {tracking ? 'Tracking...' : 'Track Status'}
               </button>
             </form>
 
             <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-stone-600">
-              <span className="rounded-full border border-orange-200 bg-white px-2.5 py-1">Private lookup</span>
-              <span className="rounded-full border border-orange-200 bg-white px-2.5 py-1">Real-time status</span>
-              <span className="rounded-full border border-orange-200 bg-white px-2.5 py-1">No account required</span>
+              <span className="rounded-full border border-[#FFE0A3] bg-white px-2.5 py-1">Private lookup</span>
+              <span className="rounded-full border border-[#FFE0A3] bg-white px-2.5 py-1">Real-time status</span>
+              <span className="rounded-full border border-[#FFE0A3] bg-white px-2.5 py-1">No account required</span>
             </div>
 
             {trackError && <p className="mt-3 text-sm font-medium text-red-700">{trackError}</p>}
@@ -306,7 +306,7 @@ function DashboardPage() {
 
             <p className="mt-4 text-sm text-stone-600">
               Want cancellation and feedback options?
-              <Link to="/login" className="ml-1 font-semibold text-orange-700 hover:text-orange-800">
+              <Link to="/login" className="ml-1 font-semibold text-[#FF6F00] hover:text-[#D84315]">
                 Login to your dashboard
               </Link>
             </p>
@@ -316,53 +316,53 @@ function DashboardPage() {
 
       {/* Stats Cards */}
       {isLoggedIn && (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white border border-stone-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="bg-white border border-[#FFE0A3] rounded-xl p-5 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-stone-600">Total Bookings</p>
-              <p className="text-3xl font-bold text-stone-800 mt-1">{stats.total}</p>
+              <p className="text-sm text-[#333333]/70">Total Bookings</p>
+              <p className="text-3xl font-bold text-[#333333] mt-1">{stats.total}</p>
             </div>
-            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-[#FFF0C2] rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-[#FF6F00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-stone-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+        <div className="bg-white border border-[#FFE0A3] rounded-xl p-5 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-stone-600">Pending</p>
-              <p className="text-3xl font-bold text-yellow-600 mt-1">{stats.pending}</p>
+              <p className="text-sm text-[#333333]/70">Pending</p>
+              <p className="text-3xl font-bold text-[#D84315] mt-1">{stats.pending}</p>
             </div>
-            <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-[#FFF0C2] rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-[#D84315]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-stone-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+        <div className="bg-white border border-[#FFE0A3] rounded-xl p-5 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-stone-600">Confirmed</p>
-              <p className="text-3xl font-bold text-blue-600 mt-1">{stats.confirmed}</p>
+              <p className="text-sm text-[#333333]/70">Confirmed</p>
+              <p className="text-3xl font-bold text-[#FF6F00] mt-1">{stats.confirmed}</p>
             </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-[#FFF8E1] rounded-full flex items-center justify-center">
+              <svg className="w-6 h-6 text-[#FF6F00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
         </div>
 
-        <div className="bg-white border border-stone-200 rounded-xl p-5 hover:shadow-md transition-shadow">
+        <div className="bg-white border border-[#FFE0A3] rounded-xl p-5 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-stone-600">Completed</p>
+              <p className="text-sm text-[#333333]/70">Completed</p>
               <p className="text-3xl font-bold text-green-600 mt-1">{stats.completed}</p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
@@ -376,7 +376,7 @@ function DashboardPage() {
       )}
 
       {/* Bookings Table */}
-      <div id="bookings" className="bg-white border border-stone-200 rounded-xl overflow-hidden mb-8 scroll-mt-28">
+      <div id="bookings" className="bg-white border border-[#FFE0A3] rounded-xl overflow-hidden mb-8 scroll-mt-28">
         <div
           className={`px-6 py-4 border-b ${
             isLoggedIn
@@ -417,14 +417,14 @@ function DashboardPage() {
                   <th className="px-6 py-3 text-left font-semibold text-stone-700">Package</th>
                   <th className="px-6 py-3 text-left font-semibold text-stone-700">Payment</th>
                   <th className="px-6 py-3 text-left font-semibold text-stone-700">Status</th>
-                  <th className="px-6 py-3 text-left font-semibold text-stone-700">Action</th>
+                  <th className="px-6 py-3 text-left font-semibold text-[#333333]/75">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-200">
                 {bookings.map((booking) => (
-                  <tr key={booking._id} className="hover:bg-stone-50 transition-colors">
+                  <tr key={booking._id} className="hover:bg-[#FFF8E1] transition-colors">
                     <td className="px-6 py-4">
-                      <p className="font-medium text-stone-800">{booking.poojaId?.title}</p>
+                      <p className="font-medium text-[#333333]">{booking.poojaId?.title}</p>
                       <p className="text-xs text-stone-500 mt-1">{booking.city}</p>
                     </td>
                     <td className="px-6 py-4">
@@ -466,7 +466,7 @@ function DashboardPage() {
                         <button
                           onClick={() => handleCancelBooking(booking._id)}
                           disabled={Boolean(cancelLoadingById[booking._id])}
-                          className="px-3 py-1.5 text-xs rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+                          className="px-3 py-1.5 text-xs rounded-md bg-[#D84315] text-white hover:bg-[#C63B12] disabled:opacity-60"
                         >
                           {cancelLoadingById[booking._id] ? 'Cancelling...' : 'Cancel'}
                         </button>
@@ -484,15 +484,15 @@ function DashboardPage() {
 
       {/* Feedback Section */}
       {isLoggedIn && (
-      <div id="feedback" className="bg-white border border-stone-200 rounded-xl p-6 scroll-mt-28">
+      <div id="feedback" className="bg-white border border-[#FFE0A3] rounded-xl p-6 scroll-mt-28">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-            <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-[#FFF0C2] rounded-full flex items-center justify-center">
+            <svg className="w-5 h-5 text-[#FF6F00]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
             </svg>
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-stone-800">Share Your Experience</h2>
+            <h2 className="text-xl font-semibold text-[#333333]">Share Your Experience</h2>
             <p className="text-sm text-stone-600">Help us improve by sharing feedback for completed poojas</p>
           </div>
         </div>
@@ -518,10 +518,10 @@ function DashboardPage() {
                 id={`feedback-booking-${booking._id}`}
                 key={booking._id}
                 className={`border rounded-lg p-4 ${
-                  reviewBookingId === booking._id ? 'border-orange-400 ring-2 ring-orange-200' : 'border-stone-200'
+                  reviewBookingId === booking._id ? 'border-[#FF6F00] ring-2 ring-[#FF6F00]/15' : 'border-stone-200'
                 }`}
               >
-                <p className="font-medium text-stone-800">{booking.poojaId?.title}</p>
+                <p className="font-medium text-[#333333]">{booking.poojaId?.title}</p>
                 <p className="text-sm text-stone-600 mt-1">{booking.date} {booking.time}</p>
 
                 <div className="mt-3 grid sm:grid-cols-[160px_1fr] gap-3">
@@ -549,7 +549,7 @@ function DashboardPage() {
                 <button
                   onClick={() => submitFeedback(booking._id)}
                   disabled={Boolean(feedbackSubmittingById[booking._id])}
-                  className="mt-3 px-4 py-2 rounded bg-orange-700 text-white disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="mt-3 px-4 py-2 rounded bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {feedbackSubmittingById[booking._id] ? 'Submitting...' : 'Submit Feedback'}
                 </button>

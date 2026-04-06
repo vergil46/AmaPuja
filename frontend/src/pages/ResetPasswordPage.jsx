@@ -57,11 +57,11 @@ function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-orange-50 to-amber-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-[#FFF8E1] to-[#FFF3C4] px-4">
       <Seo title="Reset Password | Puja Samriddhi" />
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-stone-800 text-center mb-2">Reset Password</h2>
-        <p className="text-stone-600 text-center mb-6">Enter your new password</p>
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-[#FFE0A3]">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[#333333] text-center mb-2">Reset Password</h2>
+        <p className="text-[#333333]/78 text-center mb-6">Enter your new password</p>
 
         {status === 'success' && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -80,7 +80,7 @@ function ResetPasswordPage() {
           <div className="text-center">
             <Link
               to="/forgot-password"
-              className="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-700 transition"
+              className="inline-block bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white px-6 py-3 rounded-lg font-semibold hover:brightness-110 transition"
             >
               Request New Reset Link
             </Link>
@@ -88,7 +88,7 @@ function ResetPasswordPage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="newPassword" className="block text-sm font-medium text-stone-700 mb-1">
+              <label htmlFor="newPassword" className="block text-sm font-medium text-[#333333]/78 mb-1">
                 New Password
               </label>
               <input
@@ -98,14 +98,14 @@ function ResetPasswordPage() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#FF6F00] focus:border-transparent"
                 placeholder="Enter new password"
                 disabled={status === 'loading' || status === 'success'}
               />
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-stone-700 mb-1">
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#333333]/78 mb-1">
                 Confirm Password
               </label>
               <input
@@ -115,7 +115,7 @@ function ResetPasswordPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[#FF6F00] focus:border-transparent"
                 placeholder="Confirm new password"
                 disabled={status === 'loading' || status === 'success'}
               />
@@ -124,7 +124,7 @@ function ResetPasswordPage() {
             <button
               type="submit"
               disabled={status === 'loading' || status === 'success'}
-              className="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white py-3 rounded-lg font-semibold hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {status === 'loading' ? 'Resetting...' : 'Reset Password'}
             </button>
@@ -132,7 +132,7 @@ function ResetPasswordPage() {
         )}
 
         <div className="mt-6 text-center">
-          <Link to="/login" className="text-orange-600 hover:text-orange-700 font-medium">
+          <Link to="/login" className="text-[#FF6F00] hover:text-[#D84315] font-medium">
             ← Back to Login
           </Link>
         </div>

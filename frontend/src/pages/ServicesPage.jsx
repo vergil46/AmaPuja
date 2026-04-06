@@ -747,40 +747,40 @@ function ServicesPage() {
     <section className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
       <Seo title="Puja Samriddhi Services" description="Explore all available puja services and packages." />
 
-      <div className="overflow-hidden rounded-3xl border border-orange-100 bg-linear-to-br from-white via-orange-50/40 to-amber-50/60 shadow-sm">
+      <div className="overflow-hidden rounded-3xl border border-[#FFE0A3] bg-linear-to-br from-white via-[#FFF8E1]/70 to-[#FFF3C4]/80 shadow-sm">
         <div className="px-5 py-7 sm:px-7 sm:py-8">
-          <p className="text-sm font-medium uppercase tracking-widest text-orange-700">Sacred Services</p>
-          <h1 className="mt-2 text-2xl font-semibold leading-tight text-stone-900 sm:text-4xl">Find the Right Puja in Seconds</h1>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-stone-600">
+          <p className="text-sm font-medium uppercase tracking-widest text-[#FF6F00]">Sacred Services</p>
+          <h1 className="mt-2 text-2xl font-semibold leading-tight text-[#333333] sm:text-4xl">Find the Right Puja in Seconds</h1>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-[#333333]/78">
             Modern booking experience with verified priests, language preference, and city-wise availability.
           </p>
 
           <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
-              <p className="text-sm text-stone-600">Available Services</p>
-              <p className="mt-1 text-lg font-semibold text-stone-900">{isLoading ? '...' : displayPoojas.length}</p>
+            <div className="rounded-xl border border-[#FFE0A3] bg-white/88 px-4 py-3.5">
+              <p className="text-sm text-[#333333]/70">Available Services</p>
+              <p className="mt-1 text-lg font-semibold text-[#333333]">{isLoading ? '...' : displayPoojas.length}</p>
             </div>
-            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
-              <p className="text-sm text-stone-600">Selected City</p>
-              <p className="mt-1 text-lg font-semibold text-stone-900">{selectedCity}</p>
+            <div className="rounded-xl border border-[#FFE0A3] bg-white/88 px-4 py-3.5">
+              <p className="text-sm text-[#333333]/70">Selected City</p>
+              <p className="mt-1 text-lg font-semibold text-[#333333]">{selectedCity}</p>
             </div>
-            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
-              <p className="text-sm text-stone-600">Priest Language</p>
-              <p className="mt-1 text-lg font-semibold text-stone-900">{priestPreference}</p>
+            <div className="rounded-xl border border-[#FFE0A3] bg-white/88 px-4 py-3.5">
+              <p className="text-sm text-[#333333]/70">Priest Language</p>
+              <p className="mt-1 text-lg font-semibold text-[#333333]">{priestPreference}</p>
             </div>
-            <div className="rounded-xl border border-orange-200/70 bg-white/80 px-4 py-3.5">
-              <p className="text-sm text-stone-600">Coverage</p>
-              <p className="mt-1 text-lg font-semibold text-stone-900">{selectedLanguageCount || 'All'} Poojas</p>
+            <div className="rounded-xl border border-[#FFE0A3] bg-white/88 px-4 py-3.5">
+              <p className="text-sm text-[#333333]/70">Coverage</p>
+              <p className="mt-1 text-lg font-semibold text-[#333333]">{selectedLanguageCount || 'All'} Poojas</p>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-orange-100 bg-white/85 px-5 py-5 sm:px-7">
+        <div className="border-t border-[#FFF0C2] bg-white/88 px-5 py-5 sm:px-7">
           <div className="grid gap-4 md:grid-cols-3">
             <div>
-              <label className="text-sm font-medium text-stone-700">Priest Preference</label>
+              <label className="text-sm font-medium text-[#333333]/78">Priest Preference</label>
               <select
-                className="mt-1 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="mt-1 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none focus:border-[#FF6F00] focus:ring-2 focus:ring-[#FF6F00]/20"
                 value={priestPreference}
                 onChange={(event) => setPriestPreference(event.target.value)}
               >
@@ -791,9 +791,9 @@ function ServicesPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-700">Select City</label>
+              <label className="text-sm font-medium text-[#333333]/78">Select City</label>
               <select
-                className="mt-1 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="mt-1 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none focus:border-[#FF6F00] focus:ring-2 focus:ring-[#FF6F00]/20"
                 value={selectedCity}
                 onChange={(event) => setSelectedCity(event.target.value)}
               >
@@ -803,9 +803,9 @@ function ServicesPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-stone-700">Search Pooja</label>
+              <label className="text-sm font-medium text-[#333333]/78">Search Pooja</label>
               <input
-                className="mt-1 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
+                className="mt-1 w-full min-h-11 rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-base shadow-sm outline-none focus:border-[#FF6F00] focus:ring-2 focus:ring-[#FF6F00]/20"
                 placeholder="Type pooja name"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
@@ -814,7 +814,7 @@ function ServicesPage() {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-            <span className="rounded-full bg-orange-100 text-orange-800 px-3 py-1">{priestPreference} priest</span>
+            <span className="rounded-full bg-[#FFF0C2] text-[#D84315] px-3 py-1">{priestPreference} priest</span>
             <span className="rounded-full bg-stone-100 text-stone-700 px-3 py-1">{selectedCity}</span>
             <span className="rounded-full bg-stone-100 text-stone-700 px-3 py-1">{displayPoojas.length} poojas</span>
             {(searchTerm || selectedCity !== 'Bangalore' || priestPreference !== 'Odia') && (
@@ -835,8 +835,8 @@ function ServicesPage() {
       </div>
 
       {isUsingFallbackData && (
-        <div className="mt-3 flex flex-col gap-2 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-orange-700">
+        <div className="mt-3 flex flex-col gap-2 rounded-lg border border-[#FFE0A3] bg-[#FFF8E1] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-[#D84315]">
             {fallbackMode === 'cached'
               ? 'Unable to reach the server right now — showing cached service data.'
               : 'Unable to reach the server right now — showing backup service data.'}
@@ -844,23 +844,23 @@ function ServicesPage() {
           <button
             type="button"
             onClick={() => setReloadNonce((value) => value + 1)}
-            className="self-start rounded-md border border-orange-300 bg-white px-3 py-1.5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-100 sm:self-auto"
+            className="self-start rounded-md border border-[#FF6F00]/35 bg-white px-3 py-1.5 text-sm font-semibold text-[#FF6F00] transition-colors hover:bg-[#FFF3C4] sm:self-auto"
           >
             Retry now
           </button>
         </div>
       )}
 
-      <div className="mt-4 rounded-2xl border border-orange-100 bg-white p-4 shadow-sm">
+      <div className="mt-4 rounded-2xl border border-[#FFE0A3] bg-white p-4 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-semibold text-stone-900">Need help choosing the right puja package?</p>
-            <p className="text-sm text-stone-600">Talk to our team for language, samagri, and timing guidance before booking.</p>
+            <p className="text-sm font-semibold text-[#333333]">Need help choosing the right puja package?</p>
+            <p className="text-sm text-[#333333]/78">Talk to our team for language, samagri, and timing guidance before booking.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a
               href="tel:+919739362962"
-              className="inline-flex items-center gap-2 rounded-lg border border-stone-300 px-3.5 py-2 text-sm font-semibold text-stone-800 transition-colors hover:bg-stone-50"
+              className="inline-flex items-center gap-2 rounded-lg border border-stone-300 px-3.5 py-2 text-sm font-semibold text-[#333333] transition-colors hover:bg-stone-50"
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-full border border-stone-300 bg-stone-50 text-stone-700" aria-hidden="true">
                 <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -873,7 +873,7 @@ function ServicesPage() {
               href="https://wa.me/919739362962"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-green-700"
+              className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-[#D84315] to-[#FF6F00] px-3.5 py-2 text-sm font-semibold text-white transition hover:brightness-110"
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20" aria-hidden="true">
                 <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
@@ -887,14 +887,14 @@ function ServicesPage() {
       </div>
 
       <div className="mt-8 flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-stone-900 sm:text-2xl">Available Pooja Services</h2>
+        <h2 className="text-lg font-semibold text-[#333333] sm:text-2xl">Available Pooja Services</h2>
         <span className="text-sm text-stone-500">{isLoading ? 'Fetching services… please wait' : `${displayPoojas.length} found`}</span>
       </div>
 
       {isLoading ? (
         <div className="mt-8 grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="bg-white rounded-2xl border border-orange-100 p-4 animate-pulse shadow-sm">
+            <div key={index} className="bg-white rounded-2xl border border-[#FFE0A3] p-4 animate-pulse shadow-sm">
               <div className="h-44 rounded bg-stone-200" />
               <div className="h-5 w-2/3 mt-4 rounded bg-stone-200" />
               <div className="h-4 w-full mt-3 rounded bg-stone-200" />
@@ -917,9 +917,9 @@ function ServicesPage() {
       )}
 
       {!isLoading && displayPoojas.length === 0 && (
-        <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-6 text-center">
-          <p className="text-stone-800 font-medium">No pooja found for this filter.</p>
-          <p className="text-sm text-stone-600 mt-1">Try changing priest preference or clear the search term.</p>
+        <div className="mt-6 rounded-2xl border border-[#FFE0A3] bg-white p-6 text-center">
+          <p className="text-[#333333] font-medium">No pooja found for this filter.</p>
+          <p className="text-sm text-[#333333]/78 mt-1">Try changing priest preference or clear the search term.</p>
         </div>
       )}
 
