@@ -77,7 +77,7 @@ function ContactPage() {
               </svg>
               <div>
                 <p className="text-sm text-[#333333]/70">Email</p>
-                <p className="font-semibold text-[#333333]">support@pujasamriddhi.com</p>
+                <p className="font-semibold text-[#333333]">pujasamriddhi.com</p>
               </div>
             </div>
 

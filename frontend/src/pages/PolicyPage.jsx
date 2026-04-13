@@ -254,7 +254,7 @@ const RefundPolicyContent = () => (
       <h3 className="text-lg font-semibold text-stone-900 mb-2">Have Questions?</h3>
       <p className="text-stone-700">
         If you have any questions regarding our refund policy, please contact us at 
-        <strong> support@pujasamriddhi.com</strong> or reach out via WhatsApp for immediate assistance.
+        <strong> pujasamriddhi.com</strong> or reach out via WhatsApp for immediate assistance.
       </p>
     </div>
   </section>

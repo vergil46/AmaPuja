@@ -118,11 +118,11 @@ function Footer() {
                 </span>
                 9739362962
               </a>
-              <a href="mailto:support@pujasamriddhi.com" className="group flex items-center gap-2.5 text-white/70 transition hover:text-orange-200">
+              <a href="https://pujasamriddhi.com" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-2.5 text-white/70 transition hover:text-orange-200">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-orange-300/20 bg-orange-500/12 text-orange-200 transition group-hover:border-orange-200/45 group-hover:bg-orange-400/20">
                   <MailIcon />
                 </span>
-                support@pujasamriddhi.com
+                pujasamriddhi.com
               </a>
               <a href="mailto:pujasamriddhi@gmail.com" className="group flex items-center gap-2.5 text-white/70 transition hover:text-orange-200">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-orange-300/20 bg-orange-500/12 text-orange-200 transition group-hover:border-orange-200/45 group-hover:bg-orange-400/20">

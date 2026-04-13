@@ -125,7 +125,7 @@ const sendBookingConfirmationEmail = async (booking, pooja, user) => {
           </div>` : ''}
 
           <p style="margin-top: 30px;">Our team will contact you soon to confirm the arrangements.</p>
-          <p>For any queries, please contact us at <a href="mailto:support@pujasamriddhi.com" style="color: #b45309;">support@pujasamriddhi.com</a></p>
+          <p>For any queries, please contact us at <a href="https://pujasamriddhi.com" style="color: #b45309;">pujasamriddhi.com</a></p>
           
           <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
             <p style="color: #999; font-size: 12px;">Thank you for choosing Puja Samriddhi</p>
