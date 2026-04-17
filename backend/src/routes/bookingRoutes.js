@@ -530,8 +530,19 @@ router.patch('/:id/status', protect, adminOnly, async (req, res) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
+    const previousStatus = String(booking.bookingStatus || '').toLowerCase();
     booking.bookingStatus = bookingStatus;
     await booking.save();
+
+    const nextStatus = String(booking.bookingStatus || '').toLowerCase();
+    if (previousStatus !== 'completed' && nextStatus === 'completed') {
+      sendCompletionReviewNotifications({
+        booking,
+        pooja: booking.poojaId,
+      }).catch((notificationError) => {
+        console.error('Auto review notification error:', notificationError);
+      });
+    }
 
     return res.json(withBookingDefaults(booking));
 
