@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: 'Failed to load feedbacks' });
   }
-);
+});
 
 router.get('/my', protect, async (req, res) => {
   const feedbacks = await Feedback.find({ userId: req.user._id })
