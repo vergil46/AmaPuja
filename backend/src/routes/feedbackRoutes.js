@@ -5,6 +5,18 @@ const { protect, adminOnly } = require('../middleware/auth');
 
 const router = express.Router();
 
+const normalize = (value) => String(value || '').trim().toLowerCase();
+
+const isBlockedPublicReview = (feedback) => {
+  const customerName = normalize(feedback?.userId?.name);
+  const comment = normalize(feedback?.comment);
+
+  return (
+    customerName === 'akash sevlani' &&
+    comment === 'very good experience pandit ji came on time on did in very good puja'
+  );
+};
+
 router.get('/', async (req, res) => {
   try {
     const requestedLimit = Number(req.query.limit);
@@ -18,15 +30,17 @@ router.get('/', async (req, res) => {
       .populate('userId', 'name')
       .populate('poojaId', 'title');
 
-    const items = feedbacks.map((feedback) => ({
-      _id: feedback._id,
-      rating: feedback.rating,
-      comment: feedback.comment,
-      reviewPhoto: feedback.reviewPhoto || '',
-      createdAt: feedback.createdAt,
-      customerName: feedback.userId?.name || 'Verified Customer',
-      poojaTitle: feedback.poojaId?.title || 'Pooja Service',
-    }));
+    const items = feedbacks
+      .filter((feedback) => !isBlockedPublicReview(feedback))
+      .map((feedback) => ({
+        _id: feedback._id,
+        rating: feedback.rating,
+        comment: feedback.comment,
+        reviewPhoto: feedback.reviewPhoto || '',
+        createdAt: feedback.createdAt,
+        customerName: feedback.userId?.name || 'Verified Customer',
+        poojaTitle: feedback.poojaId?.title || 'Pooja Service',
+      }));
 
     return res.json(items);
   } catch (error) {
