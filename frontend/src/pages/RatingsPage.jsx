@@ -5,6 +5,12 @@ import Testimonials from '../components/Testimonials'
 import { useAuth } from '../context/useAuth'
 import api from '../services/api'
 
+const QuoteMark = () => (
+  <svg className="h-4 w-4 text-[#FFE0A3]" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M3 21c3 0 7-1 7-8V5c0-1.25-4.716-5-7-5C1.697 5 .5 7.203.5 9.423 0 17 3 21 3 21z" />
+  </svg>
+)
+
 const RATING_OPTIONS = [
   { value: 5, label: '5 - Excellent' },
   { value: 4, label: '4 - Very Good' },
@@ -164,13 +170,13 @@ function RatingsPage() {
 
   return (
     <section className="mx-auto max-w-6xl space-y-8 px-4 py-10">
-      <Seo title="Ratings & Reviews | Puja Samriddhi" description="Share feedback for your completed pooja bookings." />
+      <Seo title="Ratings & Reviews | Puja Samriddhi" description="Read real customer reviews with photos from verified puja bookings." />
 
       <div className="rounded-3xl border border-orange-100 bg-white/90 p-6 shadow-sm sm:p-7">
-        <p className="text-xs font-medium uppercase tracking-widest text-[#FF6F00]">Customer Trust</p>
-        <h1 className="mt-2 text-3xl font-semibold text-[#333333] sm:text-4xl">Ratings & Reviews</h1>
+        <p className="text-xs font-medium uppercase tracking-widest text-[#FF6F00]">Customer Reviews</p>
+        <h1 className="mt-2 text-3xl font-semibold text-[#333333] sm:text-4xl">Verified Customer Feedback</h1>
         <p className="mt-3 text-base leading-relaxed text-[#333333]/78">
-          Share your experience and help us improve our puja service quality.
+          Real reviews from families who've experienced our puja services. Share your feedback and help others discover quality service.
         </p>
       </div>
 
@@ -295,12 +301,14 @@ function RatingsPage() {
       )}
 
       <div className="rounded-2xl border border-[#FFE0A3] bg-white p-6 shadow-sm sm:p-7">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-semibold text-[#333333] sm:text-2xl">🌟 Customer reviews</h2>
-          <div className="flex items-center gap-2 text-sm text-stone-700">
-            <StarRow rating={Math.round(Number(averageRating))} />
-            <span>{averageRating} / 5</span>
-            <span className="text-stone-500">({feedbackCount} reviews)</span>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-xl font-semibold text-[#333333] sm:text-2xl">🌟 Verified Customer Reviews</h2>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-stone-700">
+              <StarRow rating={Math.round(Number(averageRating))} />
+              <span className="font-semibold">{averageRating} / 5</span>
+              <span className="text-stone-500">({feedbackCount} reviews)</span>
+            </div>
           </div>
         </div>
 
@@ -329,25 +337,49 @@ function RatingsPage() {
         </div>
 
         {publicFeedbacks === null ? (
-          <p className="mt-3 text-sm text-stone-500">Loading customer reviews...</p>
+          <p className="mt-4 text-sm text-stone-500">Loading customer reviews...</p>
         ) : publicFeedbacks.length === 0 ? (
-          <p className="mt-3 text-sm text-stone-600">No customer reviews available yet.</p>
+          <div className="mt-6 rounded-xl border border-[#FFE0A3] bg-[#FFFDF5] p-6 text-center">
+            <p className="text-sm text-stone-600">No reviews yet. Be the first to share your feedback!</p>
+            {isLoggedIn && (
+              <Link
+                to="/dashboard#feedback"
+                className="mt-3 inline-flex px-4 py-2 rounded-lg bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white text-sm font-semibold hover:brightness-105"
+              >
+                Share Your Review
+              </Link>
+            )}
+          </div>
         ) : (
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {publicFeedbacks.map((feedback, index) => (
               <article
                 key={feedback._id}
-                    className="rounded-xl border border-[#FFE0A3] bg-[#FFFDF5] p-4 shadow-sm animate-fade-up"
+                className="rounded-xl border border-[#FFE0A3] bg-[#FFFDF5] p-5 shadow-sm hover:shadow-md transition-shadow animate-fade-up"
                 style={{ animationDelay: `${Math.min(index * 0.06, 0.42)}s` }}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                        <p className="text-base font-semibold text-[#333333]">{feedback.customerName}</p>
-                    <p className="text-xs text-stone-500 mt-0.5">{feedback.poojaTitle}</p>
+                <div className="flex items-start gap-3">
+                  {feedback.reviewPhoto ? (
+                    <img
+                      src={feedback.reviewPhoto}
+                      alt={`${feedback.customerName} review`}
+                      className="h-14 w-14 rounded-lg border-2 border-[#FFE0A3] object-cover shrink-0"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border-2 border-[#FFE0A3] bg-linear-to-br from-[#FFF3C4] to-[#FFE0A3] text-sm font-bold text-[#B85A00]">
+                      {String(feedback.customerName || 'U').trim().charAt(0).toUpperCase() || 'U'}
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-[#333333] truncate">{feedback.customerName}</p>
+                    <p className="text-xs text-stone-500 mt-0.5 line-clamp-2">{feedback.poojaTitle}</p>
+                    <div className="mt-1 flex items-center gap-1">
+                      <StarRow rating={feedback.rating} />
+                    </div>
                   </div>
-                  <StarRow rating={feedback.rating} />
                 </div>
-                    <p className="mt-3 text-sm leading-relaxed text-[#333333]/82 sm:text-base">{feedback.comment}</p>
+                <p className="mt-3 text-sm leading-relaxed text-[#333333]/82 line-clamp-3">{feedback.comment}</p>
               </article>
             ))}
           </div>

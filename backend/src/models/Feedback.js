@@ -7,6 +7,10 @@ const feedbackSchema = new mongoose.Schema(
     poojaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pooja', required: true },
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String, required: true, trim: true, maxlength: 500 },
+    reviewPhoto: { type: String, trim: true, default: '', maxlength: 400000 },
+    isApproved: { type: Boolean, default: false },
+    approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    approvedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

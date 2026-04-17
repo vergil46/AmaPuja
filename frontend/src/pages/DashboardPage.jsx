@@ -5,6 +5,40 @@ import api from '../services/api'
 import { DashboardSkeleton } from '../components/LoadingSkeleton'
 import { useAuth } from '../context/useAuth'
 
+const compressImageToDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = () => {
+      const image = new Image()
+      image.onload = () => {
+        const maxDimension = 800
+        const ratio = Math.min(maxDimension / image.width, maxDimension / image.height, 1)
+        const width = Math.max(1, Math.round(image.width * ratio))
+        const height = Math.max(1, Math.round(image.height * ratio))
+
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+
+        const context = canvas.getContext('2d')
+        if (!context) {
+          reject(new Error('Image processing failed'))
+          return
+        }
+
+        context.drawImage(image, 0, 0, width, height)
+        resolve(canvas.toDataURL('image/jpeg', 0.75))
+      }
+
+      image.onerror = () => reject(new Error('Invalid image file'))
+      image.src = reader.result
+    }
+
+    reader.onerror = () => reject(new Error('Unable to read image file'))
+    reader.readAsDataURL(file)
+  })
+
 function DashboardPage() {
   const { token } = useAuth()
   const isLoggedIn = Boolean(token)
@@ -13,6 +47,7 @@ function DashboardPage() {
   const [feedbacks, setFeedbacks] = useState([])
   const [feedbackForm, setFeedbackForm] = useState({})
   const [feedbackSubmittingById, setFeedbackSubmittingById] = useState({})
+  const [feedbackPhotoProcessingById, setFeedbackPhotoProcessingById] = useState({})
   const [feedbackMessage, setFeedbackMessage] = useState({ type: '', text: '' })
   const [trackForm, setTrackForm] = useState({ email: '', phone: '' })
   const [trackError, setTrackError] = useState('')
@@ -114,15 +149,40 @@ function DashboardPage() {
       [bookingId]: {
         rating: prev[bookingId]?.rating || 5,
         comment: prev[bookingId]?.comment || '',
+        reviewPhoto: prev[bookingId]?.reviewPhoto || '',
         [field]: value,
       },
     }))
   }
 
+  const handleFeedbackPhotoChange = async (bookingId, file) => {
+    if (!file) {
+      handleFeedbackChange(bookingId, 'reviewPhoto', '')
+      return
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setFeedbackMessage({ type: 'error', text: 'Please select a valid image file.' })
+      return
+    }
+
+    setFeedbackPhotoProcessingById((prev) => ({ ...prev, [bookingId]: true }))
+
+    try {
+      const compressedImage = await compressImageToDataUrl(file)
+      handleFeedbackChange(bookingId, 'reviewPhoto', compressedImage)
+      setFeedbackMessage({ type: '', text: '' })
+    } catch (error) {
+      setFeedbackMessage({ type: 'error', text: error.message || 'Unable to process review photo.' })
+    } finally {
+      setFeedbackPhotoProcessingById((prev) => ({ ...prev, [bookingId]: false }))
+    }
+  }
+
   const submitFeedback = async (bookingId) => {
     if (feedbackSubmittingById[bookingId]) return
 
-    const payload = feedbackForm[bookingId] || { rating: 5, comment: '' }
+    const payload = feedbackForm[bookingId] || { rating: 5, comment: '', reviewPhoto: '' }
     if (!payload.comment?.trim()) {
       setFeedbackMessage({ type: 'error', text: 'Please write a comment before submitting feedback.' })
       return
@@ -135,11 +195,12 @@ function DashboardPage() {
         bookingId,
         rating: Number(payload.rating || 5),
         comment: payload.comment,
+        reviewPhoto: payload.reviewPhoto || '',
       })
 
       setFeedbacks((prev) => [res.data, ...prev.filter((item) => item.bookingId !== bookingId)])
-      setFeedbackForm((prev) => ({ ...prev, [bookingId]: { rating: 5, comment: '' } }))
-      setFeedbackMessage({ type: 'success', text: 'Thank you! Your feedback has been submitted.' })
+      setFeedbackForm((prev) => ({ ...prev, [bookingId]: { rating: 5, comment: '', reviewPhoto: '' } }))
+      setFeedbackMessage({ type: 'success', text: 'Thank you! Your feedback has been submitted and is pending approval.' })
     } catch (error) {
       setFeedbackMessage({
         type: 'error',
@@ -546,9 +607,38 @@ function DashboardPage() {
                   />
                 </div>
 
+                <div className="mt-3 rounded-lg border border-stone-200 bg-stone-50 p-3">
+                  <label className="block text-sm font-medium text-stone-700">Add Photo (optional)</label>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="mt-2 block w-full text-sm text-stone-700 file:mr-3 file:rounded file:border-0 file:bg-orange-100 file:px-3 file:py-1.5 file:font-medium file:text-orange-800"
+                    onChange={(e) => handleFeedbackPhotoChange(booking._id, e.target.files?.[0])}
+                  />
+                  {feedbackPhotoProcessingById[booking._id] ? (
+                    <p className="mt-2 text-xs text-stone-500">Optimizing photo...</p>
+                  ) : null}
+                  {feedbackForm[booking._id]?.reviewPhoto ? (
+                    <div className="mt-3 flex items-center gap-3">
+                      <img
+                        src={feedbackForm[booking._id].reviewPhoto}
+                        alt="Review preview"
+                        className="h-14 w-14 rounded-lg border border-stone-200 object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleFeedbackChange(booking._id, 'reviewPhoto', '')}
+                        className="text-xs font-medium text-[#D84315] hover:text-[#B63A12]"
+                      >
+                        Remove photo
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+
                 <button
                   onClick={() => submitFeedback(booking._id)}
-                  disabled={Boolean(feedbackSubmittingById[booking._id])}
+                  disabled={Boolean(feedbackSubmittingById[booking._id]) || Boolean(feedbackPhotoProcessingById[booking._id])}
                   className="mt-3 px-4 py-2 rounded bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {feedbackSubmittingById[booking._id] ? 'Submitting...' : 'Submit Feedback'}

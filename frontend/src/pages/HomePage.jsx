@@ -4,6 +4,7 @@ import homeBackground from '../assets/poojas/background-optimized-1280.webp'
 import Seo from '../components/Seo'
 import WorkProofGallery from '../components/WorkProofGallery'
 import GoogleBusinessCard from '../components/GoogleBusinessCard'
+import Testimonials from '../components/Testimonials'
 
 const MapPinIcon = ({ className = 'h-4 w-4' }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -300,6 +301,8 @@ function HomePage() {
 
       {/* ── Google Business Profile ── */}
       <GoogleBusinessCard variant="full" />
+
+      <Testimonials />
 
       <WorkProofGallery />
     </>

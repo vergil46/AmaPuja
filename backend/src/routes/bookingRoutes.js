@@ -530,10 +530,32 @@ router.patch('/:id/status', protect, adminOnly, async (req, res) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
+    const previousStatus = String(booking.bookingStatus || 'pending').toLowerCase();
     booking.bookingStatus = bookingStatus;
     await booking.save();
 
-    return res.json(booking);
+    const nextStatus = String(booking.bookingStatus || '').toLowerCase();
+    if (previousStatus !== 'completed' && nextStatus === 'completed') {
+      try {
+        await sendCompletionReviewNotifications({
+          booking,
+          pooja: booking.poojaId,
+        });
+      } catch (notificationError) {
+        console.error('Auto review notification error:', notificationError);
+        await alertCriticalIssue({
+          type: 'review_notification_failed',
+          title: 'Auto review notification failed',
+          message: 'Could not send completion review notifications after booking status update',
+          metadata: {
+            bookingId: booking?._id,
+            poojaTitle: booking?.poojaId?.title,
+          },
+        });
+      }
+    }
+
+    return res.json(withBookingDefaults(booking));
 
   } catch (error) {
     console.error('Update booking status error:', error);

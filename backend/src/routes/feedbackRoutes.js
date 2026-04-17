@@ -1,7 +1,7 @@
 const express = require('express');
 const Feedback = require('../models/Feedback');
 const Booking = require('../models/Booking');
-const { protect } = require('../middleware/auth');
+const { protect, adminOnly } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
       ? Math.min(Math.max(Math.trunc(requestedLimit), 1), 100)
       : 30;
 
-    const feedbacks = await Feedback.find({})
+    const feedbacks = await Feedback.find({ isApproved: true })
       .sort({ createdAt: -1 })
       .limit(limit)
       .populate('userId', 'name')
@@ -22,6 +22,7 @@ router.get('/', async (req, res) => {
       _id: feedback._id,
       rating: feedback.rating,
       comment: feedback.comment,
+      reviewPhoto: feedback.reviewPhoto || '',
       createdAt: feedback.createdAt,
       customerName: feedback.userId?.name || 'Verified Customer',
       poojaTitle: feedback.poojaId?.title || 'Pooja Service',
@@ -31,7 +32,7 @@ router.get('/', async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: 'Failed to load feedbacks' });
   }
-});
+);
 
 router.get('/my', protect, async (req, res) => {
   const feedbacks = await Feedback.find({ userId: req.user._id })
@@ -42,7 +43,7 @@ router.get('/my', protect, async (req, res) => {
 
 router.post('/', protect, async (req, res) => {
   try {
-    const { bookingId, rating, comment } = req.body;
+    const { bookingId, rating, comment, reviewPhoto } = req.body;
 
     if (!bookingId || !rating || !comment) {
       return res.status(400).json({ message: 'bookingId, rating, and comment are required' });
@@ -56,6 +57,18 @@ router.post('/', protect, async (req, res) => {
     const trimmedComment = String(comment).trim();
     if (!trimmedComment) {
       return res.status(400).json({ message: 'Comment is required' });
+    }
+
+    const normalizedPhoto = String(reviewPhoto || '').trim();
+    if (normalizedPhoto) {
+      const isSupportedImage = /^data:image\/(jpeg|jpg|png|webp);base64,/i.test(normalizedPhoto);
+      if (!isSupportedImage) {
+        return res.status(400).json({ message: 'Review photo must be a valid JPG, PNG, or WEBP image' });
+      }
+
+      if (normalizedPhoto.length > 400000) {
+        return res.status(400).json({ message: 'Review photo is too large. Please upload a smaller image.' });
+      }
     }
 
     const booking = await Booking.findById(bookingId);
@@ -79,6 +92,7 @@ router.post('/', protect, async (req, res) => {
         poojaId: booking.poojaId,
         rating: parsedRating,
         comment: trimmedComment,
+        reviewPhoto: normalizedPhoto,
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
@@ -91,6 +105,68 @@ router.post('/', protect, async (req, res) => {
       return res.status(409).json({ message: 'Feedback already exists for this booking' });
     }
     return res.status(500).json({ message: 'Failed to submit feedback' });
+  }
+});
+
+/**
+ * ADMIN: GET PENDING FEEDBACKS (UNAPPROVED)
+ */
+router.get('/admin/pending', protect, adminOnly, async (req, res) => {
+  try {
+    const pendingFeedbacks = await Feedback.find({ isApproved: false })
+      .sort({ createdAt: -1 })
+      .populate('userId', 'name email')
+      .populate('poojaId', 'title')
+      .populate('bookingId', 'date');
+
+    return res.json(pendingFeedbacks);
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to fetch pending feedbacks' });
+  }
+});
+
+/**
+ * ADMIN: APPROVE A FEEDBACK
+ */
+router.patch('/:id/approve', protect, adminOnly, async (req, res) => {
+  try {
+    const feedback = await Feedback.findById(req.params.id);
+
+    if (!feedback) {
+      return res.status(404).json({ message: 'Feedback not found' });
+    }
+
+    feedback.isApproved = true;
+    feedback.approvedBy = req.user._id;
+    feedback.approvedAt = new Date();
+    await feedback.save();
+
+    const populatedFeedback = await Feedback.findById(feedback._id)
+      .populate('userId', 'name')
+      .populate('poojaId', 'title');
+
+    return res.json(populatedFeedback);
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to approve feedback' });
+  }
+});
+
+/**
+ * ADMIN: REJECT A FEEDBACK (SOFT DELETE)
+ */
+router.patch('/:id/reject', protect, adminOnly, async (req, res) => {
+  try {
+    const feedback = await Feedback.findById(req.params.id);
+
+    if (!feedback) {
+      return res.status(404).json({ message: 'Feedback not found' });
+    }
+
+    await Feedback.deleteOne({ _id: feedback._id });
+
+    return res.json({ message: 'Feedback rejected and removed' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to reject feedback' });
   }
 });
 

@@ -77,6 +77,9 @@ function Header() {
           <NavLink to="/contact" className={navClass}>
             {t('contact')}
           </NavLink>
+          <NavLink to="/ratings" className={navClass}>
+            Reviews
+          </NavLink>
           {user && (
             <NavLink to="/dashboard" className={navClass}>
               {t('dashboard')}
