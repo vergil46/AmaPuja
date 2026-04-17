@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
       ? Math.min(Math.max(Math.trunc(requestedLimit), 1), 100)
       : 30;
 
-    const feedbacks = await Feedback.find({ isApproved: true })
+    const feedbacks = await Feedback.find({})
       .sort({ createdAt: -1 })
       .limit(limit)
       .populate('userId', 'name')
@@ -93,6 +93,8 @@ router.post('/', protect, async (req, res) => {
         rating: parsedRating,
         comment: trimmedComment,
         reviewPhoto: normalizedPhoto,
+        isApproved: true,
+        approvedAt: new Date(),
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );

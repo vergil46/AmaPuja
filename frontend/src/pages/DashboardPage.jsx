@@ -200,7 +200,7 @@ function DashboardPage() {
 
       setFeedbacks((prev) => [res.data, ...prev.filter((item) => item.bookingId !== bookingId)])
       setFeedbackForm((prev) => ({ ...prev, [bookingId]: { rating: 5, comment: '', reviewPhoto: '' } }))
-      setFeedbackMessage({ type: 'success', text: 'Thank you! Your feedback has been submitted and is pending approval.' })
+      setFeedbackMessage({ type: 'success', text: 'Thank you! Your feedback has been submitted successfully.' })
     } catch (error) {
       setFeedbackMessage({
         type: 'error',
