@@ -9,8 +9,8 @@ router.get('/', async (req, res) => {
   try {
     const requestedLimit = Number(req.query.limit);
     const limit = Number.isFinite(requestedLimit)
-      ? Math.min(Math.max(Math.trunc(requestedLimit), 1), 100)
-      : 30;
+      ? Math.min(Math.max(Math.trunc(requestedLimit), 1), 500)
+      : 200;
 
     const feedbacks = await Feedback.find({})
       .sort({ createdAt: -1 })

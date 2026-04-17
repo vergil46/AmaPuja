@@ -43,7 +43,7 @@ function RatingsPage() {
 
   useEffect(() => {
     api
-      .get('/feedback?limit=60')
+      .get('/feedback?limit=500')
       .then((response) => setPublicFeedbacks(response.data || []))
       .catch(() => setPublicFeedbacks([]))
   }, [])
