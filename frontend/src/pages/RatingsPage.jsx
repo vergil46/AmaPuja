@@ -341,7 +341,7 @@ function RatingsPage() {
         ) : publicFeedbacks.length === 0 ? (
           <div className="mt-6 rounded-xl border border-[#FFE0A3] bg-[#FFFDF5] p-6 text-center">
             <p className="text-sm text-stone-600">No reviews yet. Be the first to share your feedback!</p>
-            {isLoggedIn && (
+            {Boolean(token) && (
               <Link
                 to="/dashboard#feedback"
                 className="mt-3 inline-flex px-4 py-2 rounded-lg bg-linear-to-r from-[#D84315] to-[#FF6F00] text-white text-sm font-semibold hover:brightness-105"
