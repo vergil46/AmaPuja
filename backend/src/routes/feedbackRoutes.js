@@ -142,6 +142,29 @@ router.get('/admin/pending', protect, adminOnly, async (req, res) => {
 });
 
 /**
+ * ADMIN: GET ALL FEEDBACKS
+ */
+router.get('/admin/all', protect, adminOnly, async (req, res) => {
+  try {
+    const requestedLimit = Number(req.query.limit);
+    const limit = Number.isFinite(requestedLimit)
+      ? Math.min(Math.max(Math.trunc(requestedLimit), 1), 1000)
+      : 500;
+
+    const feedbacks = await Feedback.find({})
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate('userId', 'name email')
+      .populate('poojaId', 'title')
+      .populate('bookingId', 'date time');
+
+    return res.json(feedbacks);
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to fetch feedbacks' });
+  }
+});
+
+/**
  * ADMIN: APPROVE A FEEDBACK
  */
 router.patch('/:id/approve', protect, adminOnly, async (req, res) => {

@@ -52,6 +52,9 @@ function AdminPage() {
   const [recentBookings, setRecentBookings] = useState([])
   const [enquiries, setEnquiries] = useState([])
   const [payments, setPayments] = useState([])
+  const [feedbacks, setFeedbacks] = useState([])
+  const [feedbackActionMessage, setFeedbackActionMessage] = useState('')
+  const [deletingFeedbackById, setDeletingFeedbackById] = useState({})
   const [refreshingDashboard, setRefreshingDashboard] = useState(false)
   const [refreshingRecent, setRefreshingRecent] = useState(false)
   const [packageFilter, setPackageFilter] = useState('all')
@@ -159,18 +162,20 @@ function AdminPage() {
   }, [])
 
   const loadData = async () => {
-    const [poojaRes, bookingRes, recentBookingRes, enquiryRes, paymentRes] = await Promise.all([
+    const [poojaRes, bookingRes, recentBookingRes, enquiryRes, paymentRes, feedbackRes] = await Promise.all([
       api.get('/poojas'),
       api.get('/bookings/admin/all'),
       api.get('/bookings/admin/recent?limit=10'),
       api.get('/enquiries'),
       api.get('/payments/admin/all'),
+      api.get('/feedback/admin/all?limit=500'),
     ])
     setPoojas(poojaRes.data)
     setBookings(bookingRes.data)
     setRecentBookings(recentBookingRes.data)
     setEnquiries(enquiryRes.data)
     setPayments(paymentRes.data)
+    setFeedbacks(feedbackRes.data)
     setLastUpdatedAt(new Date())
   }
 
@@ -239,6 +244,26 @@ function AdminPage() {
       setReviewRequestMessage(error.response?.data?.message || 'Failed to send review request.')
     } finally {
       setReviewRequestLoadingById((prev) => ({ ...prev, [bookingId]: false }))
+    }
+  }
+
+  const deleteFeedback = async (feedbackId) => {
+    if (!feedbackId) return
+
+    const shouldDelete = window.confirm('Delete this review permanently? This cannot be undone.')
+    if (!shouldDelete) return
+
+    setFeedbackActionMessage('')
+    setDeletingFeedbackById((prev) => ({ ...prev, [feedbackId]: true }))
+
+    try {
+      await api.patch(`/feedback/${feedbackId}/reject`)
+      setFeedbacks((prev) => prev.filter((feedback) => feedback._id !== feedbackId))
+      setFeedbackActionMessage('Review deleted successfully.')
+    } catch (error) {
+      setFeedbackActionMessage(error.response?.data?.message || 'Failed to delete review.')
+    } finally {
+      setDeletingFeedbackById((prev) => ({ ...prev, [feedbackId]: false }))
     }
   }
 
@@ -1261,6 +1286,43 @@ function AdminPage() {
                         <p className="mt-1 text-stone-700">{item.message}</p>
                       </div>
                     ))}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-2xl font-semibold text-stone-900">Reviews</h2>
+                    <span className="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-xs text-orange-700">
+                      {feedbacks.length} total
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-stone-500">Delete any customer review permanently from the website.</p>
+                  {feedbackActionMessage && <p className="mt-2 text-xs text-stone-700">{feedbackActionMessage}</p>}
+                  <div className="mt-3 space-y-2 max-h-88 overflow-auto">
+                    {feedbacks.length === 0 ? (
+                      <p className="text-sm text-stone-500">No reviews found.</p>
+                    ) : (
+                      feedbacks.map((feedback) => (
+                        <div key={feedback._id} className="rounded-lg border border-stone-200 bg-stone-50/60 p-3 text-sm">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="font-semibold text-stone-900 truncate">{feedback.userId?.name || 'Verified Customer'}</p>
+                              <p className="mt-0.5 text-xs text-stone-500 truncate">{feedback.poojaId?.title || 'Pooja Service'} • {feedback.bookingId?.date || 'N/A'}</p>
+                              <p className="mt-1 text-xs text-stone-500">Rating: {Number(feedback.rating || 0)}/5</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => deleteFeedback(feedback._id)}
+                              className="rounded bg-red-600 px-2.5 py-1.5 text-xs text-white hover:bg-red-700 disabled:opacity-60"
+                              disabled={Boolean(deletingFeedbackById[feedback._id])}
+                            >
+                              {deletingFeedbackById[feedback._id] ? 'Deleting...' : 'Delete'}
+                            </button>
+                          </div>
+                          <p className="mt-2 text-stone-700">{feedback.comment || '-'}</p>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
 
