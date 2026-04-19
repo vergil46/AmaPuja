@@ -4,28 +4,28 @@ const Pooja = require('./src/models/Pooja');
 
 const newOdiaServices = [
   {
-    title: 'Annaprashan Pooja',
-    description: 'Annaprashan Pooja - the first rice feeding ceremony for your child, performed according to authentic Odia traditions.',
+    title: 'Annaprashan Puja',
+    description: 'Annaprashan Puja - the first rice feeding ceremony for your child, performed according to authentic Odia traditions.',
     basePrice: 3900
   },
   {
-    title: 'Ganpathi puja',
-    description: 'Ganpathi puja performed with traditional Odia rituals to remove obstacles and bring prosperity and success.',
+    title: 'Ganapathi Puja',
+    description: 'Ganapathi Puja performed with traditional Odia rituals to remove obstacles and bring prosperity and success.',
     basePrice: 4200
   },
   {
-    title: 'laxmi puja',
-    description: 'Laxmi puja performed with traditional Odia rituals for prosperity, wealth, and divine blessings in your home.',
+    title: 'Lakshmi Puja',
+    description: 'Lakshmi Puja performed with traditional Odia rituals for prosperity, wealth, and divine blessings in your home.',
     basePrice: 4500
   },
   {
-    title: 'namkaran puja(ekosia)',
-    description: 'Namkaran puja (ekosia) - the naming ceremony for your newborn performed according to authentic Odia traditions.',
+    title: 'Namkaran Puja (Ekoisia)',
+    description: 'Namkaran Puja (Ekoisia) - the naming ceremony for your newborn performed according to authentic Odia traditions.',
     basePrice: 3800
   },
   {
-    title: 'office/shop opening puja',
-    description: 'Office/shop opening puja performed with traditional Odia rituals for prosperity and success in your business venture.',
+    title: 'Office/Shop Opening Puja',
+    description: 'Office/Shop Opening Puja performed with traditional Odia rituals for prosperity and success in your business venture.',
     basePrice: 5200
   }
 ];

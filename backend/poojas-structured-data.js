@@ -741,13 +741,12 @@ module.exports = [
   {
     "key": "lakshmi_puja",
     "availableLanguages": [
-      "hindi",
       "bengali",
       "odia"
     ],
     "title": {
       "odia": "Lakshmi Puja",
-      "hindi": "Lakshmi Puja",
+      "hindi": "",
       "kannada": "",
       "bengali": "Laxmi Puja"
     },
@@ -757,8 +756,8 @@ module.exports = [
         "full": "Lakshmi Puja is performed to gain, conserve the existing wealth, and also to achieve financial stability by appeasing Goddess Laxmi, the Goddess of wealth and prosperity."
       },
       "hindi": {
-        "short": "Lakshmi Puja is performed to gain, conserve the existing wealth, and also to achieve financial stability by appeasing Goddess Laxmi, the Goddess of wealth and prosperity.",
-        "full": "Lakshmi Puja is performed to gain, conserve the existing wealth, and also to achieve financial stability by appeasing Goddess Laxmi, the Goddess of wealth and prosperity."
+        "short": "",
+        "full": ""
       },
       "kannada": {
         "short": "",
@@ -807,39 +806,8 @@ module.exports = [
         "addOns": []
       },
       "hindi": {
-        "packages": [
-          {
-            "name": "Standard",
-            "price": 4000,
-            "includesSamagri": true,
-            "pandits": "1 Panditji + Puja Samagries",
-            "procedure": [
-              "Kaya Shudhi",
-              "Ghata Sthapana",
-              "Sankalpa",
-              "Ganapathi Panchdevta Puja",
-              "Brahama Savitri Matrigana Mandal Puja",
-              "Narayan Vardhani Ghata Puja",
-              "Lakshmi Ghata Puja",
-              "Neivedhya, Aarti",
-              "Pushpanjali and Bhojyadana"
-            ],
-            "inclusions": [
-              "Dakshina",
-              "All Puja Samagries"
-            ]
-          }
-        ],
-        "addOns": [
-          {
-            "name": "Flowers & Fruits",
-            "price": 1000
-          },
-          {
-            "name": "Havan",
-            "price": 1000
-          }
-        ]
+        "packages": [],
+        "addOns": []
       },
       "kannada": {
         "packages": [],

@@ -7,9 +7,40 @@ import api from '../services/api'
 const normalizeTitle = (value) => String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
 const normalizeLanguageKey = (value) => String(value || '').trim().toLowerCase()
 const normalizedHindiExcludedTitles = new Set(
-  ['Engagement Puja', 'Namkaran Puja (Ekoisia)'].map(normalizeTitle)
+  [
+    'Engagement Puja',
+    'Namkaran Puja (Ekoisia)',
+    'Lakshmi Puja',
+    'Laxmi Puja',
+  ].map(normalizeTitle)
 )
-const servicesListCacheKey = 'services_list_cache_v2'
+
+const hindiCanonicalAliases = {
+  'Lalitha Sahasranamam Puja': ['Lalitha Sahasranam Puja', 'Lalitha Sahasranamam Puja'],
+  'Murti Pran Pratishta At Home': ['Murti Pran Pratishta At Home', 'Murti Pran Pratistha At Home'],
+  'Yagnopavit Sanskar': ['Yagnopavit Sanskar', 'Yagnopavit Sanskar (Upanayan Sanskar)'],
+}
+
+const normalizedHindiCanonicalIndex = Object.entries(hindiCanonicalAliases).reduce((acc, [canonicalTitle, aliases]) => {
+  const normalizedCanonical = normalizeTitle(canonicalTitle)
+  aliases.forEach((alias) => {
+    acc[normalizeTitle(alias)] = normalizedCanonical
+  })
+  return acc
+}, {})
+
+const odiaCanonicalAliases = {
+  'Office/Shop Opening Puja': ['Office/Shop Opening Puja', 'Office Opening Puja', 'office/shop opening puja'],
+}
+
+const normalizedOdiaCanonicalIndex = Object.entries(odiaCanonicalAliases).reduce((acc, [canonicalTitle, aliases]) => {
+  const normalizedCanonical = normalizeTitle(canonicalTitle)
+  aliases.forEach((alias) => {
+    acc[normalizeTitle(alias)] = normalizedCanonical
+  })
+  return acc
+}, {})
+const servicesListCacheKey = 'services_list_cache_v3'
 const servicesListCacheTtlMs = 30 * 60 * 1000
 
 const allowedPriestPreferences = new Set(['Hindi', 'Odia', 'Bengali'])
@@ -242,6 +273,7 @@ const priestLanguagePoojas = {
       'Mahalaxmi Puja',
       'Mundan Or Chudakarana Ceremony',
       'Murti Pran Pratishta At Home',
+      'Murti Pran Pratistha At Home',
       'Namkaran Puja',
       'New Vehicle Puja',
       'Office Opening Puja',
@@ -259,6 +291,7 @@ const priestLanguagePoojas = {
       'Vishwakarma Puja',
       'Vivah (Marriage)',
       'Yagnopavit Sanskar',
+      'Yagnopavit Sanskar (Upanayan Sanskar)',
     ].map(normalizeTitle)
   ),
   Bengali: new Set(
@@ -666,6 +699,10 @@ function ServicesPage() {
     const selectedLanguageKey = normalizeLanguageKey(priestPreference)
 
     return poojasWithNormalizedTitles.filter((pooja) => {
+      if (!allowedTitles.has(pooja.normalizedTitle)) {
+        return false
+      }
+
       const availableLanguageKeys = Array.isArray(pooja?.availableLanguages)
         ? pooja.availableLanguages.map(normalizeLanguageKey).filter(Boolean)
         : []
@@ -679,8 +716,26 @@ function ServicesPage() {
           pooja.pricing[selectedLanguageKey].packages.length > 0
       )
 
+      const hasAnyLanguageMetadata =
+        availableLanguageKeys.length > 0 ||
+        Boolean(
+          pooja?.pricing &&
+            typeof pooja.pricing === 'object' &&
+            Object.values(pooja.pricing).some(
+              (config) =>
+                config &&
+                Array.isArray(config.packages) &&
+                config.packages.length > 0
+            )
+        )
+
       if (hasLanguageFromAvailability || hasLanguageFromPricing) {
         return true
+      }
+
+      // Only use title-based fallback when language metadata is missing.
+      if (hasAnyLanguageMetadata) {
+        return false
       }
 
       return allowedTitles.has(pooja.normalizedTitle)
@@ -700,10 +755,48 @@ function ServicesPage() {
 
     const uniquePoojas = []
     const seenTitles = new Set()
+
+    const getLanguageScore = (pooja) => {
+      const selectedLanguageKey = normalizeLanguageKey(priestPreference)
+      const availableLanguageKeys = Array.isArray(pooja?.availableLanguages)
+        ? pooja.availableLanguages.map(normalizeLanguageKey).filter(Boolean)
+        : []
+
+      const hasLanguageFromAvailability = availableLanguageKeys.includes(selectedLanguageKey)
+      const hasLanguageFromPricing = Boolean(
+        pooja?.pricing &&
+          typeof pooja.pricing === 'object' &&
+          pooja.pricing[selectedLanguageKey] &&
+          Array.isArray(pooja.pricing[selectedLanguageKey].packages) &&
+          pooja.pricing[selectedLanguageKey].packages.length > 0
+      )
+
+      return (hasLanguageFromAvailability ? 2 : 0) + (hasLanguageFromPricing ? 4 : 0) + (pooja?.serviceKey ? 1 : 0)
+    }
+
     searchedPoojas.forEach((pooja) => {
-      if (!seenTitles.has(pooja.normalizedTitle)) {
-        seenTitles.add(pooja.normalizedTitle)
+      const dedupeKey =
+        priestPreference === 'Hindi'
+          ? normalizedHindiCanonicalIndex[pooja.normalizedTitle] || pooja.normalizedTitle
+          : priestPreference === 'Odia'
+            ? normalizedOdiaCanonicalIndex[pooja.normalizedTitle] || pooja.normalizedTitle
+          : pooja.normalizedTitle
+
+      if (!seenTitles.has(dedupeKey)) {
+        seenTitles.add(dedupeKey)
         uniquePoojas.push(pooja)
+        return
+      }
+
+      if (priestPreference === 'Hindi') {
+        const existingIndex = uniquePoojas.findIndex((item) => {
+          const existingKey = normalizedHindiCanonicalIndex[item.normalizedTitle] || item.normalizedTitle
+          return existingKey === dedupeKey
+        })
+
+        if (existingIndex >= 0 && getLanguageScore(pooja) > getLanguageScore(uniquePoojas[existingIndex])) {
+          uniquePoojas[existingIndex] = pooja
+        }
       }
     })
 

@@ -8,7 +8,9 @@
     "start": "node src/server.js",
     "test": "echo \"No tests configured\"",
     "poojas:upsert-verify": "node upsert-and-verify-special-poojas.js",
-    "poojas:cleanup-duplicates": "node cleanup-duplicate-poojas.js"
+    "poojas:cleanup-duplicates": "node cleanup-duplicate-poojas.js",
+    "audit:languages": "node strict-language-audit.js",
+    "fix:languages": "node fix-hindi-odia-bengali-language-metadata.js"
   },
   "keywords": [],
   "author": "",
