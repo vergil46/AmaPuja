@@ -1028,7 +1028,7 @@ module.exports = [
         "packages": [
           {
             "name": "Economy",
-            "price": 3500,
+            "price": 4200,
             "includesSamagri": true,
             "pandits": "1 Panditji + Puja Samagries",
             "description": "In this package 1 Panditji will be there, this package is recommended for those who are looking for simple and short puja for New office, Restaurants, any New shop openings etc.",

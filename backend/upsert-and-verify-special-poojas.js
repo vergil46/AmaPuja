@@ -93,7 +93,7 @@ const officeOpeningPuja = {
       packages: [
         {
           name: 'Economy',
-          price: 3500,
+          price: 4200,
           includesSamagri: true,
           pandits: '1 Panditji + Puja Samagries',
           description:
