@@ -42,7 +42,6 @@ const poojaTitles = [
   'New Vehicle Puja',
   'Nischitartha',
   'Office Opening Puja',
-  'Office/Shop Opening Puja',
   'Onnoprashon (Mukhe Bhaat)',
   'Punsavan Sanskar',
   'Roka Ceremony',
