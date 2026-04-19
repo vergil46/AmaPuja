@@ -31,14 +31,11 @@ const poojaTitles = [
   'Kuber Upasana Puja',
   'Lakshmi Puja',
   'Lalitha Sahasranam Puja',
-  'laxmi puja',
   'Mahalaxmi Puja',
   'Marriage',
   'Murti Pran Pratishta',
   'Namakarana',
-  'Namkaran (Ekoisia)',
   'Namkaran Puja (Ekoisia)',
-  'namkaran puja(ekosia)',
   'New Vehicle Puja',
   'Nischitartha',
   'Office Opening Puja',
@@ -176,6 +173,108 @@ const seedPoojas = async () => {
             ],
           },
         },
+      };
+    }
+    if (title === 'Office Opening Puja') {
+      return {
+        title,
+        description:
+          'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
+        image: defaultImage,
+        startPrice: 4300,
+        pricing: {
+          odia: {
+            packages: [
+              {
+                name: 'Standard',
+                price: 4300,
+                pandits: '1 Panditji + All Puja Samagries',
+                procedure: [
+                  'Ganapathi Puja',
+                  'Lakshmi Puja',
+                  'Vastu Puja',
+                  'Vishnu Puja',
+                  'Navagraha Puja',
+                  'Dwarpal Puja',
+                  'Dasadikpal Puja',
+                  'Havan',
+                  'Pushpanjali',
+                  'Neivedhya',
+                  'Aarti',
+                  'Prasad Vitran',
+                ],
+                inclusions: ['Dakshina', 'All Puja Samagries'],
+              },
+            ],
+            addOns: [],
+          },
+          hindi: {
+            packages: [
+              {
+                name: 'Economy',
+                price: 3500,
+                pandits: '1 Panditji + Puja Samagries',
+                description:
+                  'In this package 1 Panditji will be there, this package is recommended for those who are looking for simple and short puja for New office, Restaurants, any New shop openings etc.',
+                procedure: [
+                  'Swasti vachanam',
+                  'Gauri Ganesh Puja',
+                  'Kalash Puja',
+                  'Ganesh, Lakshmi and Navgraha Puja',
+                  'Aarti',
+                  'Pushpanjali',
+                ],
+                inclusions: ['Dakshina', 'All Puja Samagries'],
+                addOns: [
+                  { name: 'Flowers & Fruits', price: 1200 },
+                  { name: 'Havan', price: 1000 },
+                ],
+                note:
+                  'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Milk, Curd, Prasad, Photos etc. You will receive a detailed to-do list after booking.',
+              },
+              {
+                name: 'Standard',
+                price: 7200,
+                pandits: '2 Panditji + All Puja Samagries + Havan',
+                description:
+                  'In standard package 2 Vedic pandits will be there, More number of Vedis/mandals will be put, more number of mantra aahutis will be performed and Puja goes on for 2:00 to 2:30 hrs.',
+                procedure: [
+                  'Dwar Puja',
+                  'Gauri Ganesh puja',
+                  'Kalash Navgraha Puja',
+                  'Vastu Puja',
+                  'Havans – Ganesh, Navagrah, Laxmi, Varun and Vastu Havan',
+                  'Poornahuthi, Aarti & Prasad Distribution',
+                ],
+                inclusions: ['Dakshina', 'All Puja Samagries'],
+                addOns: [{ name: 'Flowers & Fruits', price: 1500 }],
+                note:
+                  'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Dravyas, Kapda, Ghee, Havan Sticks, Samidha etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Milk, Curd, Plates, Prasad, Photos etc. You will receive a detailed to-do list after booking.',
+              },
+            ],
+            addOns: [],
+          },
+        },
+        startPrice: 4300,
+        packages: [
+          { name: 'Standard', price: 4300, includesSamagri: true },
+        ],
+        availableLanguages: ['odia', 'hindi'],
+        localizedTitle: {
+          odia: 'Office Opening Puja',
+          hindi: 'Office/Shop Opening Puja',
+        },
+        localizedDescription: {
+          odia: {
+            short: 'Office Opening Puja for Odia rituals',
+            full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
+          },
+          hindi: {
+            short: 'Office/Shop Opening Puja with Hindi pandits',
+            full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
+          },
+        },
+        addOns: [],
       };
     }
     // ...existing code...

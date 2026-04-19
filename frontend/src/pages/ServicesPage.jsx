@@ -9,7 +9,7 @@ const normalizeLanguageKey = (value) => String(value || '').trim().toLowerCase()
 const normalizedHindiExcludedTitles = new Set(
   ['Engagement Puja', 'Namkaran Puja (Ekoisia)'].map(normalizeTitle)
 )
-const servicesListCacheKey = 'services_list_cache_v1'
+const servicesListCacheKey = 'services_list_cache_v2'
 const servicesListCacheTtlMs = 30 * 60 * 1000
 
 const allowedPriestPreferences = new Set(['Hindi', 'Odia', 'Bengali'])

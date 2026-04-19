@@ -1,1133 +1,183 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
+
 const Pooja = require('./src/models/Pooja');
-const structuredPoojasToUpsert = require('./poojas-structured-data');
 
 const DEFAULT_IMAGE =
   'https://images.unsplash.com/photo-1542327897-d73f4005b533?auto=format&fit=crop&w=1200&q=80';
 
-const DEFAULT_SERVICE_LANGUAGE = 'hindi';
-
-const createServiceKey = (title = '') =>
-  String(title)
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '');
-
-const deepClone = (value) => JSON.parse(JSON.stringify(value));
-
-const normalizeText = (value) => (typeof value === 'string' ? value.trim() : '');
-
-const normalizeLanguageKey = (value) => normalizeText(value).toLowerCase();
-
-const uniqueStrings = (items) =>
-  Array.from(new Set((Array.isArray(items) ? items : []).filter(Boolean)));
-
-const preferredLanguageFromList = (languages = []) => {
-  if (Array.isArray(languages) && languages.length > 0) {
-    return languages[0];
-  }
-
-  const preferredOrder = ['hindi', 'odia', 'bengali', 'kannada'];
-  for (const languageKey of preferredOrder) {
-    if (languages.includes(languageKey)) {
-      return languageKey;
-    }
-  }
-  return languages[0] || DEFAULT_SERVICE_LANGUAGE;
-};
-
-const normalizeDescriptionBlock = (value, fallbackText = '') => {
-  if (value && typeof value === 'object' && !Array.isArray(value)) {
-    const short = normalizeText(value.short);
-    const full = normalizeText(value.full);
-    const fallback = normalizeText(fallbackText);
-    return {
-      short: short || full || fallback,
-      full: full || short || fallback,
-    };
-  }
-
-  const text = normalizeText(value) || normalizeText(fallbackText);
-  return {
-    short: text,
-    full: text,
-  };
-};
-
-const minPackagePrice = (packages = []) => {
-  const prices = (Array.isArray(packages) ? packages : [])
-    .map((pkg) => Number(pkg?.price))
-    .filter((price) => Number.isFinite(price) && price > 0);
-
-  if (prices.length === 0) {
-    return 0;
-  }
-
-  return Math.min(...prices);
-};
-
-const convertLegacyToStructuredFormat = (rawPooja) => {
-  const legacyTitle = normalizeText(rawPooja?.title);
-  const legacyDescription = normalizeText(rawPooja?.description);
-
-  const localizedTitle =
-    rawPooja?.localizedTitle && typeof rawPooja.localizedTitle === 'object'
-      ? deepClone(rawPooja.localizedTitle)
-      : {};
-
-  const localizedDescription =
-    rawPooja?.localizedDescription && typeof rawPooja.localizedDescription === 'object'
-      ? deepClone(rawPooja.localizedDescription)
-      : {};
-
-  const pricingSource =
-    rawPooja?.pricing && typeof rawPooja.pricing === 'object'
-      ? deepClone(rawPooja.pricing)
-      : {};
-
-  const availableLanguages = uniqueStrings([
-    ...(Array.isArray(rawPooja?.availableLanguages) ? rawPooja.availableLanguages : [])
-      .map(normalizeLanguageKey)
-      .filter(Boolean),
-    ...Object.keys(localizedTitle).map(normalizeLanguageKey).filter(Boolean),
-    ...Object.keys(localizedDescription).map(normalizeLanguageKey).filter(Boolean),
-    ...Object.keys(pricingSource).map(normalizeLanguageKey).filter(Boolean),
-  ]);
-
-  if (availableLanguages.length === 0) {
-    availableLanguages.push(DEFAULT_SERVICE_LANGUAGE);
-  }
-
-  const title = {};
-  const description = {};
-  const pricing = {};
-
-  availableLanguages.forEach((languageKey) => {
-    const languagePricing =
-      pricingSource[languageKey] && typeof pricingSource[languageKey] === 'object'
-        ? pricingSource[languageKey]
-        : {};
-
-    const languageTitle =
-      normalizeText(localizedTitle[languageKey]) ||
-      normalizeText(languagePricing.title) ||
-      legacyTitle;
-
-    const languageDescription = normalizeDescriptionBlock(
-      localizedDescription[languageKey] || languagePricing.description,
-      legacyDescription
-    );
-
-    const languagePackages =
-      Array.isArray(languagePricing.packages) && languagePricing.packages.length > 0
-        ? deepClone(languagePricing.packages)
-        : deepClone(rawPooja?.packages || []);
-
-    const languageAddOns =
-      Array.isArray(languagePricing.addOns)
-        ? deepClone(languagePricing.addOns)
-        : deepClone(rawPooja?.addOns || []);
-
-    title[languageKey] = languageTitle;
-    description[languageKey] = languageDescription;
-    pricing[languageKey] = {
-      packages: languagePackages,
-      addOns: languageAddOns,
-    };
-  });
-
-  return {
-    key: normalizeText(rawPooja?.key || rawPooja?.serviceKey) || createServiceKey(legacyTitle),
-    availableLanguages,
-    title,
-    description,
-    pricing,
-    __legacyTitle: legacyTitle,
-    __legacyDescription: legacyDescription,
-    __legacyStartPrice: Number(rawPooja?.startPrice) || 0,
-  };
-};
-
-const buildPoojaPayloadFromStructured = (structuredPooja) => {
-  const hasMeaningfulLanguageData = (languageKey) => {
-    const title = normalizeText(structuredPooja?.title?.[languageKey]);
-    const descriptionShort = normalizeText(structuredPooja?.description?.[languageKey]?.short);
-    const descriptionFull = normalizeText(structuredPooja?.description?.[languageKey]?.full);
-
-    const packageCount = Array.isArray(structuredPooja?.pricing?.[languageKey]?.packages)
-      ? structuredPooja.pricing[languageKey].packages.length
-      : 0;
-
-    const addOnCount = Array.isArray(structuredPooja?.pricing?.[languageKey]?.addOns)
-      ? structuredPooja.pricing[languageKey].addOns.length
-      : 0;
-
-    return Boolean(title || descriptionShort || descriptionFull || packageCount > 0 || addOnCount > 0);
-  };
-
-  const explicitAvailableLanguages = uniqueStrings(
-    (Array.isArray(structuredPooja?.availableLanguages) ? structuredPooja.availableLanguages : [])
-      .map(normalizeLanguageKey)
-      .filter(Boolean)
-  );
-
-  const inferredLanguageKeys = uniqueStrings([
-    ...Object.keys(structuredPooja?.title || {}).map(normalizeLanguageKey).filter(Boolean),
-    ...Object.keys(structuredPooja?.description || {}).map(normalizeLanguageKey).filter(Boolean),
-    ...Object.keys(structuredPooja?.pricing || {}).map(normalizeLanguageKey).filter(Boolean),
-  ]);
-
-  const meaningfulExplicitLanguages = explicitAvailableLanguages.filter((languageKey) =>
-    hasMeaningfulLanguageData(languageKey)
-  );
-
-  const meaningfulInferredLanguages = inferredLanguageKeys.filter((languageKey) =>
-    hasMeaningfulLanguageData(languageKey)
-  );
-
-  let languageKeys = [];
-
-  if (meaningfulExplicitLanguages.length > 0) {
-    languageKeys = meaningfulExplicitLanguages;
-  } else if (explicitAvailableLanguages.length > 0) {
-    languageKeys = explicitAvailableLanguages;
-  } else if (meaningfulInferredLanguages.length > 0) {
-    languageKeys = meaningfulInferredLanguages;
-  } else {
-    languageKeys = inferredLanguageKeys;
-  }
-
-  if (languageKeys.length === 0) {
-    languageKeys.push(DEFAULT_SERVICE_LANGUAGE);
-  }
-
-  const preferredLanguage = preferredLanguageFromList(languageKeys);
-  const localizedTitle = {};
-  const localizedDescription = {};
-  const pricing = {};
-
-  languageKeys.forEach((languageKey) => {
-    const languageTitle =
-      normalizeText(structuredPooja?.title?.[languageKey]) ||
-      normalizeText(structuredPooja?.__legacyTitle);
-
-    const languageDescription = normalizeDescriptionBlock(
-      structuredPooja?.description?.[languageKey],
-      structuredPooja?.__legacyDescription
-    );
-
-    const languagePackages =
-      Array.isArray(structuredPooja?.pricing?.[languageKey]?.packages)
-        ? deepClone(structuredPooja.pricing[languageKey].packages)
-        : [];
-
-    const languageAddOns =
-      Array.isArray(structuredPooja?.pricing?.[languageKey]?.addOns)
-        ? deepClone(structuredPooja.pricing[languageKey].addOns)
-        : [];
-
-    localizedTitle[languageKey] = languageTitle;
-    localizedDescription[languageKey] = languageDescription;
-    pricing[languageKey] = {
-      title: languageTitle,
-      description: languageDescription,
-      packages: languagePackages,
-      addOns: languageAddOns,
-    };
-  });
-
-  const title =
-    normalizeText(structuredPooja?.__legacyTitle) ||
-    normalizeText(localizedTitle[preferredLanguage]);
-
-  const description =
-    normalizeText(structuredPooja?.__legacyDescription) ||
-    normalizeText(localizedDescription[preferredLanguage]?.full) ||
-    normalizeText(localizedDescription[preferredLanguage]?.short);
-
-  const packages =
-    Array.isArray(pricing[preferredLanguage]?.packages) &&
-    pricing[preferredLanguage].packages.length > 0
-      ? pricing[preferredLanguage].packages
-      : [];
-
-  const addOns =
-    Array.isArray(pricing[preferredLanguage]?.addOns)
-      ? pricing[preferredLanguage].addOns
-      : [];
-
-  const derivedStartPrice = minPackagePrice(packages);
-  const startPrice =
-    Number.isFinite(Number(structuredPooja?.__legacyStartPrice)) && Number(structuredPooja.__legacyStartPrice) > 0
-      ? Number(structuredPooja.__legacyStartPrice)
-      : derivedStartPrice;
-
-  return {
-    serviceKey: normalizeText(structuredPooja?.key) || createServiceKey(title),
-    title,
-    availableLanguages: languageKeys,
-    localizedTitle,
-    localizedDescription,
-    description,
-    startPrice,
-    packages,
-    addOns,
-    pricing,
-    structured: {
-      key: normalizeText(structuredPooja?.key) || createServiceKey(title),
-      availableLanguages: languageKeys,
-      title: localizedTitle,
-      description: localizedDescription,
-      pricing: Object.fromEntries(
-        languageKeys.map((languageKey) => [
-          languageKey,
-          {
-            packages: deepClone(pricing[languageKey]?.packages || []),
-            addOns: deepClone(pricing[languageKey]?.addOns || []),
-          },
-        ])
-      ),
+const officeOpeningPuja = {
+  serviceKey: 'office_opening_puja',
+  title: 'Office Opening Puja',
+  availableLanguages: ['odia', 'hindi'],
+  localizedTitle: {
+    odia: 'Office Opening Puja',
+    hindi: 'Office/Shop Opening Puja',
+  },
+  localizedDescription: {
+    odia: {
+      short: 'Office Opening Puja for Odia rituals',
+      full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
     },
-  };
-};
-
-const legacyPoojasToUpsert = [
-  {
-    title: 'Annaprashan Puja',
-    description:
-      'Annaprashan is the ceremony where the baby is introduced to solid foods preferably Sweet/Milk Rice for the first time. The puja is performed to bestow a very healthy and prosperous life for the baby.',
-    startPrice: 4000,
-    packages: [
-      {
-        name: 'Standard',
-        price: 4000,
-        includesSamagri: true,
-        pandits: '1 Panditji + All Puja Samagries',
-        procedure: [
-          'Ghata Sthapana',
-          'Sankalpa',
-          'Ganapathi Panchdevta Puja',
-          'Matrugana Puja',
-          'Havan',
-          'Annaprashan',
-          'Neivedhya',
-          'Aarti',
-          'Pushpanjali',
-          'Bhojya daana',
-        ],
-        inclusions: ['Dakshina', 'All Pooja Materials'],
-        note:
-          'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee, etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos etc. You will receive a detailed to-do list after booking.',
-      },
-    ],
-    addOns: [
-      { name: 'Flowers & Fruits', price: 1000 },
-      { name: 'Satyanarayan Katha', price: 1700 },
-    ],
-  },
-  {
-    title: 'Engagement Puja',
-    description:
-      'Engagement or Nirbandha is an occasion where there is a formal agreement to get married and families announce the same to society. It is also known as the betrothal ceremony, Sagai, Ring ceremony, Nishchitartham, Roka, Chunni, etc.',
-    startPrice: 4000,
-    packages: [
-      {
-        name: 'Standard',
-        price: 4000,
-        includesSamagri: true,
-        pandits: '1 Panditji + Puja Samagries',
-        procedure: [
-          'Ghata Sthapana',
-          'Mangalastaka',
-          'Ganapathi Panchdevta Puja',
-          'Both Parents Sankalpa',
-          'Pushpanjali',
-          'Satya Patha',
-          'Kanya Agamana',
-          'Ring Exchange',
-        ],
-        inclusions: ['Dakshina', 'All Puja Samagries'],
-      },
-    ],
-    addOns: [{ name: 'Flowers & Fruits', price: 1000 }],
-  },
-  {
-    title: 'Ganapathi Puja',
-    description:
-      'Ganapathi Puja is performed for Lord Ganapathi who removes all the obstacles and negative energies. This puja bestows a person with victory, brings harmony to the family, and helps to attain success in life.',
-    startPrice: 5200,
-    packages: [
-      {
-        name: 'Standard',
-        price: 5200,
-        includesSamagri: true,
-        pandits: '1 Panditji + Pooja Samagries',
-        procedure: [
-          'Ghata Sthapana',
-          'Sankalpa',
-          'Ganapathi Puja',
-          'Panchdevata Puja',
-          'Ganapathi Devata Avahan',
-          'Bhog Neivedhya',
-          'Aarti',
-          'Pushpanjali',
-          'Prasad Sevan',
-        ],
-        inclusions: ['Dakshina', 'Puja Samagries'],
-      },
-    ],
-    addOns: [
-      { name: 'Flowers & Fruits', price: 1000 },
-      { name: 'Havan', price: 100 },
-    ],
-  },
-  {
-    serviceKey: 'griha_pravesh',
-    title: 'Griha Pravesh',
-    availableLanguages: ['odia', 'hindi', 'bengali'],
-    localizedTitle: {
-      odia: 'Griha Pravesh',
-      hindi: 'Griha Pravesh',
-      bengali: 'Griho Probesh',
+    hindi: {
+      short: 'Office/Shop Opening Puja with Hindi pandits',
+      full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
     },
-    localizedDescription: {
-      odia: {
-        short: 'Griha Pravesh puja for peaceful new home entry',
-        full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
-      },
-      hindi: {
-        short: 'Griha Pravesh puja with Hindi pandits',
-        full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
-      },
-      bengali: {
-        short: 'Griho Probesh puja with Bengali pandits',
-        full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
-      },
+  },
+  description:
+    'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
+  image: DEFAULT_IMAGE,
+  startPrice: 4300,
+  packages: [
+    {
+      name: 'Standard',
+      price: 4300,
+      includesSamagri: true,
+      pandits: '1 Panditji + All Puja Samagries',
+      procedure: [
+        'Ganapathi Puja',
+        'Lakshmi Puja',
+        'Vastu Puja',
+        'Vishnu Puja',
+        'Navagraha Puja',
+        'Dwarpal Puja',
+        'Dasadikpal Puja',
+        'Havan',
+        'Pushpanjali',
+        'Neivedhya',
+        'Aarti',
+        'Prasad Vitran',
+      ],
+      inclusions: ['Dakshina', 'All Puja Samagries'],
     },
-    description:
-      'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
-    startPrice: 6200,
-    packages: [
-      {
-        name: 'Basic',
-        price: 6200,
-        includesSamagri: true,
-        pandits: '1 Panditji + All Puja Samagries',
-        description:
-          'Basic Griha Pravesh Puja goes on for 1:30-2 hrs. Recommended for those looking for simple, short puja or puja for rented home.',
-        procedure: [
-          'Dwar Puja',
-          'Griha Pravesh',
-          'Kitchen Puja',
-          'Boiling Milk with new vessel',
-          'Gauri Ganesh Puja',
-          'Kalash Navgraha Puja',
-          'Vastu Puja',
-          'Havans – Ganesh, Navagraha, Laxmi, Varun and Vastu Havan',
-          'Poornahuthi, Aarti & Prasad Distribution',
-        ],
-        inclusions: ['Dakshina', 'All Puja Samagries'],
-        note:
-          'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will be receiving a detailed to-do list after booking.',
-        addOns: [
-          { name: 'Flowers & Fruits', price: 1500 },
-          { name: 'Satyanarayan Katha', price: 1700 },
-        ],
-      },
-      {
-        name: 'Economy',
-        price: 11000,
-        includesSamagri: true,
-        pandits: '2 Panditji + All Puja Samagries',
-        description:
-          'In Economy package 2 vedic pandits will be there, more number of vedis/mandals will be put, more number of mantra aahutis will be performed and Griha Pravesh puja will be performed in a grand way and goes on for 2:30-3:00 hrs. This package is recommended for new home.',
-        procedure: [
-          'Dwar Puja',
-          'Griha Pravesh',
-          'Kitchen Puja',
-          'Boiling Milk with new vessel',
-          'Gauri Ganesh Puja',
-          'Kalasha Navgraha Puja',
-          'Vastu Puja',
-          'Havans – Ganesh, Navagraha, Laxmi, Varun and Vastu Havan',
-          'Poornahuthi, Aarti & Prasad Distribution',
-        ],
-        inclusions: ['Dakshina', 'All Puja Samagries'],
-        note:
-          'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will be receiving a detailed to-do list after booking.',
-        addOns: [
-          { name: 'Flowers & Fruits', price: 1600 },
-          { name: 'Satyanarayan Katha', price: 1700 },
-        ],
-      },
-    ],
-    pricing: {
-      hindi: {
-        title: 'Griha Pravesh',
-        description: {
-          short: 'Griha Pravesh puja with Hindi pandits',
-          full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
-        },
-        packages: [
-          {
-            name: 'Basic',
-            price: 6200,
-            includesSamagri: true,
-            pandits: '1 Panditji + All Puja Samagries',
-            description:
-              'Basic Griha Pravesh Puja goes on for 1:30-2 hrs. Recommended for those looking for simple, short puja or puja for rented home.',
-            procedure: [
-              'Dwar Puja',
-              'Griha Pravesh',
-              'Kitchen Puja',
-              'Boiling Milk with new vessel',
-              'Gauri Ganesh Puja',
-              'Kalash Navgraha Puja',
-              'Vastu Puja',
-              'Havans – Ganesh, Navagraha, Laxmi, Varun and Vastu Havan',
-              'Poornahuthi, Aarti & Prasad Distribution',
-            ],
-            inclusions: ['Dakshina', 'All Puja Samagries'],
-            note:
-              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will be receiving a detailed to-do list after booking.',
-            addOns: [
-              { name: 'Flowers & Fruits', price: 1500 },
-              { name: 'Satyanarayan Katha', price: 1700 },
-            ],
-          },
-          {
-            name: 'Economy',
-            price: 11000,
-            includesSamagri: true,
-            pandits: '2 Panditji + All Puja Samagries',
-            description:
-              'In Economy package 2 vedic pandits will be there, more number of vedis/mandals will be put, more number of mantra aahutis will be performed and Griha Pravesh puja will be performed in a grand way and goes on for 2:30-3:00 hrs. This package is recommended for new home.',
-            procedure: [
-              'Dwar Puja',
-              'Griha Pravesh',
-              'Kitchen Puja',
-              'Boiling Milk with new vessel',
-              'Gauri Ganesh Puja',
-              'Kalasha Navgraha Puja',
-              'Vastu Puja',
-              'Havans – Ganesh, Navagraha, Laxmi, Varun and Vastu Havan',
-              'Poornahuthi, Aarti & Prasad Distribution',
-            ],
-            inclusions: ['Dakshina', 'All Puja Samagries'],
-            note:
-              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will be receiving a detailed to-do list after booking.',
-            addOns: [
-              { name: 'Flowers & Fruits', price: 1600 },
-              { name: 'Satyanarayan Katha', price: 1700 },
-            ],
-          },
-        ],
-        addOns: [],
-      },
-      odia: {
-        title: 'Griha Pravesh',
-        description: {
-          short: 'Traditional Odia Griha Pravesh packages',
-          full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
-        },
-        packages: [
-          {
-            name: 'Economy',
-            price: 7200,
-            includesSamagri: true,
-            pandits: '1 Panditji + All Puja Samagries',
-            description:
-              'Basic Griha Pravesh Puja goes on for 1:30-2 hrs. Recommended for those looking for Simple, Short Puja or Puja for rented home.',
-            procedure: [
-              'Ghata sthapana',
-              'Dwarapal Puja',
-              'Surya puja',
-              'Panchagavya Sinchana',
-              'Ganapati Ghata Puja',
-              'Navagraha Mandal Puja',
-              'Durga Madhava Puja',
-              'Naryana Lakshmivardhani Ghata Puja.',
-              'Vrindavati Puja',
-              'Vastu Puja',
-              'Havan',
-              'Gruha pravesh',
-              'Aarti and Pushpanjali',
-            ],
-            inclusions: ['Dakshina', 'All Puja Samagries'],
-            note:
-              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji dan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc you will be receiving detailed to do list after booking.',
-            addOns: [
-              { name: 'Flowers & Fruits', price: 1500 },
-              { name: 'Satyanarayan Katha', price: 1500 },
-            ],
-          },
-          {
-            name: 'Standard',
-            price: 11000,
-            includesSamagri: true,
-            pandits: '2 Panditjis + All Puja Samagries',
-            description:
-              'In Standard Griha Pravesh Puja 1 main panditji and 1 assistant panditji will be there, More number of pujas will be performed and more number of mandals are drawn, total pooja goes on for 2:30-3:00 hours.',
-            procedure: [
-              'Ghata sthapana',
-              'Dwarapal Puja',
-              'Guru Puja',
-              'Surya puja',
-              'Matru pitru Puja',
-              'Purohit varan',
-              'Saptadhanya Abhimantrita',
-              'Panchagavya Sinchana',
-              'Ganapati Ghata Puja',
-              'Brahma Mandal Puja',
-              'Savitri Puja',
-              'Navagraha Mandal Puja',
-              'Dashadikpal Mandal Puja',
-              'Astadasha Matrika Puja',
-              'Durga Madhava Puja',
-              'Naryana Lakshmivardhani Ghata Puja.',
-              'Vrindavati Puja',
-              'Vastu Mandal Puja',
-              'Vishwakarma Puja',
-              'Havan',
-              'Gruha pravesh',
-              'Aarti and Pushpanjali',
-            ],
-            inclusions: ['Dakshina', 'All Puja Samagries'],
-            note:
-              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji daan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc you will be receiving detailed to do list after booking.',
-            addOns: [
-              { name: 'Flowers & Fruits', price: 2000 },
-              { name: 'Satyanarayan Katha', price: 1500 },
-            ],
-          },
-        ],
-        addOns: [],
-      },
-      bengali: {
-        title: 'Griho Probesh',
-        description: {
-          short: 'Traditional Bengali Griho Probesh packages',
-          full: 'Griha Pravesh also known as Gruha Pratistha is the set of Pujas and rituals that are performed before a person starts to live in a new house. It is the process of cleansing the new house with Vedic mantras to make it peaceful and to live happily.',
-        },
-        packages: [
-          {
-            name: 'Economy',
-            price: 7800,
-            includesSamagri: true,
-            pandits: '1 Panditji + All Puja Samagries',
-            description:
-              'Basic Griho Probesh Puja goes on for 1:30-2 hours. Recommended for those looking for simple, short puja or puja for rented home.',
-            procedure: [
-              'Ghata Sthapana',
-              'Dwarapal Puja',
-              'Surya Puja',
-              'Panchagavya Sinchana',
-              'Ganapati Ghata Puja',
-              'Navagraha Mandal Puja',
-              'Durga Madhava Puja',
-              'Naryana Lakshmivardhani Ghata Puja',
-              'Vrindavati Puja',
-              'Vastu Puja',
-              'Havan',
-              'Griho Probesh',
-              'Aarti and Pushpanjali',
-            ],
-            inclusions: ['Dakshina', 'All Puja Samagries'],
-            note:
-              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji dan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will receive a detailed to-do list after booking.',
-            addOns: [
-              { name: 'Flowers & Fruits', price: 1500 },
-              { name: 'Satyanarayan Katha', price: 1500 },
-            ],
-          },
-          {
-            name: 'Standard',
-            price: 11000,
-            includesSamagri: true,
-            pandits: '2 Panditjis + All Puja Samagries',
-            description:
-              'In Standard Griho Probesh Puja, 1 main panditji and 1 assistant panditji perform additional pujas and more mandals. Total puja goes on for 2:30-3:00 hours.',
-            procedure: [
-              'Ghata Sthapana',
-              'Dwarapal Puja',
-              'Guru Puja',
-              'Surya Puja',
-              'Matru Pitru Puja',
-              'Purohit Varan',
-              'Saptadhanya Abhimantrita',
-              'Panchagavya Sinchana',
-              'Ganapati Ghata Puja',
-              'Brahma Mandal Puja',
-              'Savitri Puja',
-              'Navagraha Mandal Puja',
-              'Dashadikpal Mandal Puja',
-              'Astadasha Matrika Puja',
-              'Durga Madhava Puja',
-              'Naryana Lakshmivardhani Ghata Puja',
-              'Vrindavati Puja',
-              'Vastu Mandal Puja',
-              'Vishwakarma Puja',
-              'Havan',
-              'Griho Probesh',
-              'Aarti and Pushpanjali',
-            ],
-            inclusions: ['Dakshina', 'All Puja Samagries'],
-            note:
-              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji daan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc. You will receive a detailed to-do list after booking.',
-            addOns: [
-              { name: 'Flowers & Fruits', price: 2000 },
-              { name: 'Satyanarayan Katha', price: 1500 },
-            ],
-          },
-        ],
-        addOns: [],
-      },
-    },
-    addOns: [],
-  },
-  {
-    title: 'Janma Chuti Poka (Mundan)',
-    description:
-      'Mundan Ceremony is performed for the child, the hairs are shaved to signify freedom from the past and moving into the new life. Chudakarana is done to ensure the baby grows as a healthy and spiritual individual who is free from sins and also to attain the goodness of life.',
-    startPrice: 3500,
-    packages: [
-      {
-        name: 'Standard',
-        price: 3500,
-        includesSamagri: true,
-        pandits: '1 Panditji + Puja Samagri',
-        procedure: [
-          'Swastivachanam',
-          'Sankalp',
-          'Gauri Ganesh Puja',
-          'Panchdevata Puja',
-          'Chudakaran Puja',
-          'Bhog Neivedhya',
-          'Pushpanjali',
-          'Prasad Sevan',
-        ],
-        inclusions: ['Dakshina', 'All Puja Samagries'],
-        note: 'You need to arrange your barber .',
-      },
-    ],
-    addOns: [
-      { name: 'Fruits & Flowers', price: 1000 },
-      { name: 'Havan', price: 800 },
-    ],
-  },
-  {
-    title: 'Lakshmi Puja',
-    description:
-      'Lakshmi Puja is performed to gain, conserve the existing wealth, and also to achieve financial stability by appeasing Goddess Laxmi, the Goddess of wealth and prosperity.',
-    startPrice: 4000,
-    packages: [
-      {
-        name: 'Standard',
-        price: 4000,
-        includesSamagri: true,
-        pandits: '1 Panditji + Puja Samagries',
-        procedure: [
-          'Kaya Shudhi',
-          'Ghata Sthapana',
-          'Sankalpa',
-          'Ganapathi Panchdevta Puja',
-          'Brahama Savitri Matrigana Mandal Puja',
-          'Narayan Vardhani Ghata Puja',
-          'Lakshmi Ghata Puja',
-          'Neivedhya, Aarti',
-          'Pushpanjali and Bhojyadana',
-        ],
-        inclusions: ['Dakshina', 'All Puja Samagries'],
-      },
-    ],
-    addOns: [
-      { name: 'Flowers & Fruits', price: 1000 },
-      { name: 'Havan', price: 1000 },
-    ],
-  },
-  {
-    title: 'Namkaran Puja (Ekoisia)',
-    description:
-      'Namkaran is the naming ceremony of the child, it is very important as it is the first ceremony of a child’s life. It is also known as Ekoisia or Ekusia. Satyanarayan Katha and havan are performed for the well-being of the child to get all the blessings for a healthy and happy life.',
-    startPrice: 5200,
-    packages: [
-      {
-        name: 'Standard',
-        price: 5200,
-        includesSamagri: true,
-        pandits: '1 Panditji + All Puja Samagries',
-        procedure: [
-          'Ghata Sthapana',
-          'Sankalpa',
-          'Ganapathi Panchdevta Puja',
-          'Navagraha Mandala Puja',
-          'Narayan Puja',
-          'Satyanarayan Katha',
-          'Havan',
-          'Neivedhya',
-          'Aarti',
-          'Pushpanjali',
-          'Namakaran',
-          'Bhojya daana',
-        ],
-        inclusions: ['Dakshina', 'All Puja Samagries'],
-        note:
-          'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos etc. You will receive a detailed to-do list after booking.',
-      },
-    ],
-    addOns: [{ name: 'Flowers & Fruits', price: 1000 }],
-  },
-  {
-    serviceKey: 'office_opening_puja',
-    title: 'Office Opening Puja',
-    availableLanguages: ['odia', 'hindi'],
-    localizedTitle: {
-      odia: 'Office Opening Puja',
-      hindi: 'Office/Shop Opening Puja',
-    },
-    localizedDescription: {
-      odia: {
+  ],
+  addOns: [],
+  pricing: {
+    odia: {
+      title: 'Office Opening Puja',
+      description: {
         short: 'Office Opening Puja for Odia rituals',
         full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
       },
-      hindi: {
+      packages: [
+        {
+          name: 'Standard',
+          price: 4300,
+          includesSamagri: true,
+          pandits: '1 Panditji + All Puja Samagries',
+          procedure: [
+            'Ganapathi Puja',
+            'Lakshmi Puja',
+            'Vastu Puja',
+            'Vishnu Puja',
+            'Navagraha Puja',
+            'Dwarpal Puja',
+            'Dasadikpal Puja',
+            'Havan',
+            'Pushpanjali',
+            'Neivedhya',
+            'Aarti',
+            'Prasad Vitran',
+          ],
+          inclusions: ['Dakshina', 'All Puja Samagries'],
+        },
+      ],
+      addOns: [],
+    },
+    hindi: {
+      title: 'Office/Shop Opening Puja',
+      description: {
         short: 'Office/Shop Opening Puja with Hindi pandits',
         full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
       },
-    },
-    description:
-      'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
-    startPrice: 4300,
-    packages: [
-      {
-        name: 'Standard',
-        price: 4300,
-        includesSamagri: true,
-        pandits: '1 Panditji + All Puja Samagries',
-        procedure: [
-          'Ganapathi Puja',
-          'Lakshmi Puja',
-          'Vastu Puja',
-          'Vishnu Puja',
-          'Navagraha Puja',
-          'Dwarpal Puja',
-          'Dasadikpal Puja',
-          'Havan',
-          'Pushpanjali',
-          'Neivedhya',
-          'Aarti',
-          'Prasad Vitran',
-        ],
-        inclusions: ['Dakshina', 'All Puja Samagries'],
-      },
-    ],
-    pricing: {
-      odia: {
-        title: 'Office Opening Puja',
-        description: {
-          short: 'Office Opening Puja for Odia rituals',
-          full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
+      packages: [
+        {
+          name: 'Economy',
+          price: 3500,
+          includesSamagri: true,
+          pandits: '1 Panditji + Puja Samagries',
+          description:
+            'In this package 1 Panditji will be there, this package is recommended for those who are looking for simple and short puja for New office, Restaurants, any New shop openings etc.',
+          procedure: [
+            'Swasti vachanam',
+            'Gauri Ganesh Puja',
+            'Kalash Puja',
+            'Ganesh, Lakshmi and Navgraha Puja',
+            'Aarti',
+            'Pushpanjali',
+          ],
+          inclusions: ['Dakshina', 'All Puja Samagries'],
+          addOns: [
+            { name: 'Flowers & Fruits', price: 1200 },
+            { name: 'Havan', price: 1000 },
+          ],
+          note:
+            'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Milk, Curd, Prasad, Photos etc. You will receive a detailed to-do list after booking.',
         },
-        packages: [
-          {
-            name: 'Standard',
-            price: 4300,
-            includesSamagri: true,
-            pandits: '1 Panditji + All Puja Samagries',
-            procedure: [
-              'Ganapathi Puja',
-              'Lakshmi Puja',
-              'Vastu Puja',
-              'Vishnu Puja',
-              'Navagraha Puja',
-              'Dwarpal Puja',
-              'Dasadikpal Puja',
-              'Havan',
-              'Pushpanjali',
-              'Neivedhya',
-              'Aarti',
-              'Prasad Vitran',
-            ],
-            inclusions: ['Dakshina', 'All Puja Samagries'],
-          },
-        ],
-        addOns: [],
-      },
-      hindi: {
-        title: 'Office/Shop Opening Puja',
-        description: {
-          short: 'Office/Shop Opening Puja with Hindi pandits',
-          full: 'In the new building or place, many negative dosh and effects exist. By performing Office Opening Puja, blessings of Lord Ganesha and Mata Lakshmi are invoked to negate the influence of negative energies and bring success in business.',
+        {
+          name: 'Standard',
+          price: 7200,
+          includesSamagri: true,
+          pandits: '2 Panditji + All Puja Samagries + Havan',
+          description:
+            'In standard package 2 Vedic pandits will be there, More number of Vedis/mandals will be put, more number of mantra aahutis will be performed and Puja goes on for 2:00 to 2:30 hrs.',
+          procedure: [
+            'Dwar Puja',
+            'Gauri Ganesh puja',
+            'Kalash Navgraha Puja',
+            'Vastu Puja',
+            'Havans – Ganesh, Navagrah, Laxmi, Varun and Vastu Havan',
+            'Poornahuthi, Aarti & Prasad Distribution',
+          ],
+          inclusions: ['Dakshina', 'All Puja Samagries'],
+          addOns: [{ name: 'Flowers & Fruits', price: 1500 }],
+          note:
+            'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Dravyas, Kapda, Ghee, Havan Sticks, Samidha etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Milk, Curd, Plates, Prasad, Photos etc. You will receive a detailed to-do list after booking.',
         },
-        packages: [
-          {
-            name: 'Standard',
-            price: 4300,
-            includesSamagri: true,
-            pandits: '1 Panditji + All Puja Samagries',
-            procedure: [
-              'Ganapathi Puja',
-              'Lakshmi Puja',
-              'Vastu Puja',
-              'Vishnu Puja',
-              'Navagraha Puja',
-              'Dwarpal Puja',
-              'Dasadikpal Puja',
-              'Havan',
-              'Pushpanjali',
-              'Neivedhya',
-              'Aarti',
-              'Prasad Vitran',
-            ],
-            inclusions: ['Dakshina', 'All Puja Samagries'],
-            note:
-              'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos etc. You will receive a detailed to-do list after booking.',
-          },
-        ],
-        addOns: [{ name: 'Flowers & Fruits', price: 1000 }],
-      },
+      ],
+      addOns: [],
     },
-    addOns: [],
   },
-  {
-    title: 'Saraswati Puja',
-    description:
-      'Mata Saraswati is the deity of intelligence, wisdom, arts, music, memory power, and other soft skills. This havan relieves people from mental pressure. It improves concentration, memory power, focus, and the ability to understand complex things.',
-    startPrice: 4300,
-    packages: [
-      {
-        name: 'Standard',
-        price: 4300,
-        includesSamagri: true,
-        pandits: '1 Panditji + Pooja Samagries',
-        procedure: [
-          'Ghata Sthapana',
-          'Sankalpa',
-          'Ganapathi Puja',
-          'Panchdevata Puja',
-          'Saraswati Devi Avahan',
-          'Bhog Neivedhya',
-          'Aarti',
-          'Pushpanjali',
-          'Prasad Sevan',
-        ],
-        inclusions: ['Dakshina', 'Puja Samagries'],
-      },
-    ],
-    addOns: [
-      { name: 'Flowers & Fruits', price: 1000 },
-      { name: 'Havan', price: 1000 },
-    ],
-  },
-  {
-    title: 'Satyanarayan Puja',
-    description:
-      'Satyanarayan Puja is performed to remove all the obstacles and negative energies and gives victory or success. It acquires wealth and prosperity and brings harmony to the family and success in life.',
-    startPrice: 4000,
-    packages: [
-      {
-        name: 'Standard',
-        price: 4000,
-        includesSamagri: true,
-        pandits: '1 Panditji + All Pooja Samagries',
-        procedure: [
-          'Ganapathi Puja',
-          'Varun Puja',
-          'Narayan Puja',
-          'Pachdevta Puja',
-          'Navagraha Puja',
-          'Asthadasha Matrika Puja',
-          'Satyanarayan Katha Shravan',
-          'Havan',
-          'Pushpanjali',
-          'Neivedhya',
-          'Aarti',
-          'Prasad Vitran',
-        ],
-        inclusions: ['Dakshina', 'All Puja Samagries'],
-        note:
-          'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalash, Beetle Leaves, Beetle Nuts, Havan Sticks, Samidha, Havan Kund, Dravyas, Kapda, Ghee etc. will be brought by us. Yajaman has to keep house items like Vessels, Oil Lamps, Mats, Bowls, Chowki, Plates, Prasad, Photos, Bhojya daan (raw rice, dal, vegetables etc.) You will receive a detailed to-do list after booking.',
-      },
-    ],
-    addOns: [{ name: 'Flowers & Fruits', price: 1000 }],
-  },
-  {
-    title: 'Vishwakarma Puja',
-    description:
-      'Lord Vishwakarma is the chief deity of all architects and craftsmen, also known as Devashilpi. This puja is performed to please Lord Vishwakarma and get his blessings for a happy and wealthy life.',
-    startPrice: 4000,
-    packages: [
-      {
-        name: 'Standard',
-        price: 4000,
-        includesSamagri: true,
-        pandits: '1 Panditji + Puja Samagries',
-        procedure: [
-          'Kaya Shudhi',
-          'Ghata Sthapana',
-          'Sankalpa',
-          'Ganapathi Panchdevta Puja',
-          'Narayan Vardhani Ghata Puja',
-          'Vishwakarma Puja',
-          'Neivedhya, Aarti',
-          'Pushpanjali and Bhojyadana',
-        ],
-        inclusions: ['Dakshina', 'All Puja Samagries'],
-      },
-    ],
-    addOns: [
-      { name: 'Flowers & Fruits', price: 1000 },
-      { name: 'Havan', price: 1000 },
-    ],
-  },
-];
-
-const pujasToUpsert = structuredPoojasToUpsert
-  .map((item) => buildPoojaPayloadFromStructured(item));
-
-const expectedByTitle = new Map(pujasToUpsert.map((item) => [item.title, item]));
-
-const validatePooja = (doc, expected) => {
-  const issues = [];
-
-  if (!doc) {
-    issues.push('missing record');
-    return issues;
-  }
-
-  if (!doc.description || doc.description.trim().length < 20) {
-    issues.push('description missing/too short');
-  }
-
-  if (!Array.isArray(doc.packages) || doc.packages.length !== expected.packages.length) {
-    issues.push(`packages mismatch (expected ${expected.packages.length}, got ${doc.packages?.length || 0})`);
-  }
-
-  for (const expectedPackage of expected.packages) {
-    const found = (doc.packages || []).find((pkg) => pkg.name === expectedPackage.name);
-    if (!found) {
-      issues.push(`package missing: ${expectedPackage.name}`);
-      continue;
-    }
-
-    if (Number(found.price) !== Number(expectedPackage.price)) {
-      issues.push(
-        `package price mismatch for ${expectedPackage.name} (expected ${expectedPackage.price}, got ${found.price})`
-      );
-    }
-
-    if (!Array.isArray(found.procedure) || found.procedure.length === 0) {
-      issues.push(`procedure missing for ${expectedPackage.name}`);
-    }
-
-    if (!Array.isArray(found.inclusions) || found.inclusions.length === 0) {
-      issues.push(`inclusions missing for ${expectedPackage.name}`);
-    }
-  }
-
-  const expectedAddOns = expected.addOns || [];
-  const actualAddOns = doc.addOns || [];
-  if (actualAddOns.length !== expectedAddOns.length) {
-    issues.push(`add-ons mismatch (expected ${expectedAddOns.length}, got ${actualAddOns.length})`);
-  }
-
-  for (const expectedAddOn of expectedAddOns) {
-    const found = actualAddOns.find((item) => item.name === expectedAddOn.name);
-    if (!found) {
-      issues.push(`add-on missing: ${expectedAddOn.name}`);
-      continue;
-    }
-
-    if (Number(found.price) !== Number(expectedAddOn.price)) {
-      issues.push(
-        `add-on price mismatch for ${expectedAddOn.name} (expected ${expectedAddOn.price}, got ${found.price})`
-      );
-    }
-  }
-
-  return issues;
 };
 
-async function upsertAndVerify() {
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('Connected to MongoDB');
-
-    await Pooja.deleteOne({ title: 'Office/Shop Opening Puja' });
-
-    let upserted = 0;
-    for (const pooja of pujasToUpsert) {
-      const primaryNote = pooja.packages?.[0]?.note;
-      const updatePayload = {
-        $set: {
-          serviceKey: pooja.serviceKey,
-          title: pooja.title,
-          availableLanguages: pooja.availableLanguages,
-          localizedTitle: pooja.localizedTitle,
-          localizedDescription: pooja.localizedDescription,
-          description: pooja.description,
-          image: DEFAULT_IMAGE,
-          startPrice: pooja.startPrice,
-          packages: pooja.packages,
-          addOns: pooja.addOns,
-          pricing: pooja.pricing,
-        },
-      };
-
-      if (primaryNote) {
-        updatePayload.$set['details.standard.note'] = primaryNote;
-      } else {
-        updatePayload.$unset = {
-          'details.standard.note': '',
-        };
-      }
-
-      await Pooja.updateOne(
-        { title: pooja.title },
-        updatePayload,
-        { upsert: true }
-      );
-      upserted += 1;
-    }
-
-    console.log(`Upsert complete: ${upserted} records processed`);
-
-    const titles = pujasToUpsert.map((item) => item.title);
-    const docs = await Pooja.find({ title: { $in: titles } }).lean();
-    const docByTitle = new Map(docs.map((doc) => [doc.title, doc]));
-
-    let passCount = 0;
-    let failCount = 0;
-
-    console.log('\nVerification results:');
-    for (const title of titles) {
-      const expected = expectedByTitle.get(title);
-      const issues = validatePooja(docByTitle.get(title), expected);
-
-      if (issues.length === 0) {
-        console.log(`✓ ${title}`);
-        passCount += 1;
-      } else {
-        console.log(`✗ ${title}`);
-        issues.forEach((issue) => console.log(`  - ${issue}`));
-        failCount += 1;
-      }
-    }
-
-    console.log('\nSummary:');
-    console.log(`Passed: ${passCount}`);
-    console.log(`Failed: ${failCount}`);
-
-    await mongoose.connection.close();
-
-    if (failCount > 0) {
-      process.exit(1);
-    }
-  } catch (error) {
-    console.error('Error during upsert/verification:', error);
-    process.exit(1);
+async function main() {
+  if (!process.env.MONGO_URI) {
+    throw new Error('MONGO_URI is not set');
   }
+
+  await mongoose.connect(process.env.MONGO_URI);
+  await Pooja.deleteOne({ title: 'Office/Shop Opening Puja' });
+
+  const updated = await Pooja.findOneAndUpdate(
+    { title: officeOpeningPuja.title },
+    { $set: officeOpeningPuja },
+    { new: true, upsert: true, setDefaultsOnInsert: true }
+  ).lean();
+
+  console.log(
+    JSON.stringify(
+      {
+        title: updated.title,
+        startPrice: updated.startPrice,
+        pricing: {
+          odia: updated.pricing?.odia?.packages?.map((pkg) => ({ name: pkg.name, price: pkg.price })) || [],
+          hindi: updated.pricing?.hindi?.packages?.map((pkg) => ({ name: pkg.name, price: pkg.price })) || [],
+        },
+      },
+      null,
+      2
+    )
+  );
+
+  await mongoose.disconnect();
 }
 
-upsertAndVerify();
+main().catch(async (error) => {
+  console.error(error);
+  try {
+    await mongoose.disconnect();
+  } catch (disconnectError) {
+    console.error(disconnectError);
+  }
+  process.exitCode = 1;
+});
