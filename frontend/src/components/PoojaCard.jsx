@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { getPoojaImage } from '../assets/poojaImageMap'
+import fallbackImage from '../assets/poojas/puja-ceremony.jpg'
 import { slugify } from '../utils/slug'
 
 function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
@@ -92,7 +93,8 @@ function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="aspect-square w-full max-h-150 object-cover object-center transition-transform duration-500 group-hover:scale-105"
           onError={(event) => {
-            event.currentTarget.src = pooja.image
+            event.currentTarget.onerror = null
+            event.currentTarget.src = fallbackImage
           }}
         />
         <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-black/40 to-transparent" />
