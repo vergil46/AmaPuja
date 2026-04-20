@@ -234,6 +234,8 @@ function HomePage() {
         </div>
       </section>
 
+      <WorkProofGallery />
+
       {/* ── Why Us ── */}
       <section className="bg-[#FFF8E1] px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-6xl">
@@ -303,8 +305,6 @@ function HomePage() {
       <GoogleBusinessCard variant="full" />
 
       <Testimonials />
-
-      <WorkProofGallery />
     </>
   )
 }
