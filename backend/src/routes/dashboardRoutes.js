@@ -53,12 +53,18 @@ router.get('/admin/stats', protect, adminOnly, async (req, res) => {
     status: 'paid',
     ...(hasCreatedAtFilter ? createdAtFilter : {}),
   };
+  const payAfterRevenueMatchFilter = {
+    paymentOption: 'pay-after-pooja',
+    bookingStatus: 'completed',
+    ...(hasCreatedAtFilter ? createdAtFilter : {}),
+  };
 
   const [
     totalBookings,
     totalEnquiries,
     totalPayments,
     revenueResult,
+    payAfterRevenueResult,
     topServicesResult,
     bookingStatusBreakdown,
     funnelBreakdown,
@@ -67,6 +73,7 @@ router.get('/admin/stats', protect, adminOnly, async (req, res) => {
     Enquiry.countDocuments(createdAtFilter),
     Payment.countDocuments(createdAtFilter),
     Payment.aggregate([{ $match: paymentMatchFilter }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
+    Booking.aggregate([{ $match: payAfterRevenueMatchFilter }, { $group: { _id: null, total: { $sum: '$finalAmount' } } }]),
     Booking.aggregate([
       ...bookingPipelinePrefix,
       {
@@ -174,11 +181,19 @@ router.get('/admin/stats', protect, adminOnly, async (req, res) => {
       : 0,
   };
 
+  const onlineRevenue = Number(revenueResult[0]?.total || 0);
+  const payAfterRevenue = Number(payAfterRevenueResult[0]?.total || 0);
+  const totalRevenue = onlineRevenue + payAfterRevenue;
+
   return res.json({
     totalBookings,
     totalEnquiries,
     totalPayments,
-    revenue: revenueResult[0]?.total || 0,
+    revenue: totalRevenue,
+    revenueBreakdown: {
+      onlinePaid: onlineRevenue,
+      payAfterCompleted: payAfterRevenue,
+    },
     conversionRate,
     topServices: topServicesResult,
     dropOffStage,
