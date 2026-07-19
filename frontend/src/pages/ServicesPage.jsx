@@ -397,7 +397,7 @@ const bengaliTitleAliases = {
   'Durga Puja': ['Durga Puja'],
   'Ganesh Puja': ['Ganesh Puja'],
   'Griho Probesh': ['Griho Probesh', 'Griha Pravesh', 'Griha Pravesh (Gruha Pratistha)'],
-  'Laxmi Puja': ['Laxmi Puja', 'Lakshmi Puja'],
+  'Laxmi Puja': ['Laxmi Puja', 'Lakshmi Puja', 'Mahalaxmi Puja'],
   'Onnoprashon (Mukhe Bhaat)': ['Onnoprashon (Mukhe Bhaat)', 'Annaprashan Puja'],
   'Saraswati Puja': ['Saraswati Puja'],
   'Satyanarayan Puja': ['Satyanarayan Puja'],
