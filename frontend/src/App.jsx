@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import Layout from './components/Layout'
 import { useAuth } from './context/useAuth'
 import HomePage from './pages/HomePage'
@@ -145,6 +146,7 @@ function App() {
         </Routes>
       </Suspense>
       <InactivityWarningModal />
+      <SpeedInsights />
     </Layout>
   )
 }
