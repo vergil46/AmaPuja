@@ -91,7 +91,7 @@ const updates = {
 				inclusions: ['Dakshina', 'Puja Samagries'],
 				addOns: [
 					{ name: 'Flowers & Fruits', price: 1000 },
-					{ name: 'Havan', price: 100 },
+					{ name: 'Havan', price: 1000 },
 				],
 			},
 		],

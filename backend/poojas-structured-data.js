@@ -305,7 +305,7 @@ module.exports = [
               },
               {
                 "name": "Havan",
-                "price": 100
+                "price": 1000
               }
             ]
           }
