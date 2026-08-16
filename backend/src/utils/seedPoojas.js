@@ -91,6 +91,10 @@ const seedPoojas = async () => {
             { name: 'Flowers & Fruits', price: 1000 },
             { name: 'Havan', price: 1000 },
           ],
+          'pricing.odia.packages.0.addOns': [
+            { name: 'Flowers & Fruits', price: 1000 },
+            { name: 'Havan', price: 1000 },
+          ],
           'pricing.bengali.addOns': [
             { name: 'Flowers & Fruits', price: 1000 },
             { name: 'Havan', price: 1000 },
