@@ -72,6 +72,34 @@ const buildPackages = (basePrice) => [
 const seedPoojas = async () => {
   const existingPoojas = await Pooja.find({}, { title: 1 }).lean();
   const existingTitles = new Set(existingPoojas.map((pooja) => pooja.title));
+
+  const ganapathiPuja = await Pooja.findOne({ title: 'Ganapathi Puja' });
+  if (ganapathiPuja) {
+    await Pooja.updateOne(
+      { title: 'Ganapathi Puja' },
+      {
+        $set: {
+          addOns: [
+            { name: 'Flowers & Fruits', price: 1000 },
+            { name: 'Havan', price: 1000 },
+          ],
+          addons: [
+            { name: 'Flowers & Fruits', price: 1000 },
+            { name: 'Havan', price: 1000 },
+          ],
+          'pricing.odia.addOns': [
+            { name: 'Flowers & Fruits', price: 1000 },
+            { name: 'Havan', price: 1000 },
+          ],
+          'pricing.bengali.addOns': [
+            { name: 'Flowers & Fruits', price: 1000 },
+            { name: 'Havan', price: 1000 },
+          ],
+        },
+      }
+    );
+  }
+
   const missingTitles = poojaTitles.filter((title) => !existingTitles.has(title));
 
   if (missingTitles.length === 0) {
