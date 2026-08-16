@@ -357,7 +357,11 @@ function PoojaDetailPage() {
     setIsLoadingPooja(true)
     setPoojaLoadError('')
 
-    api.get(`/poojas/${id}`)
+    api.get(`/poojas/${id}`, {
+      params: {
+        _: Date.now(),
+      },
+    })
       .then((res) => {
         setPooja(res.data)
         setSelectedPackage('')
