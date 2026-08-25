@@ -5,7 +5,8 @@ const bcrypt = require('bcryptjs');
 
 async function run() {
   const email = 'lokanathpanda46@gmail.com';
-  const newPassword = 'Puja@2026'; // New password
+  const newPassword = process.env.ADMIN_PASSWORD;
+  if (!newPassword) throw new Error('ADMIN_PASSWORD is required');
   const hash = await bcrypt.hash(newPassword, 10);
   await mongoose.connect(process.env.MONGO_URI);
   await User.updateOne({ email }, { $set: { password: hash } });
