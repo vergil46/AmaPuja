@@ -49,6 +49,7 @@ function AdminPage() {
   })
   const [analyticsRange, setAnalyticsRange] = useState('30d')
   const [poojas, setPoojas] = useState([])
+  const [galleryItems, setGalleryItems] = useState([])
   const [bookings, setBookings] = useState([])
   const [recentBookings, setRecentBookings] = useState([])
   const [enquiries, setEnquiries] = useState([])
@@ -172,8 +173,9 @@ function AdminPage() {
   }, [])
 
   const loadData = async () => {
-    const [poojaRes, bookingRes, recentBookingRes, enquiryRes, paymentRes, feedbackRes] = await Promise.all([
+    const [poojaRes, galleryRes, bookingRes, recentBookingRes, enquiryRes, paymentRes, feedbackRes] = await Promise.all([
       api.get('/poojas'),
+      api.get('/gallery'),
       api.get('/bookings/admin/all'),
       api.get('/bookings/admin/recent?limit=10'),
       api.get('/enquiries'),
@@ -181,6 +183,7 @@ function AdminPage() {
       api.get('/feedback/admin/all?limit=500'),
     ])
     setPoojas(poojaRes.data)
+    setGalleryItems(Array.isArray(galleryRes.data) ? galleryRes.data : [])
     setBookings(bookingRes.data)
     setRecentBookings(recentBookingRes.data)
     setEnquiries(enquiryRes.data)
@@ -286,14 +289,28 @@ function AdminPage() {
     }
 
     try {
-      await api.post('/gallery', {
+      const response = await api.post('/gallery', {
         ...galleryForm,
         sortOrder: 0,
       })
+
+      const newGalleryPhoto = response.data
+      setGalleryItems((current) => [newGalleryPhoto, ...current])
       setGalleryForm({ title: '', category: 'Ganesh Puja', location: '', date: '', image: '' })
       setGalleryUploadState({ uploading: false, message: 'Gallery photo added successfully.', error: '' })
     } catch (error) {
       const message = error?.response?.data?.message || 'Unable to save gallery photo.'
+      setGalleryUploadState({ uploading: false, message: '', error: message })
+    }
+  }
+
+  const deleteGalleryPhoto = async (id) => {
+    try {
+      await api.delete(`/gallery/${id}`)
+      setGalleryItems((current) => current.filter((item) => item._id !== id))
+      setGalleryUploadState({ uploading: false, message: 'Gallery photo deleted successfully.', error: '' })
+    } catch (error) {
+      const message = error?.response?.data?.message || 'Unable to delete gallery photo.'
       setGalleryUploadState({ uploading: false, message: '', error: message })
     }
   }
@@ -1372,6 +1389,33 @@ function AdminPage() {
                         <button type="submit" className="px-4 py-2 bg-orange-700 text-white rounded">Save to Gallery</button>
                       </div>
                     </form>
+
+                    <div className="mt-4 rounded-lg border border-dashed border-amber-200 bg-white p-3">
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <p className="text-sm font-medium text-stone-800">Gallery Items</p>
+                        <span className="text-xs text-stone-500">{galleryItems.length}</span>
+                      </div>
+                      <div className="space-y-2 max-h-52 overflow-auto">
+                        {galleryItems.length === 0 ? (
+                          <p className="text-xs text-stone-500">No gallery items yet.</p>
+                        ) : (
+                          galleryItems.map((item) => (
+                            <div key={item._id} className="flex items-center justify-between gap-2 rounded-lg border border-stone-200 bg-stone-50 p-2">
+                              <div className="flex items-center gap-2 truncate">
+                                {item.image && (
+                                  <img src={item.image} alt={item.title} className="h-10 w-10 rounded object-cover" />
+                                )}
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm font-medium text-stone-800">{item.title}</p>
+                                  <p className="text-[11px] text-stone-500">{item.category}</p>
+                                </div>
+                              </div>
+                              <button onClick={() => deleteGalleryPhoto(item._id)} className="rounded bg-red-600 px-2 py-1 text-xs text-white">Delete</button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
 
                     <div className="mt-3 space-y-2 max-h-36 overflow-auto">
                       {poojas.map((pooja) => (
