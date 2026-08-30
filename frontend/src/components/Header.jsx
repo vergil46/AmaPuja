@@ -80,6 +80,9 @@ function Header() {
           <NavLink to="/ratings" className={navClass}>
             Reviews
           </NavLink>
+          <NavLink to="/gallery" className={navClass}>
+            Gallery
+          </NavLink>
           {user && (
             <NavLink to="/dashboard" className={navClass}>
               {t('dashboard')}
@@ -214,6 +217,9 @@ function Header() {
             </NavLink>
             <NavLink to="/ratings" className={mobileNavClass} onClick={closeMobileMenu}>
               Ratings
+            </NavLink>
+            <NavLink to="/gallery" className={mobileNavClass} onClick={closeMobileMenu}>
+              Gallery
             </NavLink>
             <NavLink to="/contact" className={mobileNavClass} onClick={closeMobileMenu}>
               {t('contact')}

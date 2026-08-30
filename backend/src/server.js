@@ -32,6 +32,7 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const galleryRoutes = require('./routes/galleryRoutes');
 const { protect, adminOnly } = require('./middleware/auth');
 
 connectDB().then(seedPoojas);
@@ -206,6 +207,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/gallery', galleryRoutes);
 
 if (process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.errorHandler());
