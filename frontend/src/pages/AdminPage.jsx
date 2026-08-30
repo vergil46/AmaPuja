@@ -76,6 +76,14 @@ function AdminPage() {
   const [twilioTestError, setTwilioTestError] = useState('')
   const [form, setForm] = useState({ title: '', description: '', image: '', startPrice: 0 })
   const [proofUploadState, setProofUploadState] = useState({ uploading: false, message: '', error: '' })
+  const [galleryForm, setGalleryForm] = useState({
+    title: '',
+    category: 'Ganesh Puja',
+    location: '',
+    date: '',
+    image: '',
+  })
+  const [galleryUploadState, setGalleryUploadState] = useState({ uploading: false, message: '', error: '' })
   const [activeSidebarSection, setActiveSidebarSection] = useState('dashboard')
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -239,6 +247,54 @@ function AdminPage() {
     } catch (error) {
       const message = error?.response?.data?.message || 'Upload failed. Please try again.'
       setProofUploadState({ uploading: false, message: '', error: message })
+    }
+  }
+
+  const handleGalleryImageUpload = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) {
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('image', file)
+
+    try {
+      setGalleryUploadState({ uploading: true, message: '', error: '' })
+      const response = await api.post('/gallery/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      setGalleryForm((current) => ({ ...current, image: response.data.url }))
+      setGalleryUploadState({
+        uploading: false,
+        message: `Image uploaded: ${response.data.fileName}`,
+        error: '',
+      })
+      event.target.value = ''
+    } catch (error) {
+      const message = error?.response?.data?.message || 'Gallery image upload failed. Please try again.'
+      setGalleryUploadState({ uploading: false, message: '', error: message })
+    }
+  }
+
+  const createGalleryPhoto = async (event) => {
+    event.preventDefault()
+
+    if (!galleryForm.image) {
+      setGalleryUploadState({ uploading: false, message: '', error: 'Please upload a gallery image before saving.' })
+      return
+    }
+
+    try {
+      await api.post('/gallery', {
+        ...galleryForm,
+        sortOrder: 0,
+      })
+      setGalleryForm({ title: '', category: 'Ganesh Puja', location: '', date: '', image: '' })
+      setGalleryUploadState({ uploading: false, message: 'Gallery photo added successfully.', error: '' })
+    } catch (error) {
+      const message = error?.response?.data?.message || 'Unable to save gallery photo.'
+      setGalleryUploadState({ uploading: false, message: '', error: message })
     }
   }
 
@@ -1262,6 +1318,7 @@ function AdminPage() {
                       <input className="px-3 py-2 border rounded" placeholder="Starting Price" type="number" required value={form.startPrice} onChange={(e) => setForm({ ...form, startPrice: e.target.value })} />
                       <button className="px-4 py-2 bg-orange-700 text-white rounded">Add Pooja</button>
                     </form>
+
                     <div className="mt-4 rounded-lg border border-dashed border-orange-200 bg-orange-50 p-3">
                       <p className="text-sm font-medium text-stone-800">Upload proof image</p>
                       <input
@@ -1280,6 +1337,42 @@ function AdminPage() {
                         <p className="mt-2 text-xs text-red-700">{proofUploadState.error}</p>
                       )}
                     </div>
+
+                    <form onSubmit={createGalleryPhoto} className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                      <p className="text-sm font-medium text-stone-800">Add gallery photo</p>
+                      <div className="mt-3 grid gap-2">
+                        <input className="px-3 py-2 border rounded bg-white" placeholder="Title" required value={galleryForm.title} onChange={(e) => setGalleryForm({ ...galleryForm, title: e.target.value })} />
+                        <select className="px-3 py-2 border rounded bg-white" value={galleryForm.category} onChange={(e) => setGalleryForm({ ...galleryForm, category: e.target.value })}>
+                          {['Ganesh Puja', 'Durga Puja', 'Satyanarayan Puja', 'Navagraha Puja', 'Shiva Puja', 'Griha Pravesh', 'Annaprashan', 'Other Pujas'].map((category) => (
+                            <option key={category} value={category}>{category}</option>
+                          ))}
+                        </select>
+                        <input className="px-3 py-2 border rounded bg-white" placeholder="Location" required value={galleryForm.location} onChange={(e) => setGalleryForm({ ...galleryForm, location: e.target.value })} />
+                        <input className="px-3 py-2 border rounded bg-white" placeholder="Date (e.g. 30 Aug 2026)" required value={galleryForm.date} onChange={(e) => setGalleryForm({ ...galleryForm, date: e.target.value })} />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleGalleryImageUpload}
+                          className="mt-1 block w-full text-sm text-stone-700 file:mr-3 file:rounded file:border-0 file:bg-orange-700 file:px-3 file:py-2 file:text-white"
+                        />
+                        {galleryForm.image && (
+                          <div className="rounded border border-dashed border-orange-300 bg-white p-2">
+                            <img src={galleryForm.image} alt="Preview" className="h-28 w-full rounded object-cover" />
+                          </div>
+                        )}
+                        {galleryUploadState.uploading && (
+                          <p className="text-xs text-orange-700">Uploading gallery image...</p>
+                        )}
+                        {galleryUploadState.message && (
+                          <p className="text-xs text-green-700">{galleryUploadState.message}</p>
+                        )}
+                        {galleryUploadState.error && (
+                          <p className="text-xs text-red-700">{galleryUploadState.error}</p>
+                        )}
+                        <button type="submit" className="px-4 py-2 bg-orange-700 text-white rounded">Save to Gallery</button>
+                      </div>
+                    </form>
+
                     <div className="mt-3 space-y-2 max-h-36 overflow-auto">
                       {poojas.map((pooja) => (
                         <div key={pooja._id} className="flex items-center justify-between rounded-lg border border-stone-200 p-2">
