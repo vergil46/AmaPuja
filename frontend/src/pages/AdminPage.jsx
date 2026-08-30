@@ -84,6 +84,14 @@ function AdminPage() {
     date: '',
     image: '',
   })
+  const [galleryEditId, setGalleryEditId] = useState(null)
+  const [galleryEditForm, setGalleryEditForm] = useState({
+    title: '',
+    category: 'Ganesh Puja',
+    location: '',
+    date: '',
+    image: '',
+  })
   const [galleryUploadState, setGalleryUploadState] = useState({ uploading: false, message: '', error: '' })
   const [activeSidebarSection, setActiveSidebarSection] = useState('dashboard')
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -267,7 +275,13 @@ function AdminPage() {
       const response = await api.post('/gallery/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-      setGalleryForm((current) => ({ ...current, image: response.data.url }))
+
+      if (galleryEditId) {
+        setGalleryEditForm((current) => ({ ...current, image: response.data.url }))
+      } else {
+        setGalleryForm((current) => ({ ...current, image: response.data.url }))
+      }
+
       setGalleryUploadState({
         uploading: false,
         message: `Image uploaded: ${response.data.fileName}`,
@@ -278,6 +292,15 @@ function AdminPage() {
       const message = error?.response?.data?.message || 'Gallery image upload failed. Please try again.'
       setGalleryUploadState({ uploading: false, message: '', error: message })
     }
+  }
+
+  const updateGalleryField = (field, value) => {
+    if (galleryEditId) {
+      setGalleryEditForm((current) => ({ ...current, [field]: value }))
+      return
+    }
+
+    setGalleryForm((current) => ({ ...current, [field]: value }))
   }
 
   const createGalleryPhoto = async (event) => {
@@ -304,10 +327,54 @@ function AdminPage() {
     }
   }
 
+  const openGalleryEditor = (item) => {
+    setGalleryEditId(item._id)
+    setGalleryEditForm({
+      title: item.title,
+      category: item.category,
+      location: item.location,
+      date: item.date,
+      image: item.image,
+    })
+    setGalleryUploadState({ uploading: false, message: '', error: '' })
+  }
+
+  const cancelGalleryEdit = () => {
+    setGalleryEditId(null)
+    setGalleryEditForm({ title: '', category: 'Ganesh Puja', location: '', date: '', image: '' })
+    setGalleryUploadState({ uploading: false, message: '', error: '' })
+  }
+
+  const saveGalleryEdit = async (event) => {
+    event.preventDefault()
+
+    if (!galleryEditId || !galleryEditForm.image) {
+      setGalleryUploadState({ uploading: false, message: '', error: 'Please upload a gallery image before saving.' })
+      return
+    }
+
+    try {
+      const response = await api.put(`/gallery/${galleryEditId}`, {
+        ...galleryEditForm,
+        sortOrder: 0,
+      })
+
+      setGalleryItems((current) => current.map((item) => (item._id === galleryEditId ? response.data : item)))
+      cancelGalleryEdit()
+      setGalleryUploadState({ uploading: false, message: 'Gallery photo updated successfully.', error: '' })
+    } catch (error) {
+      const message = error?.response?.data?.message || 'Unable to update gallery photo.'
+      setGalleryUploadState({ uploading: false, message: '', error: message })
+    }
+  }
+
   const deleteGalleryPhoto = async (id) => {
     try {
       await api.delete(`/gallery/${id}`)
       setGalleryItems((current) => current.filter((item) => item._id !== id))
+      if (galleryEditId === id) {
+        cancelGalleryEdit()
+      }
       setGalleryUploadState({ uploading: false, message: 'Gallery photo deleted successfully.', error: '' })
     } catch (error) {
       const message = error?.response?.data?.message || 'Unable to delete gallery photo.'
@@ -1355,26 +1422,53 @@ function AdminPage() {
                       )}
                     </div>
 
-                    <form onSubmit={createGalleryPhoto} className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                      <p className="text-sm font-medium text-stone-800">Add gallery photo</p>
+                    <form onSubmit={galleryEditId ? saveGalleryEdit : createGalleryPhoto} className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-medium text-stone-800">{galleryEditId ? 'Edit gallery photo' : 'Add gallery photo'}</p>
+                        {galleryEditId && (
+                          <button type="button" onClick={cancelGalleryEdit} className="text-xs font-medium text-stone-600 underline">Cancel</button>
+                        )}
+                      </div>
                       <div className="mt-3 grid gap-2">
-                        <input className="px-3 py-2 border rounded bg-white" placeholder="Title" required value={galleryForm.title} onChange={(e) => setGalleryForm({ ...galleryForm, title: e.target.value })} />
-                        <select className="px-3 py-2 border rounded bg-white" value={galleryForm.category} onChange={(e) => setGalleryForm({ ...galleryForm, category: e.target.value })}>
+                        <input
+                          className="px-3 py-2 border rounded bg-white"
+                          placeholder="Title"
+                          required
+                          value={galleryEditId ? galleryEditForm.title : galleryForm.title}
+                          onChange={(e) => updateGalleryField('title', e.target.value)}
+                        />
+                        <select
+                          className="px-3 py-2 border rounded bg-white"
+                          value={galleryEditId ? galleryEditForm.category : galleryForm.category}
+                          onChange={(e) => updateGalleryField('category', e.target.value)}
+                        >
                           {['Ganesh Puja', 'Durga Puja', 'Satyanarayan Puja', 'Navagraha Puja', 'Shiva Puja', 'Griha Pravesh', 'Annaprashan', 'Other Pujas'].map((category) => (
                             <option key={category} value={category}>{category}</option>
                           ))}
                         </select>
-                        <input className="px-3 py-2 border rounded bg-white" placeholder="Location" required value={galleryForm.location} onChange={(e) => setGalleryForm({ ...galleryForm, location: e.target.value })} />
-                        <input className="px-3 py-2 border rounded bg-white" placeholder="Date (e.g. 30 Aug 2026)" required value={galleryForm.date} onChange={(e) => setGalleryForm({ ...galleryForm, date: e.target.value })} />
+                        <input
+                          className="px-3 py-2 border rounded bg-white"
+                          placeholder="Location"
+                          required
+                          value={galleryEditId ? galleryEditForm.location : galleryForm.location}
+                          onChange={(e) => updateGalleryField('location', e.target.value)}
+                        />
+                        <input
+                          className="px-3 py-2 border rounded bg-white"
+                          placeholder="Date (e.g. 30 Aug 2026)"
+                          required
+                          value={galleryEditId ? galleryEditForm.date : galleryForm.date}
+                          onChange={(e) => updateGalleryField('date', e.target.value)}
+                        />
                         <input
                           type="file"
                           accept="image/*"
                           onChange={handleGalleryImageUpload}
                           className="mt-1 block w-full text-sm text-stone-700 file:mr-3 file:rounded file:border-0 file:bg-orange-700 file:px-3 file:py-2 file:text-white"
                         />
-                        {galleryForm.image && (
+                        {(galleryEditId ? galleryEditForm.image : galleryForm.image) && (
                           <div className="rounded border border-dashed border-orange-300 bg-white p-2">
-                            <img src={galleryForm.image} alt="Preview" className="h-28 w-full rounded object-cover" />
+                            <img src={galleryEditId ? galleryEditForm.image : galleryForm.image} alt="Preview" className="h-28 w-full rounded object-cover" />
                           </div>
                         )}
                         {galleryUploadState.uploading && (
@@ -1386,7 +1480,9 @@ function AdminPage() {
                         {galleryUploadState.error && (
                           <p className="text-xs text-red-700">{galleryUploadState.error}</p>
                         )}
-                        <button type="submit" className="px-4 py-2 bg-orange-700 text-white rounded">Save to Gallery</button>
+                        <button type="submit" className="px-4 py-2 bg-orange-700 text-white rounded">
+                          {galleryEditId ? 'Update Gallery Photo' : 'Save to Gallery'}
+                        </button>
                       </div>
                     </form>
 
@@ -1410,7 +1506,10 @@ function AdminPage() {
                                   <p className="text-[11px] text-stone-500">{item.category}</p>
                                 </div>
                               </div>
-                              <button onClick={() => deleteGalleryPhoto(item._id)} className="rounded bg-red-600 px-2 py-1 text-xs text-white">Delete</button>
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => openGalleryEditor(item)} className="rounded bg-stone-800 px-2 py-1 text-[11px] text-white">Edit</button>
+                                <button onClick={() => deleteGalleryPhoto(item._id)} className="rounded bg-red-600 px-2 py-1 text-[11px] text-white">Delete</button>
+                              </div>
                             </div>
                           ))
                         )}
