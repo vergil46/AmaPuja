@@ -1,22 +1,11 @@
 const proofVideos = []
 
-const proofImages = [
-  '/proofs/p.jpeg',
-  '/proofs/IMG_20260420_063648.jpg.jpeg',
-  '/proofs/IMG_20260420_072006.jpg.jpeg',
-  '/proofs/IMG_20260420_074152.jpg.jpeg',
-  '/proofs/IMG_20260420_074157.jpg.jpeg',
-  '/proofs/IMG_20260420_074227.jpg.jpeg',
-  '/proofs/IMG_20260420_074230.jpg.jpeg',
-  '/proofs/work1.jpeg',
-  '/proofs/work2.jpeg',
-  '/proofs/work3.jpeg',
-  '/proofs/work4.jpeg',
-  '/proofs/work5.jpeg',
-  '/proofs/work6.jpeg',
-  '/proofs/work7.jpeg',
-  '/proofs/work8.jpeg',
-]
+const proofImages = Object.values(
+  import.meta.glob('/proofs/*.{jpg,jpeg,png,webp}', {
+    eager: true,
+    import: 'default',
+  })
+)
 
 import { OptimizedGalleryImage } from './ResponsiveImage'
 
