@@ -2,18 +2,34 @@
   "buildCommand": "cd frontend && npm run build",
   "installCommand": "cd frontend && npm install",
   "outputDirectory": "frontend/dist",
+  "public": "frontend/public",
   "env": {
     "NODE_ENV": "production"
   },
-  "functions": {
-    "api/**": {
-      "runtime": "nodejs20.x"
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
     }
-  },
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "frontend/index.html"
+      "destination": "/index.html"
     }
   ]
 }
