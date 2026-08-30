@@ -4,6 +4,7 @@ import Seo from '../components/Seo'
 import Testimonials from '../components/Testimonials'
 import { useAuth } from '../context/useAuth'
 import api from '../services/api'
+import { feedbackSocket } from '../services/feedbackSocket'
 
 const QuoteMark = () => (
   <svg className="h-4 w-4 text-[#FFE0A3]" fill="currentColor" viewBox="0 0 24 24">
@@ -42,10 +43,22 @@ function RatingsPage() {
   const [message, setMessage] = useState({ type: '', text: '' })
 
   useEffect(() => {
-    api
-      .get('/feedback?limit=500')
-      .then((response) => setPublicFeedbacks(response.data || []))
-      .catch(() => setPublicFeedbacks([]))
+    const loadPublicFeedback = () => {
+      api
+        .get('/feedback?limit=500')
+        .then((response) => setPublicFeedbacks(response.data || []))
+        .catch(() => setPublicFeedbacks([]))
+    }
+
+    loadPublicFeedback()
+    feedbackSocket.on('feedback:approved', loadPublicFeedback)
+    feedbackSocket.on('feedback:changed', loadPublicFeedback)
+    feedbackSocket.connect()
+
+    return () => {
+      feedbackSocket.off('feedback:approved', loadPublicFeedback)
+      feedbackSocket.off('feedback:changed', loadPublicFeedback)
+    }
   }, [])
 
   useEffect(() => {

@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
       ? Math.min(Math.max(Math.trunc(requestedLimit), 1), 500)
       : 200;
 
-    const feedbacks = await Feedback.find({})
+    const feedbacks = await Feedback.find({ isApproved: true })
       .sort({ createdAt: -1 })
       .limit(limit)
       .populate('userId', 'name')
@@ -38,13 +38,32 @@ router.get('/', async (req, res) => {
         comment: feedback.comment,
         reviewPhoto: feedback.reviewPhoto || '',
         createdAt: feedback.createdAt,
-        customerName: feedback.userId?.name || 'Verified Customer',
+        customerName: feedback.customerName || feedback.userId?.name || 'Verified Customer',
         poojaTitle: feedback.poojaId?.title || 'Pooja Service',
+        verifiedBooking: true,
       }));
 
     return res.json(items);
   } catch (error) {
     return res.status(500).json({ message: 'Failed to load feedbacks' });
+  }
+});
+
+router.get('/booking/:bookingId', async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.bookingId).populate('poojaId', 'title');
+    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+    const existingFeedback = await Feedback.exists({ bookingId: booking._id });
+    return res.json({
+      bookingId: String(booking._id),
+      customerName: booking.name,
+      poojaName: booking.poojaId?.title || 'Pooja Service',
+      bookingStatus: booking.bookingStatus,
+      hasFeedback: Boolean(existingFeedback),
+    });
+  } catch (error) {
+    return res.status(400).json({ message: 'Invalid booking ID' });
   }
 });
 
@@ -55,12 +74,12 @@ router.get('/my', protect, async (req, res) => {
   return res.json(feedbacks);
 });
 
-router.post('/', protect, async (req, res) => {
+const submitFeedback = async (req, res, isPublic = false) => {
   try {
-    const { bookingId, rating, comment, reviewPhoto } = req.body;
+    const { bookingId, customerName, rating, comment, reviewPhoto } = req.body;
 
-    if (!bookingId || !rating || !comment) {
-      return res.status(400).json({ message: 'bookingId, rating, and comment are required' });
+    if (!bookingId || !rating || !comment || (isPublic && !customerName)) {
+      return res.status(400).json({ message: 'bookingId, customerName, rating, and comment are required' });
     }
 
     const parsedRating = Number(rating);
@@ -90,7 +109,7 @@ router.post('/', protect, async (req, res) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
-    if (String(booking.userId) !== String(req.user._id)) {
+    if (!isPublic && String(booking.userId) !== String(req.user._id)) {
       return res.status(403).json({ message: 'You can only submit feedback for your own booking' });
     }
 
@@ -98,31 +117,38 @@ router.post('/', protect, async (req, res) => {
       return res.status(400).json({ message: 'Feedback can be submitted only after pooja is completed' });
     }
 
-    const feedback = await Feedback.findOneAndUpdate(
-      { userId: req.user._id, bookingId: booking._id },
-      {
-        userId: req.user._id,
-        bookingId: booking._id,
-        poojaId: booking.poojaId,
-        rating: parsedRating,
-        comment: trimmedComment,
-        reviewPhoto: normalizedPhoto,
-        isApproved: true,
-        approvedAt: new Date(),
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
+    const existingFeedback = await Feedback.exists({ bookingId: booking._id });
+    if (existingFeedback) return res.status(409).json({ message: 'Feedback already exists for this booking' });
+
+    if (isPublic && normalize(customerName) !== normalize(booking.name)) {
+      return res.status(403).json({ message: 'Please enter the customer name used for this booking' });
+    }
+
+    const feedback = await Feedback.create({
+      userId: isPublic ? booking.userId || null : req.user._id,
+      bookingId: booking._id,
+      poojaId: booking.poojaId,
+      customerName: booking.name,
+      rating: parsedRating,
+      comment: trimmedComment,
+      reviewPhoto: normalizedPhoto,
+      isApproved: false,
+      status: 'pending',
+    });
 
     const populatedFeedback = await Feedback.findById(feedback._id).populate('poojaId', 'title');
 
-    return res.status(201).json(populatedFeedback);
+    return res.status(201).json({ ...populatedFeedback.toObject(), message: 'Feedback submitted and is pending approval' });
   } catch (error) {
     if (error?.code === 11000) {
       return res.status(409).json({ message: 'Feedback already exists for this booking' });
     }
     return res.status(500).json({ message: 'Failed to submit feedback' });
   }
-});
+};
+
+router.post('/', protect, (req, res) => submitFeedback(req, res));
+router.post('/public', (req, res) => submitFeedback(req, res, true));
 
 /**
  * ADMIN: GET PENDING FEEDBACKS (UNAPPROVED)
@@ -176,6 +202,7 @@ router.patch('/:id/approve', protect, adminOnly, async (req, res) => {
     }
 
     feedback.isApproved = true;
+    feedback.status = 'approved';
     feedback.approvedBy = req.user._id;
     feedback.approvedAt = new Date();
     await feedback.save();
@@ -183,6 +210,8 @@ router.patch('/:id/approve', protect, adminOnly, async (req, res) => {
     const populatedFeedback = await Feedback.findById(feedback._id)
       .populate('userId', 'name')
       .populate('poojaId', 'title');
+
+    req.app.get('io')?.emit('feedback:approved', { feedbackId: String(feedback._id) });
 
     return res.json(populatedFeedback);
   } catch (error) {
@@ -201,11 +230,31 @@ router.patch('/:id/reject', protect, adminOnly, async (req, res) => {
       return res.status(404).json({ message: 'Feedback not found' });
     }
 
-    await Feedback.deleteOne({ _id: feedback._id });
+    feedback.isApproved = false;
+    feedback.status = 'rejected';
+    await feedback.save();
 
-    return res.json({ message: 'Feedback rejected and removed' });
+    const populatedFeedback = await Feedback.findById(feedback._id)
+      .populate('userId', 'name email')
+      .populate('poojaId', 'title')
+      .populate('bookingId', 'date time');
+
+    req.app.get('io')?.emit('feedback:changed', { feedbackId: String(feedback._id) });
+
+    return res.json(populatedFeedback);
   } catch (error) {
     return res.status(500).json({ message: 'Failed to reject feedback' });
+  }
+});
+
+router.delete('/:id', protect, adminOnly, async (req, res) => {
+  try {
+    const result = await Feedback.deleteOne({ _id: req.params.id });
+    if (!result.deletedCount) return res.status(404).json({ message: 'Feedback not found' });
+    req.app.get('io')?.emit('feedback:changed', { feedbackId: String(req.params.id) });
+    return res.json({ message: 'Feedback deleted' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to delete feedback' });
   }
 });
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import api from '../services/api'
+import { feedbackSocket } from '../services/feedbackSocket'
 
 function Testimonials() {
   const fallbackTestimonials = [
@@ -28,29 +29,38 @@ function Testimonials() {
   useEffect(() => {
     let isMounted = true
 
-    api
-      .get('/feedback?limit=6')
-      .then((response) => {
-        const items = Array.isArray(response.data) ? response.data : []
-        const normalized = items
-          .filter((item) => item?.comment)
-          .map((item) => ({
-            name: item.customerName || 'Verified Customer',
-            text: item.comment,
-            rating: Number(item.rating || 5),
-            photo: item.reviewPhoto || '/proofs/work1.jpeg',
-          }))
+    const loadTestimonials = () => {
+      api
+        .get('/feedback?limit=6')
+        .then((response) => {
+          const items = Array.isArray(response.data) ? response.data : []
+          const normalized = items
+            .filter((item) => item?.comment)
+            .map((item) => ({
+              name: item.customerName || 'Verified Customer',
+              text: item.comment,
+              rating: Number(item.rating || 5),
+              photo: item.reviewPhoto || '/proofs/work1.jpeg',
+            }))
 
-        if (isMounted && normalized.length > 0) {
-          setTestimonials(normalized.slice(0, 6))
-        }
-      })
-      .catch(() => {
-        // Keep fallback testimonials when API is unavailable.
-      })
+          if (isMounted && normalized.length > 0) {
+            setTestimonials(normalized.slice(0, 6))
+          }
+        })
+        .catch(() => {
+          // Keep fallback testimonials when API is unavailable.
+        })
+    }
+
+    loadTestimonials()
+    feedbackSocket.on('feedback:approved', loadTestimonials)
+    feedbackSocket.on('feedback:changed', loadTestimonials)
+    feedbackSocket.connect()
 
     return () => {
       isMounted = false
+      feedbackSocket.off('feedback:approved', loadTestimonials)
+      feedbackSocket.off('feedback:changed', loadTestimonials)
     }
   }, [])
 
