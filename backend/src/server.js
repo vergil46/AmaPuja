@@ -1,10 +1,14 @@
 const express = require('express');
+const http = require('http');
+const fs = require('fs');
+const { Server } = require('socket.io');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const path = require('path');
+const multer = require('multer');
 const Sentry = require('@sentry/node');
 
 const envFilePath = path.resolve(__dirname, '../.env');
@@ -28,12 +32,54 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const { protect, adminOnly } = require('./middleware/auth');
 
 connectDB().then(seedPoojas);
 
 const app = express();
+const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: true,
+    credentials: true,
+  },
+});
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  socket.emit('feedback:connected');
+});
 
 const normalizeOrigin = (value) => String(value || '').trim().replace(/\/+$/, '');
+
+const proofUploadDir = path.resolve(__dirname, '../../frontend/public/proofs');
+fs.mkdirSync(proofUploadDir, { recursive: true });
+
+const proofStorage = multer.diskStorage({
+  destination: (_req, _file, callback) => callback(null, proofUploadDir),
+  filename: (_req, file, callback) => {
+    const sanitizedBaseName = String(file.originalname || 'proof-photo')
+      .replace(/\.[^/.]+$/, '')
+      .replace(/[^a-zA-Z0-9-_\s]/g, ' ')
+      .trim()
+      .replace(/\s+/g, '-')
+      .toLowerCase() || 'proof-photo';
+    const extension = path.extname(file.originalname || '.jpeg') || '.jpeg';
+    callback(null, `${sanitizedBaseName}-${Date.now()}${extension}`);
+  },
+});
+
+const proofUpload = multer({
+  storage: proofStorage,
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (_req, file, callback) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+      return callback(null, true);
+    }
+    callback(new Error('Only JPG, PNG, WEBP, and GIF images are allowed.'));
+  },
+});
 
 const isIPv4Host = (hostname) => /^\d{1,3}(?:\.\d{1,3}){3}$/.test(hostname);
 
@@ -133,6 +179,19 @@ app.use(cookieParser());
 app.use(compression());
 app.use(morgan('dev'));
 
+app.post('/api/admin/upload-proof', protect, adminOnly, proofUpload.single('image'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'Please select an image to upload.' });
+  }
+
+  const fileName = req.file.filename;
+  return res.status(200).json({
+    message: 'Proof photo uploaded successfully.',
+    fileName,
+    url: `/proofs/${fileName}`,
+  });
+});
+
 app.get('/api/health', (req, res) => {
   const health = getApiHealthStatus();
   const code = health.status === 'ok' ? 200 : 503;
@@ -165,7 +224,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log('Server running');
   startDailyBusinessSummaryJob();
 });

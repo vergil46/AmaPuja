@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import Seo from '../components/Seo'
 import api from '../services/api'
 
@@ -74,6 +75,7 @@ function AdminPage() {
   const [twilioTestResult, setTwilioTestResult] = useState(null)
   const [twilioTestError, setTwilioTestError] = useState('')
   const [form, setForm] = useState({ title: '', description: '', image: '', startPrice: 0 })
+  const [proofUploadState, setProofUploadState] = useState({ uploading: false, message: '', error: '' })
   const [activeSidebarSection, setActiveSidebarSection] = useState('dashboard')
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -214,6 +216,32 @@ function AdminPage() {
     loadData()
   }
 
+  const handleProofUpload = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) {
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('image', file)
+
+    try {
+      setProofUploadState({ uploading: true, message: '', error: '' })
+      const response = await api.post('/admin/upload-proof', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      setProofUploadState({
+        uploading: false,
+        message: `Uploaded: ${response.data.fileName}`,
+        error: '',
+      })
+      event.target.value = ''
+    } catch (error) {
+      const message = error?.response?.data?.message || 'Upload failed. Please try again.'
+      setProofUploadState({ uploading: false, message: '', error: message })
+    }
+  }
+
   const updateBookingStatus = async (id, bookingStatus) => {
     await api.patch(`/bookings/${id}/status`, { bookingStatus })
     loadData()
@@ -257,13 +285,23 @@ function AdminPage() {
     setDeletingFeedbackById((prev) => ({ ...prev, [feedbackId]: true }))
 
     try {
-      await api.patch(`/feedback/${feedbackId}/reject`)
+      await api.delete(`/feedback/${feedbackId}`)
       setFeedbacks((prev) => prev.filter((feedback) => feedback._id !== feedbackId))
       setFeedbackActionMessage('Review deleted successfully.')
     } catch (error) {
       setFeedbackActionMessage(error.response?.data?.message || 'Failed to delete review.')
     } finally {
       setDeletingFeedbackById((prev) => ({ ...prev, [feedbackId]: false }))
+    }
+  }
+
+  const moderateFeedback = async (feedbackId, action) => {
+    try {
+      const response = await api.patch(`/feedback/${feedbackId}/${action}`)
+      setFeedbacks((prev) => prev.map((feedback) => feedback._id === feedbackId ? response.data : feedback))
+      setFeedbackActionMessage(`Review ${action === 'approve' ? 'approved' : 'rejected'} successfully.`)
+    } catch (error) {
+      setFeedbackActionMessage(error.response?.data?.message || `Failed to ${action} review.`)
     }
   }
 
@@ -1224,6 +1262,24 @@ function AdminPage() {
                       <input className="px-3 py-2 border rounded" placeholder="Starting Price" type="number" required value={form.startPrice} onChange={(e) => setForm({ ...form, startPrice: e.target.value })} />
                       <button className="px-4 py-2 bg-orange-700 text-white rounded">Add Pooja</button>
                     </form>
+                    <div className="mt-4 rounded-lg border border-dashed border-orange-200 bg-orange-50 p-3">
+                      <p className="text-sm font-medium text-stone-800">Upload proof image</p>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProofUpload}
+                        className="mt-2 block w-full text-sm text-stone-700 file:mr-3 file:rounded file:border-0 file:bg-orange-700 file:px-3 file:py-2 file:text-white"
+                      />
+                      {proofUploadState.uploading && (
+                        <p className="mt-2 text-xs text-orange-700">Uploading image...</p>
+                      )}
+                      {proofUploadState.message && (
+                        <p className="mt-2 text-xs text-green-700">{proofUploadState.message}</p>
+                      )}
+                      {proofUploadState.error && (
+                        <p className="mt-2 text-xs text-red-700">{proofUploadState.error}</p>
+                      )}
+                    </div>
                     <div className="mt-3 space-y-2 max-h-36 overflow-auto">
                       {poojas.map((pooja) => (
                         <div key={pooja._id} className="flex items-center justify-between rounded-lg border border-stone-200 p-2">
@@ -1296,7 +1352,7 @@ function AdminPage() {
                       {feedbacks.length} total
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-stone-500">Delete any customer review permanently from the website.</p>
+                  <p className="mt-1 text-xs text-stone-500">Approve reviews to publish them. Rejected reviews stay hidden.</p>
                   {feedbackActionMessage && <p className="mt-2 text-xs text-stone-700">{feedbackActionMessage}</p>}
                   <div className="mt-3 space-y-2 max-h-88 overflow-auto">
                     {feedbacks.length === 0 ? (
@@ -1306,18 +1362,17 @@ function AdminPage() {
                         <div key={feedback._id} className="rounded-lg border border-stone-200 bg-stone-50/60 p-3 text-sm">
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
-                              <p className="font-semibold text-stone-900 truncate">{feedback.userId?.name || 'Verified Customer'}</p>
+                              <p className="font-semibold text-stone-900 truncate">{feedback.customerName || feedback.userId?.name || 'Verified Customer'}</p>
                               <p className="mt-0.5 text-xs text-stone-500 truncate">{feedback.poojaId?.title || 'Pooja Service'} • {feedback.bookingId?.date || 'N/A'}</p>
-                              <p className="mt-1 text-xs text-stone-500">Rating: {Number(feedback.rating || 0)}/5</p>
+                              <p className="mt-1 text-xs text-stone-500">Rating: {Number(feedback.rating || 0)}/5 • {feedback.status || (feedback.isApproved ? 'approved' : 'pending')}</p>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => deleteFeedback(feedback._id)}
-                              className="rounded bg-red-600 px-2.5 py-1.5 text-xs text-white hover:bg-red-700 disabled:opacity-60"
-                              disabled={Boolean(deletingFeedbackById[feedback._id])}
-                            >
-                              {deletingFeedbackById[feedback._id] ? 'Deleting...' : 'Delete'}
-                            </button>
+                            <div className="flex flex-wrap justify-end gap-1">
+                              {!feedback.isApproved && feedback.status !== 'rejected' && <button type="button" onClick={() => moderateFeedback(feedback._id, 'approve')} className="rounded bg-emerald-700 px-2 py-1.5 text-xs text-white">Approve</button>}
+                              {feedback.isApproved && <button type="button" onClick={() => moderateFeedback(feedback._id, 'reject')} className="rounded bg-amber-600 px-2 py-1.5 text-xs text-white">Reject</button>}
+                              <button type="button" onClick={() => deleteFeedback(feedback._id)} className="rounded bg-red-600 px-2 py-1.5 text-xs text-white hover:bg-red-700 disabled:opacity-60" disabled={Boolean(deletingFeedbackById[feedback._id])}>
+                                {deletingFeedbackById[feedback._id] ? 'Deleting...' : 'Delete'}
+                              </button>
+                            </div>
                           </div>
                           <p className="mt-2 text-stone-700">{feedback.comment || '-'}</p>
                         </div>
@@ -1444,6 +1499,20 @@ function AdminPage() {
               <div className="grid sm:grid-cols-2 gap-3">
                 <DetailFieldCard label="Date" value={selectedBookingDetails.date} />
                 <DetailFieldCard label="Time" value={selectedBookingDetails.time} />
+              </div>
+
+              <div className="rounded-xl border border-orange-200 bg-white p-4 sm:flex sm:items-center sm:gap-5">
+                <QRCodeSVG
+                  value={`${window.location.origin}/feedback/${selectedBookingDetails._id}`}
+                  size={144}
+                  includeMargin
+                  className="mx-auto sm:mx-0"
+                />
+                <div className="mt-3 sm:mt-0">
+                  <p className="text-xs uppercase tracking-wide text-orange-700">Customer feedback QR</p>
+                  <p className="mt-1 text-sm text-stone-600">Scan this unique code to open the feedback form for this booking.</p>
+                  <p className="mt-2 break-all text-xs text-stone-500">{window.location.origin}/feedback/{selectedBookingDetails._id}</p>
+                </div>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-3">
