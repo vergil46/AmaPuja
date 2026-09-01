@@ -1012,29 +1012,30 @@ function AdminPage() {
   }, [sidebarSections])
 
   const getSidebarButtonClass = (section) => {
-    const base = 'w-full rounded-md px-3 py-2 text-left transition-colors'
+    const base = 'admin-nav-item w-full rounded-md px-3 py-2 text-left transition-colors'
     const active = activeSidebarSection === section
 
     if (active) {
-      return `${base} border-l-2 border-[#D84315] bg-[#FFF0C2] font-medium text-[#D84315]`
+      return `${base} admin-nav-item-active border-l-2 border-[#D84315] bg-[#FFF0C2] font-medium text-[#D84315]`
     }
 
     return `${base} text-stone-700 hover:bg-[#FFF8E1] hover:text-[#FF6F00]`
   }
 
   return (
-    <section className={`min-h-screen p-3 sm:p-4 ${isDarkMode ? 'bg-stone-950' : 'bg-[#FFF8E1]'}`}>
+    <section className={`admin-shell min-h-screen p-3 sm:p-4 ${isDarkMode ? 'admin-shell-dark bg-stone-950' : 'bg-[#FFF8E1]'}`}>
       <Seo title="Admin Panel | Puja Samriddhi" description="Manage poojas, bookings, enquiries, and payments." />
 
-      <div className={`mx-auto max-w-362.5 rounded-2xl border shadow-md ${isDarkMode ? 'border-stone-700 bg-stone-900 text-stone-100' : 'border-[#FFE0A3] bg-white/96'}`}>
+      <div className={`admin-frame mx-auto max-w-362.5 rounded-2xl border shadow-md ${isDarkMode ? 'border-stone-700 bg-stone-900 text-stone-100' : 'border-[#FFE0A3] bg-white/96'}`}>
         <div className="grid lg:grid-cols-[230px_minmax(0,1fr)]">
-          <aside className={`hidden lg:flex flex-col border-r p-4 ${isDarkMode ? 'border-stone-700 bg-stone-900' : 'border-[#FFE0A3] bg-[#FFFDF5]'}`}>
-            <div className="rounded-lg border border-[#FFE0A3] bg-[#FFF8E1] px-3 py-3 shadow-sm">
+          <aside className={`admin-sidebar hidden lg:flex flex-col border-r p-4 ${isDarkMode ? 'border-stone-700 bg-stone-900' : 'border-[#FFE0A3] bg-[#FFFDF5]'}`}>
+            <div className="admin-brand rounded-lg border border-[#FFE0A3] bg-[#FFF8E1] px-3 py-3 shadow-sm">
               <p className="text-2xl font-bold text-[#333333]">Puja Samriddhi</p>
-              <p className="text-xs text-[#333333]/60">Sacred Rituals</p>
+              <p className="text-xs text-[#333333]/60">Operations workspace</p>
             </div>
 
-            <nav className="mt-5 space-y-1 text-sm">
+            <div className="mt-6 mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-stone-400">Workspace</div>
+            <nav className="space-y-1 text-sm">
               <button type="button" onClick={() => navigateToSection('dashboard')} className={getSidebarButtonClass('dashboard')}>🏠 Dashboard</button>
               <button type="button" onClick={() => navigateToSection('bookings')} className={getSidebarButtonClass('bookings')}>📅 Bookings</button>
               <button type="button" onClick={() => navigateToSection('services')} className={getSidebarButtonClass('services')}>🛕 Services</button>
@@ -1066,8 +1067,8 @@ function AdminPage() {
             </div>
           </aside>
 
-          <div className="p-4 sm:p-5 lg:p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-orange-100 bg-white p-3 shadow-sm">
+          <div className="admin-content p-4 sm:p-5 lg:p-6">
+            <div className="admin-toolbar flex flex-wrap items-center justify-between gap-3 rounded-xl border border-orange-100 bg-white p-3 shadow-sm">
               <div className="flex-1 min-w-72 max-w-130">
                 <input
                   className="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm outline-none focus:border-orange-300"
@@ -1112,14 +1113,15 @@ function AdminPage() {
               </div>
             </div>
 
-            <div className="mt-4 flex items-center justify-between rounded-xl border border-orange-100 bg-orange-50/80 px-4 py-3 text-sm shadow-sm">
+            <div className="admin-alert mt-4 flex items-center justify-between rounded-xl border border-orange-100 bg-orange-50/80 px-4 py-3 text-sm shadow-sm">
               <p className="text-orange-900">⚠️ {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length} bookings are pending action. Review now.</p>
               <button type="button" className="rounded-md bg-orange-700 px-3 py-1.5 text-xs text-white">Review now</button>
             </div>
 
             <div className="mt-5 grid xl:grid-cols-[minmax(0,1fr)_320px] gap-4">
               <div ref={dashboardSectionRef}>
-                <h1 className="text-4xl font-semibold text-stone-900">Welcome back, Lokanath Panda!</h1>
+                <p className="admin-eyebrow text-xs font-bold uppercase tracking-[0.18em] text-orange-700">Admin overview</p>
+                <h1 className="mt-2 text-4xl font-semibold text-stone-900">Welcome back, Lokanath Panda!</h1>
                 <p className="mt-1 text-base text-stone-600">Here's an overview of your platform performance.</p>
                 {lastUpdatedAt && <p className="mt-1 text-xs text-stone-500">Last updated: {lastUpdatedAt.toLocaleString()}</p>}
 
