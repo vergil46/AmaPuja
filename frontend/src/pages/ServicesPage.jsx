@@ -520,13 +520,13 @@ function ServicesPage() {
     return ''
   }
 
-  const [poojas, setPoojas] = useState([])
+  const [poojas, setPoojas] = useState(defaultPoojas)
   const [selectedCity, setSelectedCity] = useState(getInitialSelectedCity)
   const [priestPreference, setPriestPreference] = useState(getInitialPriestPreference)
   const [searchTerm, setSearchTerm] = useState(getInitialSearchTerm)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isUsingFallbackData, setIsUsingFallbackData] = useState(false)
-  const [fallbackMode, setFallbackMode] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isUsingFallbackData, setIsUsingFallbackData] = useState(true)
+  const [fallbackMode, setFallbackMode] = useState('backup')
   const [reloadNonce, setReloadNonce] = useState(0)
 
   const selectedLanguageCount = priestPreference === 'Bengali'
@@ -579,9 +579,6 @@ function ServicesPage() {
         setPoojas(cachedPoojas)
         setIsUsingFallbackData(false)
         setFallbackMode(null)
-        setIsLoading(false)
-      } else {
-        setIsLoading(true)
       }
 
       try {
