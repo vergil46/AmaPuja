@@ -11,6 +11,24 @@ const commonGrihaNote =
 	'Puja Samagries like Haldi, Abeer, Gulal, Mango leaves, Tulasi, Darba, Kalasha, Vastra, Navadhanya, Beetle Leaves, Beetle Nuts, Homam Sticks, Samidha, Havan Kund, Dravyas, Kapda Ghee etc. will be brought by us. Yajaman has to keep house items like Gas stove, Vessels, Bhoji daan, Oil Lamps, Mats, Bowls, Chowki, Plates, Photos etc you will be receiving detailed to do list after booking.'
 
 const updates = {
+	durga_puja: {
+		title: 'Durga Puja',
+		description:
+			'Durga Mata is a very powerful deity. Performing this Puja protects people from all troubles and sufferings. A person will be blessed with happiness and positivity in life. This is a 5-day Durga Puja (from Shashti to Dashami) performed by our experienced team from Odisha.',
+		packages: [
+			{
+				name: 'Economy',
+				price: 48000,
+				includesSamagri: false,
+				pandits: '2 Panditjis Dakshina + Travelling Charges',
+				description:
+					'Our team from Odisha will travel to your location and conduct the complete 5-day Durga Puja.',
+				procedure: [],
+				inclusions: ['Dakshina', 'Travelling Charges'],
+				note: 'You must arrange accommodation for the Pandits and food during their stay. A complete Puja Samagri list will be shared with you in advance so you can keep everything ready.',
+			},
+		],
+	},
 	annaprashan_puja: {
 		title: 'Annaprashan Puja',
 		description:

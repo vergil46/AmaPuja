@@ -1788,18 +1788,19 @@ module.exports = [
     "key": "durga_puja",
     "availableLanguages": [
       "hindi",
-      "bengali"
+      "bengali",
+      "odia"
     ],
     "title": {
-      "odia": "",
+      "odia": "Durga Puja",
       "hindi": "Durga Puja",
       "kannada": "",
       "bengali": "Durga Puja"
     },
     "description": {
       "odia": {
-        "short": "",
-        "full": ""
+        "short": "Durga Mata is a very powerful deity. Performing this Puja protects people from all troubles and sufferings. A person will be blessed with happiness and positivity in life. This is a 5-day Durga Puja (from Shashti to Dashami) performed by our experienced team from Odisha.",
+        "full": "Durga Mata is a very powerful deity. Performing this Puja protects people from all troubles and sufferings. A person will be blessed with happiness and positivity in life. This is a 5-day Durga Puja (from Shashti to Dashami) performed by our experienced team from Odisha."
       },
       "hindi": {
         "short": "Perform Durga Puja with experienced and knowledgeable Pandits to overcome negativity, illness, and enemies. This sacred ritual invokes the divine blessings of Goddess Durga for protection, strength, prosperity, and overall well-being.",
@@ -1816,7 +1817,21 @@ module.exports = [
     },
     "pricing": {
       "odia": {
-        "packages": [],
+        "packages": [
+          {
+            "name": "Economy",
+            "price": 48000,
+            "includesSamagri": false,
+            "pandits": "2 Panditjis Dakshina + Travelling Charges",
+            "description": "Our team from Odisha will travel to your location and conduct the complete 5-day Durga Puja.",
+            "procedure": [],
+            "inclusions": [
+              "Dakshina",
+              "Travelling Charges"
+            ],
+            "note": "You must arrange accommodation for the Pandits and food during their stay. A complete Puja Samagri list will be shared with you in advance so you can keep everything ready."
+          }
+        ],
         "addOns": []
       },
       "hindi": {

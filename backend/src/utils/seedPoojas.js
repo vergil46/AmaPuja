@@ -64,6 +64,35 @@ const poojaTitles = [
 const defaultImage =
   'https://images.unsplash.com/photo-1542327897-d73f4005b533?auto=format&fit=crop&w=1200&q=80';
 
+const durgaPujaOdiaDescription =
+  'Durga Mata is a very powerful deity. Performing this Puja protects people from all troubles and sufferings. A person will be blessed with happiness and positivity in life. This is a 5-day Durga Puja (from Shashti to Dashami) performed by our experienced team from Odisha.';
+
+const durgaPujaOdiaRequirements =
+  'You must arrange accommodation for the Pandits and food during their stay. A complete Puja Samagri list will be shared with you in advance so you can keep everything ready.';
+
+const durgaPujaOdiaTravelDescription =
+  'Our team from Odisha will travel to your location and conduct the complete 5-day Durga Puja.';
+
+const buildDurgaPujaOdiaPackage = () => ({
+  name: 'Economy',
+  price: 48000,
+  includesSamagri: false,
+  pandits: '2 Panditjis Dakshina + Travelling Charges',
+  description: durgaPujaOdiaTravelDescription,
+  inclusions: ['Dakshina', 'Travelling Charges'],
+  note: durgaPujaOdiaRequirements,
+});
+
+const buildDurgaPujaOdiaPricing = () => ({
+  title: 'Durga Puja',
+  description: {
+    short: durgaPujaOdiaDescription,
+    full: durgaPujaOdiaDescription,
+  },
+  packages: [buildDurgaPujaOdiaPackage()],
+  addOns: [],
+});
+
 const buildPackages = (basePrice) => [
   { name: 'Without Samagri', price: basePrice, includesSamagri: false },
   { name: 'With Samagri', price: Math.round(basePrice * 1.35), includesSamagri: true },
@@ -104,6 +133,28 @@ const seedPoojas = async () => {
     );
   }
 
+  const durgaPuja = await Pooja.findOne({ title: 'Durga Puja' });
+  if (durgaPuja) {
+    await Pooja.updateOne(
+      { _id: durgaPuja._id },
+      {
+        $set: {
+          serviceKey: durgaPuja.serviceKey || 'durga_puja',
+          description: durgaPujaOdiaDescription,
+          startPrice: 48000,
+          packages: [buildDurgaPujaOdiaPackage()],
+          'localizedTitle.odia': 'Durga Puja',
+          'localizedDescription.odia': {
+            short: durgaPujaOdiaDescription,
+            full: durgaPujaOdiaDescription,
+          },
+          'pricing.odia': buildDurgaPujaOdiaPricing(),
+        },
+        $addToSet: { availableLanguages: 'odia' },
+      }
+    );
+  }
+
   const missingTitles = poojaTitles.filter((title) => !existingTitles.has(title));
 
   if (missingTitles.length === 0) {
@@ -113,6 +164,28 @@ const seedPoojas = async () => {
   const docs = missingTitles.map((title, index) => {
     const basePrice = 3500 + index * 400;
     let packages = buildPackages(basePrice);
+
+    if (title === 'Durga Puja') {
+      return {
+        serviceKey: 'durga_puja',
+        title,
+        availableLanguages: ['odia'],
+        localizedTitle: { odia: title },
+        localizedDescription: {
+          odia: {
+            short: durgaPujaOdiaDescription,
+            full: durgaPujaOdiaDescription,
+          },
+        },
+        description: durgaPujaOdiaDescription,
+        image: defaultImage,
+        startPrice: 48000,
+        packages: [buildDurgaPujaOdiaPackage()],
+        pricing: { odia: buildDurgaPujaOdiaPricing() },
+        addOns: [],
+      };
+    }
+
     // Special case for Saraswati Puja: custom description, pricing, packages, procedures, and addOns
     if (title === 'Saraswati Puja') {
       return {

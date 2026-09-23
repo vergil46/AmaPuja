@@ -40,14 +40,31 @@ const normalizedOdiaCanonicalIndex = Object.entries(odiaCanonicalAliases).reduce
   })
   return acc
 }, {})
-const servicesListCacheKey = 'services_list_cache_v3'
+const servicesListCacheKey = 'services_list_cache_v5'
 const servicesListCacheTtlMs = 30 * 60 * 1000
 
 const allowedPriestPreferences = new Set(['Hindi', 'Odia', 'Bengali'])
 const allowedCities = new Set(['Bangalore', 'Bhubaneswar'])
 
+const durgaPujaOdiaDescription =
+  'Durga Mata is a very powerful deity. Performing this Puja protects people from all troubles and sufferings. A person will be blessed with happiness and positivity in life. This is a 5-day Durga Puja (from Shashti to Dashami) performed by our experienced team from Odisha.'
+
+const durgaPujaOdiaRequirements =
+  'You must arrange accommodation for the Pandits and food during their stay. A complete Puja Samagri list will be shared with you in advance so you can keep everything ready.'
+
+const durgaPujaOdiaPackage = {
+  name: 'Economy',
+  price: 48000,
+  includesSamagri: false,
+  pandits: '2 Panditjis Dakshina + Travelling Charges',
+  description: 'Our team from Odisha will travel to your location and conduct the complete 5-day Durga Puja.',
+  inclusions: ['Dakshina', 'Travelling Charges'],
+  note: durgaPujaOdiaRequirements,
+}
+
 const defaultPoojas = [
   'Annaprashan Puja',
+  'Durga Puja',
   'Engagement Puja',
   'Ganapathi Puja',
   'Griha Pravesh',
@@ -64,6 +81,29 @@ const defaultPoojas = [
     { name: 'Without Samagri', price: startPrice, includesSamagri: false },
     { name: 'With Samagri', price: Math.round(startPrice * 1.35), includesSamagri: true },
   ];
+
+  if (title === 'Durga Puja') {
+    return {
+      _id: `default-${index + 1}`,
+      title,
+      description: durgaPujaOdiaDescription,
+      image: 'https://images.unsplash.com/photo-1542327897-d73f4005b533?auto=format&fit=crop&w=1200&q=80',
+      startPrice: durgaPujaOdiaPackage.price,
+      availableLanguages: ['odia'],
+      packages: [durgaPujaOdiaPackage],
+      pricing: {
+        odia: {
+          title: 'Durga Puja',
+          description: {
+            short: durgaPujaOdiaDescription,
+            full: durgaPujaOdiaDescription,
+          },
+          packages: [durgaPujaOdiaPackage],
+          addOns: [],
+        },
+      },
+    };
+  }
 
   // Special case for Saraswati Puja: custom description, pricing, and packages
   if (title === 'Saraswati Puja') {
@@ -247,6 +287,7 @@ const priestLanguagePoojas = {
       'Namkaran Puja (Ekoisia)',
       'Office Opening Puja',
       'Office/Shop Opening Puja',
+      'Durga Puja',
       'Saraswati Puja',
       'Satyanarayan Puja',
       'Vishwakarma Puja',
