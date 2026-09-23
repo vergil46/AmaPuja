@@ -224,11 +224,11 @@ router.post('/create-order', optionalAuth, async (req, res) => {
     const normalizedRequestedFinalAmount = parseAmount(requestedFinalAmount);
     const currentStoredFinalAmount = parseAmount(booking.finalAmount);
 
-    const correctedFinalAmount = Math.max(
-      normalizedFinalAmount,
-      currentStoredFinalAmount,
-      normalizedRequestedFinalAmount
-    );
+    const correctedFinalAmount = normalizedFinalAmount;
+
+    if (normalizedRequestedFinalAmount > 0 && normalizedRequestedFinalAmount !== correctedFinalAmount) {
+      return res.status(400).json({ message: 'Payment amount does not match the selected booking package' });
+    }
 
     const normalizedPaymentAmount = computePaymentAmount(correctedFinalAmount, booking.paymentOption);
 
@@ -287,12 +287,27 @@ router.post('/verify', optionalAuth, async (req, res) => {
 
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ message: 'Incomplete payment verification data' });
+    }
+
+    const paymentRecord = await Payment.findOne({ razorpayOrderId: razorpay_order_id });
+    if (!paymentRecord) {
+      return res.status(404).json({ message: 'Payment record not found' });
+    }
+
+    if (paymentRecord.status === 'paid') {
+      return res.status(409).json({ message: 'Payment has already been verified' });
+    }
+
     const generatedSignature = crypto
       .createHmac('sha256', keySecret)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest('hex');
 
-    if (generatedSignature !== razorpay_signature) {
+    const expectedSignature = Buffer.from(generatedSignature, 'utf8');
+    const receivedSignature = Buffer.from(String(razorpay_signature), 'utf8');
+    if (expectedSignature.length !== receivedSignature.length || !crypto.timingSafeEqual(expectedSignature, receivedSignature)) {
       await Payment.findOneAndUpdate(
         { razorpayOrderId: razorpay_order_id },
         { status: 'failed' }
@@ -311,8 +326,13 @@ router.post('/verify', optionalAuth, async (req, res) => {
       return res.status(400).json({ message: 'Payment verification failed' });
     }
 
+    const booking = await Booking.findById(paymentRecord.bookingId).lean();
+    if (!booking || Number(booking.paymentAmount) !== Number(paymentRecord.amount)) {
+      return res.status(400).json({ message: 'Payment amount does not match the booking' });
+    }
+
     const payment = await Payment.findOneAndUpdate(
-      { razorpayOrderId: razorpay_order_id },
+      { _id: paymentRecord._id, status: 'created' },
       { paymentId: razorpay_payment_id, status: 'paid' },
       { new: true }
     );

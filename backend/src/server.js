@@ -7,6 +7,8 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const multer = require('multer');
 const Sentry = require('@sentry/node');
@@ -35,13 +37,56 @@ const analyticsRoutes = require('./routes/analyticsRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
 const { protect, adminOnly } = require('./middleware/auth');
 
+const normalizeOrigin = (value) => String(value || '').trim().replace(/\/+$/, '');
+
+const configuredOrigins = [
+  'https://pujasamriddhi.vercel.app',
+  'https://pujasamriddhi.com',
+  'https://www.pujasamriddhi.com',
+  process.env.CLIENT_URL,
+  ...(process.env.CLIENT_URLS || '').split(','),
+]
+  .map(normalizeOrigin)
+  .filter(Boolean);
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  const normalizedOrigin = normalizeOrigin(origin);
+  const isLocalhostVitePort = /^http:\/\/localhost:\d+$/.test(normalizedOrigin);
+  return configuredOrigins.includes(normalizedOrigin) || isLocalhostVitePort;
+};
+
+const apiRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 300,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+});
+
+const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { message: 'Too many authentication attempts. Please try again later.' },
+});
+
+const paymentRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 60,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { message: 'Too many payment requests. Please try again later.' },
+});
+
 connectDB().then(seedPoojas);
 
 const app = express();
+app.set('trust proxy', 1);
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: true,
+    origin: (origin, callback) => callback(null, isAllowedOrigin(origin)),
     credentials: true,
   },
 });
@@ -50,8 +95,6 @@ app.set('io', io);
 io.on('connection', (socket) => {
   socket.emit('feedback:connected');
 });
-
-const normalizeOrigin = (value) => String(value || '').trim().replace(/\/+$/, '');
 
 const proofUploadDir = path.resolve(__dirname, '../../frontend/public/proofs');
 fs.mkdirSync(proofUploadDir, { recursive: true });
@@ -135,47 +178,20 @@ if (process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.requestHandler());
 }
 
+app.use(helmet());
+app.use('/api', apiRateLimiter);
+app.use('/api/auth', authRateLimiter);
+app.use('/api/payments', paymentRateLimiter);
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      const configuredClientUrl = process.env.CLIENT_URL;
-      const configuredClientUrls = process.env.CLIENT_URLS
-        ? process.env.CLIENT_URLS.split(',').map((value) => value.trim()).filter(Boolean)
-        : [];
-      const configuredOrigins = [configuredClientUrl, ...configuredClientUrls].filter(Boolean);
-      const allowedConfiguredOrigins = buildAllowedConfiguredOrigins(configuredOrigins);
-
-      const normalizedOrigin = normalizeOrigin(origin);
-      const isKnownRenderFrontend = /^https:\/\/amapuja-frontend(?:-[a-z0-9-]+)?\.onrender\.com$/i.test(
-        normalizedOrigin
-      );
-      const isKnownVercelFrontend = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(normalizedOrigin);
-      const isKnownCustomFrontend = isKnownCustomFrontendOrigin(normalizedOrigin);
-
-      const isConfiguredClient = allowedConfiguredOrigins.has(normalizedOrigin);
-      const isLocalhostVitePort = /^http:\/\/localhost:\d+$/.test(origin);
-
-      if (
-        isConfiguredClient ||
-        isLocalhostVitePort ||
-        isKnownRenderFrontend ||
-        isKnownVercelFrontend ||
-        isKnownCustomFrontend
-      ) {
-        return callback(null, true);
-      }
-
-      return callback(new Error('Not allowed by CORS'));
+      return callback(null, isAllowedOrigin(origin));
     },
     credentials: true,
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 app.use(compression());
 app.use(morgan('dev'));

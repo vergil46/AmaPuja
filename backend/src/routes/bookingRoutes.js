@@ -158,8 +158,6 @@ const withBookingDefaults = (bookingDoc) => {
  * CREATE BOOKING
  */
 router.post('/', optionalAuth, async (req, res) => {
-  console.log('REQ BODY:', req.body);
-
   try {
     const {
       poojaId,

@@ -7,6 +7,8 @@ const { generateVerificationToken, sendVerificationEmail, sendPasswordResetEmail
 const router = express.Router();
 
 const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+const isStrongPassword = (value) =>
+  typeof value === 'string' && value.length >= 8 && /[A-Z]/.test(value) && /[a-z]/.test(value) && /\d/.test(value);
 
 router.post('/register', async (req, res) => {
   try {
@@ -14,6 +16,10 @@ router.post('/register', async (req, res) => {
 
     if (!name || !email || !password || !phone) {
       return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters and include uppercase, lowercase, and a number' });
     }
 
     const existing = await User.findOne({ email });
@@ -180,8 +186,8 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ message: 'Token and new password are required' });
     }
 
-    if (newPassword.length < 6) {
-      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    if (!isStrongPassword(newPassword)) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters and include uppercase, lowercase, and a number' });
     }
 
     const user = await User.findOne({
