@@ -594,7 +594,9 @@ function ServicesPage() {
           }
 
           try {
-            res = await api.get('/poojas/summary')
+            res = await api.get('/poojas/summary', {
+              params: { refresh: '2026-09-23' },
+            })
             break
           } catch (error) {
             const status = Number(error?.response?.status)
