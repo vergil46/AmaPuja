@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../services/api'
 import Seo from '../components/Seo'
@@ -57,14 +57,14 @@ function PujaGalleryPage() {
 
   const closeLightbox = () => setLightboxOpen(false)
 
-  const moveLightbox = (direction) => {
+  const moveLightbox = useCallback((direction) => {
     setSelectedImageIndex((currentIndex) => {
       const nextIndex = direction === 'next' ? currentIndex + 1 : currentIndex - 1
       if (nextIndex < 0) return filteredItems.length - 1
       if (nextIndex >= filteredItems.length) return 0
       return nextIndex
     })
-  }
+  }, [filteredItems.length])
 
   useEffect(() => {
     if (!lightboxOpen) return undefined
@@ -77,7 +77,7 @@ function PujaGalleryPage() {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [lightboxOpen, filteredItems.length])
+  }, [lightboxOpen, moveLightbox])
 
   const activeImage = filteredItems[selectedImageIndex] || filteredItems[0]
 
