@@ -18,7 +18,7 @@ const updates = {
 		packages: [
 			{
 				name: 'Economy',
-				price: 48000,
+				price: 55000,
 				includesSamagri: false,
 				pandits: '2 Panditjis Dakshina + Travelling Charges',
 				description:

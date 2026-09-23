@@ -75,7 +75,7 @@ const durgaPujaOdiaTravelDescription =
 
 const buildDurgaPujaOdiaPackage = () => ({
   name: 'Economy',
-  price: 48000,
+  price: 55000,
   includesSamagri: false,
   pandits: '2 Panditjis Dakshina + Travelling Charges',
   description: durgaPujaOdiaTravelDescription,
@@ -141,7 +141,7 @@ const seedPoojas = async () => {
         $set: {
           serviceKey: durgaPuja.serviceKey || 'durga_puja',
           description: durgaPujaOdiaDescription,
-          startPrice: 48000,
+          startPrice: 55000,
           packages: [buildDurgaPujaOdiaPackage()],
           'localizedTitle.odia': 'Durga Puja',
           'localizedDescription.odia': {
@@ -179,7 +179,7 @@ const seedPoojas = async () => {
         },
         description: durgaPujaOdiaDescription,
         image: defaultImage,
-        startPrice: 48000,
+        startPrice: 55000,
         packages: [buildDurgaPujaOdiaPackage()],
         pricing: { odia: buildDurgaPujaOdiaPricing() },
         addOns: [],

@@ -54,7 +54,7 @@ const durgaPujaOdiaRequirements =
 
 const durgaPujaOdiaPackage = {
   name: 'Economy',
-  price: 48000,
+  price: 55000,
   includesSamagri: false,
   pandits: '2 Panditjis Dakshina + Travelling Charges',
   description: 'Our team from Odisha will travel to your location and conduct the complete 5-day Durga Puja.',
