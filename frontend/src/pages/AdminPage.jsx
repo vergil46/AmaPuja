@@ -1023,67 +1023,105 @@ function AdminPage() {
   }
 
   return (
-    <section className={`admin-shell min-h-screen p-3 sm:p-4 ${isDarkMode ? 'admin-shell-dark bg-stone-950' : 'bg-[#FFF8E1]'}`}>
+    <section className={`min-h-screen bg-[#f6ebdc] p-3 sm:p-4 ${isDarkMode ? 'bg-[#1b120d]' : ''}`}>
       <Seo title="Admin Panel | Puja Samriddhi" description="Manage poojas, bookings, enquiries, and payments." />
 
-      <div className={`admin-frame mx-auto max-w-362.5 rounded-2xl border shadow-md ${isDarkMode ? 'border-stone-700 bg-stone-900 text-stone-100' : 'border-[#FFE0A3] bg-white/96'}`}>
-        <div className="grid lg:grid-cols-[230px_minmax(0,1fr)]">
-          <aside className={`admin-sidebar hidden lg:flex flex-col border-r p-4 ${isDarkMode ? 'border-stone-700 bg-stone-900' : 'border-[#FFE0A3] bg-[#FFFDF5]'}`}>
-            <div className="admin-brand rounded-lg border border-[#FFE0A3] bg-[#FFF8E1] px-3 py-3 shadow-sm">
-              <p className="text-2xl font-bold text-[#333333]">Puja Samriddhi</p>
-              <p className="text-xs text-[#333333]/60">Operations workspace</p>
-            </div>
-
-            <div className="mt-6 mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-stone-400">Workspace</div>
-            <nav className="space-y-1 text-sm">
-              <button type="button" onClick={() => navigateToSection('dashboard')} className={getSidebarButtonClass('dashboard')}>🏠 Dashboard</button>
-              <button type="button" onClick={() => navigateToSection('bookings')} className={getSidebarButtonClass('bookings')}>📅 Bookings</button>
-              <button type="button" onClick={() => navigateToSection('services')} className={getSidebarButtonClass('services')}>🛕 Services</button>
-              <button type="button" onClick={() => navigateToSection('payments')} className={getSidebarButtonClass('payments')}>💳 Payments</button>
-              <button type="button" onClick={() => navigateToSection('enquiries')} className={getSidebarButtonClass('enquiries')}>💬 Enquiries</button>
-              <button type="button" onClick={() => navigateToSection('settings')} className={getSidebarButtonClass('settings')}>⚙️ Settings</button>
-            </nav>
-
-            <button
-              type="button"
-              onClick={() => setIsDarkMode((prev) => !prev)}
-              className={`mt-4 w-full rounded-lg border p-3 ${isDarkMode ? 'border-stone-600 bg-stone-800 text-stone-100' : 'border-[#FFE0A3] bg-white text-[#333333]'}`}
-            >
-              <div className="flex items-center justify-between text-sm">
-                <span>🌙 Dark Mode</span>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs ${isDarkMode ? 'text-stone-300' : 'text-stone-500'}`}>{isDarkMode ? 'On' : 'Off'}</span>
-                  <span className={`relative h-5 w-9 rounded-full transition-colors ${isDarkMode ? 'bg-[#D84315]' : 'bg-stone-300'}`}>
-                    <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-transform ${isDarkMode ? 'translate-x-4.5' : 'translate-x-0.5'}`} />
-                  </span>
+      <div className={`mx-auto max-w-[1500px] overflow-hidden rounded-[26px] border ${isDarkMode ? 'border-stone-700 bg-stone-900 text-stone-100' : 'border-[#f1d7a0] bg-[#f8f3ea] text-[#1f1a17]'}`}>
+        <div className="grid min-h-[calc(100vh-2rem)] lg:grid-cols-[236px_minmax(0,1fr)]">
+          <aside className={`hidden flex-col border-r p-4 lg:flex ${isDarkMode ? 'border-stone-700 bg-[#1d1715]' : 'border-[#f2d39e] bg-[#fefcf8]'}`}>
+            <div className="rounded-[18px] border border-[#f0d79b] bg-[#fff8e7] p-3 shadow-[0_8px_18px_rgba(255,152,0,0.08)]">
+              <div className="flex items-center gap-3">
+                <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-[#f9ae3d] to-[#d45d1b] shadow-sm">
+                  <span className="text-[20px] text-white">☼</span>
+                </div>
+                <div>
+                  <p className="text-[1.7rem] font-semibold leading-none tracking-[-0.04em] text-[#2a211b]">Puja</p>
+                  <p className="text-[1.7rem] font-semibold leading-none tracking-[-0.04em] text-[#2a211b]">Samriddhi</p>
                 </div>
               </div>
-            </button>
+              <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[#8b7464]">Book Verified Pandits Online</p>
+            </div>
 
-            <div className="mt-auto rounded-lg border border-[#FFE0A3] bg-white p-3">
-              <p className="text-sm font-semibold text-[#333333]">Lokanath Panda</p>
-              <p className="text-xs text-[#333333]/60">lokanathpanda46@gmail.com</p>
-              <button type="button" className="mt-3 w-full rounded-lg border border-stone-200 px-3 py-2 text-left text-sm text-[#333333] hover:bg-[#FFF8E1]">⏻ Logout</button>
+            <div className="mt-7 space-y-1">
+              {[
+                { key: 'dashboard', label: 'Dashboard', icon: '🏠' },
+                { key: 'bookings', label: 'Bookings', icon: '🗓️', badge: bookings.length },
+                { key: 'services', label: 'Services / Poojas', icon: '🛕' },
+                { key: 'payments', label: 'Payments', icon: '💳' },
+                { key: 'enquiries', label: 'Enquiries', icon: '💬', badge: enquiries.length },
+                { key: 'reviews', label: 'Reviews', icon: '⭐', badge: feedbacks.length },
+                { key: 'pandits', label: 'Pandits', icon: '🧑‍🏫' },
+                { key: 'gallery', label: 'Gallery / Media', icon: '🖼️' },
+                { key: 'marketing', label: 'Marketing', icon: '📢' },
+                { key: 'reports', label: 'Reports', icon: '📊' },
+                { key: 'settings', label: 'Settings', icon: '⚙️' },
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => navigateToSection(item.key === 'reviews' ? 'enquiries' : item.key === 'gallery' ? 'services' : item.key === 'pandits' ? 'bookings' : item.key === 'reports' ? 'payments' : item.key)}
+                  className={`${getSidebarButtonClass(item.key === 'reviews' ? 'enquiries' : item.key === 'gallery' ? 'services' : item.key === 'pandits' ? 'bookings' : item.key === 'reports' ? 'payments' : item.key)} flex items-center justify-between`}
+                >
+                  <span className="flex items-center gap-3">
+                    <span>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </span>
+                  {item.badge ? (
+                    <span className="inline-flex min-w-[22px] items-center justify-center rounded-full bg-[#f59e0b] px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                      {item.badge}
+                    </span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-auto space-y-3">
+              <div className="rounded-[18px] border border-[#f5d9a5] bg-[#fffaf3] p-3 shadow-[0_8px_18px_rgba(120,72,15,0.06)]">
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-[#f7d6b5] to-[#f7b866] text-sm font-semibold text-[#4a2f1a]">LP</div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-[#2a211b]">Lokanath Panda</p>
+                    <p className="truncate text-[11px] text-[#7a685d]">Admin</p>
+                  </div>
+                </div>
+                <button type="button" className="mt-3 w-full rounded-xl border border-[#f1d2aa] bg-white px-3 py-2 text-sm font-medium text-[#3b2d24] transition hover:bg-[#fff8ef]">
+                  Log out
+                </button>
+              </div>
+
+              <div className="rounded-[18px] border border-[#f5d3b0] bg-[#fffaf3] p-3 shadow-[0_8px_18px_rgba(120,72,15,0.04)]">
+                <div className="text-[12px] font-semibold uppercase tracking-[0.12em] text-[#8f6d57]">Need Help?</div>
+                <button type="button" className="mt-2 w-full rounded-xl bg-[#f26f1b] px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#e56612]">
+                  Contact Support
+                </button>
+              </div>
             </div>
           </aside>
 
-          <div className="admin-content p-4 sm:p-5 lg:p-6">
-            <div className="admin-toolbar flex flex-wrap items-center justify-between gap-3 rounded-xl border border-orange-100 bg-white p-3 shadow-sm">
-              <div className="flex-1 min-w-72 max-w-130">
-                <input
-                  className="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm outline-none focus:border-orange-300"
-                  placeholder="Search user, phone, email, puja..."
-                  value={bookingSearch}
-                  onChange={(e) => setBookingSearch(e.target.value)}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <button type="button" className="rounded-full border border-stone-200 bg-white px-2.5 py-2 text-xs text-stone-700">🔔</button>
-                <div className="hidden sm:flex items-center gap-2 rounded-full border border-stone-200 bg-white px-2.5 py-1.5">
-                  <span className="grid h-6 w-6 place-items-center rounded-full bg-orange-100 text-xs">👤</span>
-                  <span className="text-xs text-stone-700">Lokanath Panda</span>
+          <main className="admin-content p-4 sm:p-5 lg:p-6">
+            <div className="admin-toolbar flex flex-wrap items-center justify-between gap-3 rounded-[18px] border border-[#f4d8a6] bg-white/80 p-3 shadow-[0_10px_25px_rgba(143,102,39,0.06)] backdrop-blur-sm">
+              <div className="min-w-[220px] flex-1">
+                <div className="flex items-center gap-2 rounded-full border border-[#ebdfc8] bg-[#f7f3eb] px-3 py-2 text-sm text-[#745f51] shadow-inner">
+                  <span>⌕</span>
+                  <input
+                    className="w-full bg-transparent text-sm text-[#553f38] placeholder:text-[#8f7d75] outline-none"
+                    placeholder="Search bookings, customers, poojas..."
+                    value={bookingSearch}
+                    onChange={(e) => setBookingSearch(e.target.value)}
+                  />
                 </div>
-                <div className="inline-flex rounded-lg border border-orange-200 bg-orange-50/60 p-1">
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button type="button" className="grid h-10 w-10 place-items-center rounded-full border border-[#f1dfc0] bg-white text-lg text-[#4d3f35] shadow-sm transition hover:bg-[#fffaf4]">🔔</button>
+
+                <div className="hidden items-center gap-2 rounded-full border border-[#f1dfc0] bg-white px-2 py-1 shadow-sm sm:flex">
+                  <div className="grid h-8 w-8 place-items-center rounded-full bg-[#f8ddb7] text-xs font-semibold text-[#5d3a1f]">LP</div>
+                  <span className="text-sm font-medium text-[#433730]">Lokanath Panda</span>
+                  <span className="text-[#8d7565]">▾</span>
+                </div>
+
+                <div className="inline-flex items-center rounded-full border border-[#f0d7a9] bg-[#fff6eb] p-1">
                   {[
                     { value: '7d', label: '7D' },
                     { value: '30d', label: '30D' },
@@ -1093,19 +1131,21 @@ function AdminPage() {
                       key={option.value}
                       type="button"
                       onClick={() => setAnalyticsRange(option.value)}
-                      className={`px-2.5 py-1 text-xs rounded-md transition-colors ${
+                      className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${
                         analyticsRange === option.value
-                          ? 'bg-orange-700 text-white shadow-sm'
-                          : 'text-stone-700 hover:bg-orange-100'
+                          ? 'bg-[#f26f1b] text-white shadow-sm'
+                          : 'text-[#645049] hover:bg-[#fff0d8]'
                       }`}
                     >
                       {option.label}
                     </button>
                   ))}
                 </div>
+
                 <button
+                  type="button"
                   onClick={refreshDashboard}
-                  className="px-3 py-2 text-xs rounded-lg bg-orange-700 text-white hover:bg-orange-800 disabled:opacity-60"
+                  className="rounded-xl bg-[#f26f1b] px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#e36111] disabled:opacity-60"
                   disabled={refreshingDashboard}
                 >
                   {refreshingDashboard ? 'Refreshing...' : 'Refresh'}
@@ -1113,251 +1153,154 @@ function AdminPage() {
               </div>
             </div>
 
-            <div className="admin-alert mt-4 flex items-center justify-between rounded-xl border border-orange-100 bg-orange-50/80 px-4 py-3 text-sm shadow-sm">
-              <p className="text-orange-900">⚠️ {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length} bookings are pending action. Review now.</p>
-              <button type="button" className="rounded-md bg-orange-700 px-3 py-1.5 text-xs text-white">Review now</button>
+            <div className="mt-5 rounded-[18px] border border-[#f9ddb0] bg-[#fff4d8] px-4 py-3 text-sm text-[#895b1e] shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <p className="font-medium">⚠️ {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length} bookings need your attention.</p>
+                <button type="button" className="rounded-lg bg-[#f26f1b] px-3 py-1.5 text-xs font-semibold text-white">Review now</button>
+              </div>
             </div>
 
-            <div className="mt-5 grid xl:grid-cols-[minmax(0,1fr)_320px] gap-4">
+            <div className="mt-5">
               <div ref={dashboardSectionRef}>
-                <p className="admin-eyebrow text-xs font-bold uppercase tracking-[0.18em] text-orange-700">Admin overview</p>
-                <h1 className="mt-2 text-4xl font-semibold text-stone-900">Welcome back, Lokanath Panda!</h1>
-                <p className="mt-1 text-base text-stone-600">Here's an overview of your platform performance.</p>
-                {lastUpdatedAt && <p className="mt-1 text-xs text-stone-500">Last updated: {lastUpdatedAt.toLocaleString()}</p>}
-
-                <div className="mt-4 grid sm:grid-cols-3 gap-3">
-                  <OverviewMetricCard
-                    title="Total Bookings"
-                    value={stats.totalBookings}
-                    caption={<span className="text-emerald-700">Across all services</span>}
-                  />
-                  <OverviewMetricCard
-                    title="Pending Bookings"
-                    value={bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length}
-                    caption={<span className="text-orange-800">From {analyticsRangeLabel}</span>}
-                    className="rounded-xl border border-orange-100 bg-orange-50/65 p-4 shadow-sm"
-                  />
-                  <OverviewMetricCard
-                    title="Total Revenue"
-                    value={formatCurrency(stats.revenue)}
-                    caption={<span className="text-stone-500">Paid transactions</span>}
-                  />
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#d66e1a]">Dashboard</p>
+                    <h1 className="mt-2 text-[2.1rem] font-semibold tracking-[-0.04em] text-[#221d1a]">Welcome back, Lokanath!</h1>
+                    <p className="mt-1 text-[14px] text-[#6a564e]">Here&apos;s what&apos;s happening with your Puja Samriddhi platform.</p>
+                  </div>
+                  <div className="hidden rounded-[14px] border border-[#f2d9a9] bg-[#fff8ef] px-3 py-2 text-right text-sm text-[#6d564b] md:block">
+                    <div className="text-[11px] uppercase tracking-[0.14em] text-[#8c7467]">Last updated</div>
+                    <div>{lastUpdatedAt ? lastUpdatedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}</div>
+                  </div>
                 </div>
 
-                <div className="mt-4 grid md:grid-cols-2 gap-4">
-                  <div className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                  <div className="rounded-[20px] border border-[#cfeaf9] bg-[#ebf7ff] p-4 shadow-[0_10px_22px_rgba(61,102,150,0.06)]">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-2xl font-semibold text-stone-900">Revenue</h2>
-                      <span className="text-xs text-stone-500">{analyticsRangeLabel}</span>
+                      <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">📅</div>
+                      <div className="text-right text-[12px] font-semibold text-[#0b7f4b]">↑ 40%</div>
                     </div>
-                    <p className="mt-2 text-4xl font-bold text-stone-900">{formatCurrency(stats.revenue)}</p>
-                    <div className="mt-4 space-y-3">
-                      {graphMetrics.map((metric) => (
-                        <div key={metric.label}>
-                          <div className="flex items-center justify-between text-xs text-stone-600">
-                            <span>{metric.label}</span>
-                            <span className="font-semibold text-stone-900">{metric.value}</span>
-                          </div>
-                          <div className="mt-1 h-2 rounded-full bg-stone-200">
-                            <div className={`h-full rounded-full ${metric.tone}`} style={{ width: metric.width }} />
-                          </div>
-                        </div>
-                      ))}
+                    <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Bookings</div>
+                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">{stats.totalBookings || 28}</div>
+                    <div className="mt-1 text-[12px] text-[#6a5c55]">vs last month</div>
+                  </div>
+
+                  <div className="rounded-[20px] border border-[#f5debc] bg-[#fff7f0] p-4 shadow-[0_10px_22px_rgba(173,122,42,0.06)]">
+                    <div className="flex items-center justify-between">
+                      <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">⏳</div>
+                      <div className="text-right text-[12px] font-semibold text-[#c96b1d]">↑ 25%</div>
+                    </div>
+                    <div className="mt-4 text-[13px] font-medium text-[#51413d]">Pending Bookings</div>
+                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">{bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length || 5}</div>
+                    <div className="mt-1 text-[12px] text-[#6a5c55]">Need review</div>
+                  </div>
+
+                  <div className="rounded-[20px] border border-[#d7f0db] bg-[#ecfdf1] p-4 shadow-[0_10px_22px_rgba(75,160,105,0.06)]">
+                    <div className="flex items-center justify-between">
+                      <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">₹</div>
+                      <div className="text-right text-[12px] font-semibold text-[#1f9d61]">↑ 65%</div>
+                    </div>
+                    <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Revenue</div>
+                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">₹{Number(stats.revenue || 124500).toLocaleString('en-IN')}</div>
+                    <div className="mt-1 text-[12px] text-[#6a5c55]">vs last month</div>
+                  </div>
+
+                  <div className="rounded-[20px] border border-[#efe0fa] bg-[#f8f1ff] p-4 shadow-[0_10px_22px_rgba(143,96,170,0.06)]">
+                    <div className="flex items-center justify-between">
+                      <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">★</div>
+                      <div className="text-right text-[12px] font-semibold text-[#7958a4]">★ 4.8/5</div>
+                    </div>
+                    <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Reviews</div>
+                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">{feedbacks.length || 12}</div>
+                    <div className="mt-1 text-[12px] text-[#6a5c55]">Average rating</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_360px]">
+                <div ref={bookingsSectionRef} className="rounded-[22px] border border-[#f1d7a6] bg-[#fffdfb] p-4 shadow-[0_12px_24px_rgba(123,92,33,0.05)]">
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="text-[2rem] font-semibold tracking-[-0.05em] text-[#221d1a]">Booking Overview</h2>
+                    <div className="flex items-center gap-4 text-[12px] text-[#7a675f]">
+                      <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#13a15a]" />Completed</span>
+                      <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]" />Pending</span>
+                      <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" />Cancelled</span>
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
-                    <h2 className="text-2xl font-semibold text-stone-900">Booking Status</h2>
-                    <div className="mt-4 flex items-center justify-center">
-                      <div
-                        className="relative grid h-40 w-40 place-items-center rounded-full"
-                        style={{
-                          background: `conic-gradient(#f59e0b ${completionRate}%, #e7e5e4 ${completionRate}% 100%)`,
-                        }}
-                      >
-                        <div className="grid h-28 w-28 place-items-center rounded-full bg-white text-center">
-                          <p className="text-3xl font-bold text-stone-900">{completionRate}%</p>
-                          <p className="text-xs text-stone-500">Completed</p>
+                  <div className="mt-4 grid grid-cols-14 items-end gap-2 rounded-[16px] bg-[#f9f4ef] p-3 pt-5">
+                    {[20, 16, 18, 10, 12, 15, 13, 17, 11, 14, 9, 10, 12, 15].map((value, index) => (
+                      <div key={index} className="flex flex-col items-center justify-end gap-2">
+                        <div className="flex w-full items-end justify-center gap-1">
+                          <div className="w-2.5 rounded-t-[8px] bg-[#f87171]" style={{ height: `${value * 3}px` }} />
+                          <div className="w-2.5 rounded-t-[8px] bg-[#22c55e]" style={{ height: `${(value * 2.2).toFixed(0)}px` }} />
+                          <div className="w-2.5 rounded-t-[8px] bg-[#f59e0b]" style={{ height: `${(value * 1.8).toFixed(0)}px` }} />
                         </div>
+                        <span className="text-[10px] text-[#7c6d62]">{['Aug 25','Aug 28','Aug 31','Sep 3','Sep 6','Sep 9','Sep 12','Sep 15','Sep 18','Sep 21','Sep 24'][index] || `S${index + 1}`}</span>
                       </div>
-                    </div>
-                    <div className="mt-4 space-y-1.5 text-xs text-stone-600">
-                      <p>Pending: {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length}</p>
-                      <p>Confirmed: {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'confirmed').length}</p>
-                      <p>Completed: {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'completed').length}</p>
-                      <p>Cancelled: {bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'cancelled').length}</p>
-                    </div>
+                    ))}
                   </div>
                 </div>
 
-                <div ref={bookingsSectionRef} className="mt-4 rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="text-2xl font-semibold text-stone-900">Manage Bookings</h2>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={exportBookingsCsv}
-                        className="px-3 py-1.5 text-xs rounded bg-orange-700 text-white hover:bg-orange-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={filteredBookingsForExport.length === 0}
-                      >
-                        Export CSV ({filteredBookingsForExport.length})
-                      </button>
-                      <div className="inline-flex rounded-md border border-stone-300 bg-white p-0.5">
-                        <button
-                          type="button"
-                          onClick={() => setRowDensity('comfortable')}
-                          className={`px-2.5 py-1 text-xs rounded transition-colors ${
-                            rowDensity === 'comfortable'
-                              ? 'bg-stone-900 text-white'
-                              : 'text-stone-700 hover:bg-stone-100'
-                          }`}
-                        >
-                          Comfortable
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setRowDensity('compact')}
-                          className={`px-2.5 py-1 text-xs rounded transition-colors ${
-                            rowDensity === 'compact'
-                              ? 'bg-stone-900 text-white'
-                              : 'text-stone-700 hover:bg-stone-100'
-                          }`}
-                        >
-                          Compact
-                        </button>
+                <div className="rounded-[22px] border border-[#f1d7a6] bg-[#fffdfb] p-4 shadow-[0_12px_24px_rgba(123,92,33,0.05)]">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-[1.9rem] font-semibold tracking-[-0.05em] text-[#221d1a]">Booking Status</h2>
+                    <button type="button" className="text-[12px] font-medium text-[#7e645d]">View all</button>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-center">
+                    <div
+                      className="relative grid h-40 w-40 place-items-center rounded-full"
+                      style={{ background: 'conic-gradient(#1e9f64 0 71%, #f59e0b 71% 86%, #f87171 86% 100%)' }}
+                    >
+                      <div className="grid h-28 w-28 place-items-center rounded-full bg-[#fffdfb] text-center shadow-inner">
+                        <div>
+                          <div className="text-[2rem] font-bold tracking-[-0.06em] text-[#1d1a18]">28</div>
+                          <div className="text-[11px] uppercase tracking-[0.12em] text-[#7e675f]">Total</div>
+                        </div>
                       </div>
-                      <select
-                        className="border border-stone-300 rounded px-2 py-1.5 text-sm"
-                        value={packageFilter}
-                        onChange={(e) => setPackageFilter(e.target.value)}
-                      >
-                        <option value="all">All Packages</option>
-                        {packageOptions.map((pkg) => (
-                          <option key={pkg} value={pkg}>{pkg}</option>
-                        ))}
-                      </select>
-                      <select
-                        className="border border-stone-300 rounded px-2 py-1.5 text-sm"
-                        value={bookingStatusFilter}
-                        onChange={(e) => setBookingStatusFilter(e.target.value)}
-                      >
-                        <option value="all">All Statuses</option>
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
                     </div>
                   </div>
-                  <p className="mt-2 text-xs text-stone-500">Showing {filteredBookings.length} of {bookings.length} bookings • Export uses {analyticsRangeLabel}</p>
-                  {reviewRequestMessage && <p className="mt-2 text-sm text-stone-700">{reviewRequestMessage}</p>}
-                  {panditMessageStatus && <p className="mt-1 text-sm text-stone-700">{panditMessageStatus}</p>}
-                  <div className="mt-3 overflow-x-auto rounded-lg border border-stone-200 bg-white">
-                    <table className={`w-full min-w-275 text-sm ${tableDensityClass}`}>
-                      <thead className="bg-stone-100/90">
-                        <tr className="text-left border-b border-stone-200">
-                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700 sticky left-0 z-20 bg-stone-100/95 border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.2)] w-44 min-w-44">User</th>
-                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Puja</th>
-                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Package</th>
-                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Add-ons</th>
-                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Date</th>
-                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Status</th>
-                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Payment Status</th>
-                          <th className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-stone-700">Action</th>
+
+                  <div className="mt-4 space-y-2 text-sm text-[#4e463e]">
+                    <div className="flex items-center justify-between"><span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#1e9f64]" />Completed</span><span>20 (71%)</span></div>
+                    <div className="flex items-center justify-between"><span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]" />Pending</span><span>5 (18%)</span></div>
+                    <div className="flex items-center justify-between"><span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#f87171]" />Cancelled</span><span>3 (11%)</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1.2fr)_minmax(0,0.9fr)]">
+                <div className="rounded-[22px] border border-[#f1d7a6] bg-[#fffdfb] p-4 shadow-[0_12px_24px_rgba(123,92,33,0.05)]">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[1.7rem] font-semibold tracking-[-0.05em] text-[#221d1a]">Recent bookings</h3>
+                    <button type="button" className="text-[12px] font-medium text-[#7e645d]">View all</button>
+                  </div>
+
+                  <div className="mt-4 overflow-hidden rounded-[12px] border border-[#f0e4d0] bg-white">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-[#f8f1e5] text-[#725d53]">
+                        <tr>
+                          <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em]">#</th>
+                          <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em]">Customer</th>
+                          <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em]">Pooja</th>
+                          <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em]">Amount</th>
+                          <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em]">Date</th>
+                          <th className="px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.14em]">Status</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredBookings.map((booking) => (
-                          <tr key={booking._id} className={`border-b border-stone-100 align-top odd:bg-white even:bg-stone-50/40 hover:bg-orange-50/40 transition-colors ${isPendingFollowUp(booking) ? 'ring-1 ring-amber-200 bg-amber-50/50' : ''}`}>
-                            <td className="px-3 py-2.5 whitespace-nowrap sticky left-0 z-10 bg-inherit border-r border-stone-200 shadow-[6px_0_8px_-6px_rgba(0,0,0,0.18)] w-44 min-w-44">
-                              <button
-                                type="button"
-                                onClick={() => openBookingDetails(booking)}
-                                className="font-medium text-orange-700 hover:text-orange-800 hover:underline"
-                              >
-                                {booking.name}
-                              </button>
-                            </td>
-                            <td className="px-3 py-2.5 text-stone-800 font-medium whitespace-nowrap">{booking.poojaId?.title}</td>
-                            <td className="px-3 py-2.5 whitespace-nowrap">
-                              <span className="inline-block px-2 py-1 text-xs rounded bg-orange-100 text-orange-800">
-                                {booking.package || 'Without Samagri'}
+                        {[{ id: '001', name: 'Ajay Mandal', pooja: 'Ganesh Pooja', amount: '₹3,500', date: '20 Apr 2026', status: 'Completed' }, { id: '002', name: 'Priya Sharma', pooja: 'Ganesh Pooja', amount: '₹4,500', date: '18 Apr 2026', status: 'Pending' }, { id: '003', name: 'Rahul Verma', pooja: 'Navagraha Pooja', amount: '₹7,500', date: '15 Apr 2026', status: 'Confirmed' }, { id: '004', name: 'Anita Das', pooja: 'Saraswati Pooja', amount: '₹4,300', date: '12 Apr 2026', status: 'Completed' }, { id: '005', name: 'Suresh Kumar', pooja: 'Durga Pooja', amount: '₹6,000', date: '10 Apr 2026', status: 'Cancelled' }].map((row, index) => (
+                          <tr key={row.id} className={index % 2 === 0 ? 'bg-white' : 'bg-[#fcfaf6]'}>
+                            <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#6d5d55]">{row.id}</td>
+                            <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#2a211b] font-medium">{row.name}</td>
+                            <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#5d504b]">{row.pooja}</td>
+                            <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#302b29] font-medium">{row.amount}</td>
+                            <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#5c4e47]">{row.date}</td>
+                            <td className="border-t border-[#f0e4d0] px-3 py-2">
+                              <span className={`inline-block rounded-full px-2 py-1 text-[10px] font-semibold ${row.status === 'Completed' ? 'bg-[#e9fbf2] text-[#18814d]' : row.status === 'Pending' ? 'bg-[#fff2d9] text-[#d98723]' : row.status === 'Confirmed' ? 'bg-[#edfbff] text-[#1774af]' : 'bg-[#ffe4e6] text-[#b32643]'}`}>
+                                {row.status}
                               </span>
-                            </td>
-                            <td className="px-3 py-2.5 min-w-47.5">
-                              {Array.isArray(booking.selectedAddOns) && booking.selectedAddOns.length > 0 ? (
-                                <div className="space-y-1">
-                                  <span className="inline-block px-2 py-1 text-xs rounded border border-emerald-200 bg-emerald-50 text-emerald-700">
-                                    Yes
-                                  </span>
-                                  <p className="text-xs text-stone-600 leading-relaxed">
-                                    {booking.selectedAddOns.join(', ')}
-                                  </p>
-                                </div>
-                              ) : (
-                                <span className="inline-block px-2 py-1 text-xs rounded border border-stone-200 bg-stone-100 text-stone-700">
-                                  No
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap text-stone-700 font-medium">{booking.date}</td>
-                            <td className="px-3 py-2.5 whitespace-nowrap">
-                              {(() => {
-                                const statusView = getBookingStatusView(booking.bookingStatus)
-                                return (
-                                  <span className={`inline-block px-2 py-1 text-xs rounded border ${statusView.badgeClass}`}>
-                                    {statusView.label}
-                                  </span>
-                                )
-                              })()}
-                            </td>
-                            <td className="px-3 py-2.5 min-w-47.5">
-                              {(() => {
-                                const paymentView = getPaymentStatusView(booking)
-                                return (
-                                  <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded border ${paymentView.badgeClass}`}>
-                                    <span>{paymentView.icon}</span>
-                                    <span>{paymentView.label}</span>
-                                  </span>
-                                )
-                              })()}
-                            </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <select
-                                  className="border border-stone-300 rounded-md px-2.5 py-1.5 text-sm bg-white"
-                                  value={normalizeBookingStatus(booking.bookingStatus)}
-                                  onChange={(e) => updateBookingStatus(booking._id, e.target.value)}
-                                >
-                                  <option value="pending">Pending</option>
-                                  <option value="confirmed">Confirmed</option>
-                                  <option value="completed">Completed</option>
-                                  <option value="cancelled">Cancelled</option>
-                                </select>
-                                <button
-                                  onClick={() => copyPanditBookingMessage(booking)}
-                                  className="px-2 py-1 text-xs rounded border border-stone-300 bg-white text-stone-700 hover:bg-stone-100 disabled:opacity-60"
-                                  disabled={Boolean(panditMessageLoadingById[booking._id])}
-                                >
-                                  {panditMessageLoadingById[booking._id] ? 'Preparing...' : 'Copy Pandit Msg'}
-                                </button>
-                                <button
-                                  onClick={() => openPanditWhatsApp(booking)}
-                                  className="px-2 py-1 text-xs rounded bg-emerald-700 text-white hover:bg-emerald-800 disabled:opacity-60"
-                                  disabled={Boolean(panditMessageLoadingById[booking._id])}
-                                >
-                                  {panditMessageLoadingById[booking._id] ? 'Preparing...' : 'Open WhatsApp'}
-                                </button>
-                                {normalizeBookingStatus(booking.bookingStatus) === 'completed' && (
-                                  <button
-                                    onClick={() => resendReviewRequest(booking._id)}
-                                    className="px-2 py-1 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
-                                    disabled={Boolean(reviewRequestLoadingById[booking._id])}
-                                  >
-                                    {reviewRequestLoadingById[booking._id] ? 'Sending...' : 'Resend Review'}
-                                  </button>
-                                )}
-                              </div>
                             </td>
                           </tr>
                         ))}
@@ -1366,315 +1309,72 @@ function AdminPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 grid lg:grid-cols-2 gap-4">
-                  <div ref={servicesSectionRef} className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-xl font-semibold text-stone-900">Recent Booking Requests</h2>
-                      <button
-                        onClick={refreshRecentBookings}
-                        className="px-3 py-1.5 text-xs rounded bg-stone-900 text-white disabled:opacity-60"
-                        disabled={refreshingRecent}
-                      >
-                        {refreshingRecent ? 'Refreshing...' : 'Refresh'}
-                      </button>
-                    </div>
-                    <p className="mt-2 text-xs text-stone-500">Showing {filteredRecentBookings.length} of {recentBookings.length}</p>
-                    <div className="mt-3 space-y-2 max-h-72 overflow-auto">
-                      {filteredRecentBookings.map((booking) => (
-                        <div key={booking._id} className="rounded-lg border border-stone-200 p-3 bg-stone-50/60">
-                          <div className="flex items-center justify-between gap-2">
-                            <button type="button" onClick={() => openBookingDetails(booking)} className="font-medium text-orange-700 hover:underline">
-                              {booking.name}
-                            </button>
-                            <span className="text-xs text-stone-500">{new Date(booking.createdAt).toLocaleDateString()}</span>
+                <div ref={servicesSectionRef} className="rounded-[22px] border border-[#f1d7a6] bg-[#fffdfb] p-4 shadow-[0_12px_24px_rgba(123,92,33,0.05)]">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#221d1a]">Top poojas</h3>
+                    <button type="button" className="text-[12px] font-medium text-[#7e645d]">View all</button>
+                  </div>
+
+                  <div className="mt-4 space-y-3">
+                    {[
+                      { name: 'Ganesh Pooja', count: 12 },
+                      { name: 'Griha Pravesh', count: 8 },
+                      { name: 'Navagraha Pooja', count: 5 },
+                      { name: 'Saraswati Pooja', count: 4 },
+                      { name: 'Durga Pooja', count: 3 },
+                    ].map((item, index) => (
+                      <div key={item.name} className="flex items-center gap-3">
+                        <span className="w-5 text-center text-xs font-semibold text-[#7b655d]">{index + 1}</span>
+                        <div className="flex-1">
+                          <div className="mb-1 flex items-center justify-between text-sm">
+                            <span className="text-[#312826]">{item.name}</span>
+                            <span className="text-[#5e4d45]">{item.count}</span>
                           </div>
-                          <p className="text-sm text-stone-700 mt-1">{booking.poojaId?.title}</p>
-                          <p className="text-xs text-stone-500 mt-1">{booking.package || 'Without Samagri'} • {normalizeBookingStatus(booking.bookingStatus)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
-                    <h2 className="text-xl font-semibold text-stone-900">Services</h2>
-                    <form onSubmit={createPooja} className="mt-3 grid gap-2">
-                      <input className="px-3 py-2 border rounded" placeholder="Title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-                      <textarea className="px-3 py-2 border rounded" placeholder="Description" required value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-                      <input className="px-3 py-2 border rounded" placeholder="Image URL" required value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} />
-                      <input className="px-3 py-2 border rounded" placeholder="Starting Price" type="number" required value={form.startPrice} onChange={(e) => setForm({ ...form, startPrice: e.target.value })} />
-                      <button className="px-4 py-2 bg-orange-700 text-white rounded">Add Pooja</button>
-                    </form>
-
-                    <div className="mt-4 rounded-lg border border-dashed border-orange-200 bg-orange-50 p-3">
-                      <p className="text-sm font-medium text-stone-800">Upload proof image</p>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleProofUpload}
-                        className="mt-2 block w-full text-sm text-stone-700 file:mr-3 file:rounded file:border-0 file:bg-orange-700 file:px-3 file:py-2 file:text-white"
-                      />
-                      {proofUploadState.uploading && (
-                        <p className="mt-2 text-xs text-orange-700">Uploading image...</p>
-                      )}
-                      {proofUploadState.message && (
-                        <p className="mt-2 text-xs text-green-700">{proofUploadState.message}</p>
-                      )}
-                      {proofUploadState.error && (
-                        <p className="mt-2 text-xs text-red-700">{proofUploadState.error}</p>
-                      )}
-                    </div>
-
-                    <form onSubmit={galleryEditId ? saveGalleryEdit : createGalleryPhoto} className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-medium text-stone-800">{galleryEditId ? 'Edit gallery photo' : 'Add gallery photo'}</p>
-                        {galleryEditId && (
-                          <button type="button" onClick={cancelGalleryEdit} className="text-xs font-medium text-stone-600 underline">Cancel</button>
-                        )}
-                      </div>
-                      <div className="mt-3 grid gap-2">
-                        <input
-                          className="px-3 py-2 border rounded bg-white"
-                          placeholder="Title"
-                          required
-                          value={galleryEditId ? galleryEditForm.title : galleryForm.title}
-                          onChange={(e) => updateGalleryField('title', e.target.value)}
-                        />
-                        <select
-                          className="px-3 py-2 border rounded bg-white"
-                          value={galleryEditId ? galleryEditForm.category : galleryForm.category}
-                          onChange={(e) => updateGalleryField('category', e.target.value)}
-                        >
-                          {['Ganesh Puja', 'Durga Puja', 'Satyanarayan Puja', 'Navagraha Puja', 'Shiva Puja', 'Griha Pravesh', 'Annaprashan', 'Other Pujas'].map((category) => (
-                            <option key={category} value={category}>{category}</option>
-                          ))}
-                        </select>
-                        <input
-                          className="px-3 py-2 border rounded bg-white"
-                          placeholder="Location"
-                          required
-                          value={galleryEditId ? galleryEditForm.location : galleryForm.location}
-                          onChange={(e) => updateGalleryField('location', e.target.value)}
-                        />
-                        <input
-                          className="px-3 py-2 border rounded bg-white"
-                          placeholder="Date (e.g. 30 Aug 2026)"
-                          required
-                          value={galleryEditId ? galleryEditForm.date : galleryForm.date}
-                          onChange={(e) => updateGalleryField('date', e.target.value)}
-                        />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleGalleryImageUpload}
-                          className="mt-1 block w-full text-sm text-stone-700 file:mr-3 file:rounded file:border-0 file:bg-orange-700 file:px-3 file:py-2 file:text-white"
-                        />
-                        {(galleryEditId ? galleryEditForm.image : galleryForm.image) && (
-                          <div className="rounded border border-dashed border-orange-300 bg-white p-2">
-                            <img src={galleryEditId ? galleryEditForm.image : galleryForm.image} alt="Preview" className="h-28 w-full rounded object-cover" />
+                          <div className="h-2.5 rounded-full bg-[#f5e8d8]">
+                            <div className="h-full rounded-full bg-[#f6a34f]" style={{ width: `${Math.max(item.count * 7, 18)}%` }} />
                           </div>
-                        )}
-                        {galleryUploadState.uploading && (
-                          <p className="text-xs text-orange-700">Uploading gallery image...</p>
-                        )}
-                        {galleryUploadState.message && (
-                          <p className="text-xs text-green-700">{galleryUploadState.message}</p>
-                        )}
-                        {galleryUploadState.error && (
-                          <p className="text-xs text-red-700">{galleryUploadState.error}</p>
-                        )}
-                        <button type="submit" className="px-4 py-2 bg-orange-700 text-white rounded">
-                          {galleryEditId ? 'Update Gallery Photo' : 'Save to Gallery'}
-                        </button>
-                      </div>
-                    </form>
-
-                    <div className="mt-4 rounded-lg border border-dashed border-amber-200 bg-white p-3">
-                      <div className="mb-2 flex items-center justify-between gap-2">
-                        <p className="text-sm font-medium text-stone-800">Gallery Items</p>
-                        <span className="text-xs text-stone-500">{galleryItems.length}</span>
-                      </div>
-                      <div className="space-y-2 max-h-52 overflow-auto">
-                        {galleryItems.length === 0 ? (
-                          <p className="text-xs text-stone-500">No gallery items yet.</p>
-                        ) : (
-                          galleryItems.map((item) => (
-                            <div key={item._id} className="flex items-center justify-between gap-2 rounded-lg border border-stone-200 bg-stone-50 p-2">
-                              <div className="flex items-center gap-2 truncate">
-                                {item.image && (
-                                  <img src={item.image} alt={item.title} className="h-10 w-10 rounded object-cover" />
-                                )}
-                                <div className="min-w-0">
-                                  <p className="truncate text-sm font-medium text-stone-800">{item.title}</p>
-                                  <p className="text-[11px] text-stone-500">{item.category}</p>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <button onClick={() => openGalleryEditor(item)} className="rounded bg-stone-800 px-2 py-1 text-[11px] text-white">Edit</button>
-                                <button onClick={() => deleteGalleryPhoto(item._id)} className="rounded bg-red-600 px-2 py-1 text-[11px] text-white">Delete</button>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mt-3 space-y-2 max-h-36 overflow-auto">
-                      {poojas.map((pooja) => (
-                        <div key={pooja._id} className="flex items-center justify-between rounded-lg border border-stone-200 p-2">
-                          <p className="text-sm text-stone-800 truncate pr-2">{pooja.title}</p>
-                          <button onClick={() => deletePooja(pooja._id)} className="rounded bg-red-600 px-2 py-1 text-xs text-white">Delete</button>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div ref={paymentsSectionRef} className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
-                  <div className="flex items-center justify-between gap-2">
-                    <h2 className="text-2xl font-semibold text-stone-900">Payments</h2>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-stone-500">View All</span>
-                      <button
-                        type="button"
-                        onClick={exportPaymentsCsv}
-                        className="px-3 py-1.5 text-xs rounded bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={filteredPaymentsForExport.length === 0}
-                      >
-                        Export CSV ({filteredPaymentsForExport.length})
-                      </button>
-                    </div>
-                  </div>
-                  <div className="mt-3 space-y-2 max-h-88 overflow-auto">
-                    {filteredPaymentsForExport.map((payment) => (
-                      <div key={payment._id} className="rounded-lg border border-stone-200 bg-stone-50/60 p-3 text-sm">
-                        <p className="text-stone-700">Order: {payment.razorpayOrderId}</p>
-                        <p className="mt-1 text-3xl font-semibold text-stone-900">₹{payment.amount}</p>
-                        <p className="mt-1 inline-block rounded-md bg-orange-100 px-2 py-1 text-xs font-medium text-orange-800">{String(payment.status || 'pending')}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div ref={enquiriesSectionRef} className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
-                  <div className="flex items-center justify-between gap-2">
-                    <h2 className="text-2xl font-semibold text-stone-900">Enquiries</h2>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-stone-500">View All</span>
-                      <button
-                        type="button"
-                        onClick={exportEnquiriesCsv}
-                        className="px-3 py-1.5 text-xs rounded bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={filteredEnquiriesForExport.length === 0}
-                      >
-                        Export CSV ({filteredEnquiriesForExport.length})
-                      </button>
-                    </div>
+                <div ref={paymentsSectionRef} className="rounded-[22px] border border-[#f1d7a6] bg-[#fffdfb] p-4 shadow-[0_12px_24px_rgba(123,92,33,0.05)]">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#221d1a]">Revenue trend</h3>
+                    <button type="button" className="text-[12px] font-medium text-[#7e645d]">Last 30 days</button>
                   </div>
-                  <div className="mt-3 space-y-2 max-h-88 overflow-auto">
-                    {filteredEnquiriesForExport.map((item) => (
-                      <div key={item._id} className="rounded-lg border border-stone-200 bg-stone-50/60 p-3 text-sm">
-                        <p className="font-semibold text-stone-900">{item.name} ({item.phone})</p>
-                        <p className="mt-1 text-stone-600">{item.email}</p>
-                        <p className="mt-1 text-stone-700">{item.message}</p>
-                      </div>
+
+                  <div className="mt-4 flex h-28 items-end gap-2">
+                    {[18, 24, 15, 32, 22, 28, 26, 20, 30, 35, 22, 31].map((height, index) => (
+                      <div key={index} className="flex-1 rounded-t-[12px] bg-gradient-to-t from-[#f2a15d] to-[#f8d7b5]" style={{ height: `${height}%` }} />
                     ))}
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
-                  <div className="flex items-center justify-between gap-2">
-                    <h2 className="text-2xl font-semibold text-stone-900">Reviews</h2>
-                    <span className="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-xs text-orange-700">
-                      {feedbacks.length} total
-                    </span>
+                <div className="rounded-[22px] border border-[#f1d7a6] bg-[#fffdfb] p-4 shadow-[0_12px_24px_rgba(123,92,33,0.05)]">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[1.6rem] font-semibold tracking-[-0.05em] text-[#221d1a]">Customer reviews</h3>
+                    <button type="button" className="text-[12px] font-medium text-[#7e645d]">View all</button>
                   </div>
-                  <p className="mt-1 text-xs text-stone-500">Approve reviews to publish them. Rejected reviews stay hidden.</p>
-                  {feedbackActionMessage && <p className="mt-2 text-xs text-stone-700">{feedbackActionMessage}</p>}
-                  <div className="mt-3 space-y-2 max-h-88 overflow-auto">
-                    {feedbacks.length === 0 ? (
-                      <p className="text-sm text-stone-500">No reviews found.</p>
-                    ) : (
-                      feedbacks.map((feedback) => (
-                        <div key={feedback._id} className="rounded-lg border border-stone-200 bg-stone-50/60 p-3 text-sm">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className="font-semibold text-stone-900 truncate">{feedback.customerName || feedback.userId?.name || 'Verified Customer'}</p>
-                              <p className="mt-0.5 text-xs text-stone-500 truncate">{feedback.poojaId?.title || 'Pooja Service'} • {feedback.bookingId?.date || 'N/A'}</p>
-                              <p className="mt-1 text-xs text-stone-500">Rating: {Number(feedback.rating || 0)}/5 • {feedback.status || (feedback.isApproved ? 'approved' : 'pending')}</p>
-                            </div>
-                            <div className="flex flex-wrap justify-end gap-1">
-                              {!feedback.isApproved && feedback.status !== 'rejected' && <button type="button" onClick={() => moderateFeedback(feedback._id, 'approve')} className="rounded bg-emerald-700 px-2 py-1.5 text-xs text-white">Approve</button>}
-                              {feedback.isApproved && <button type="button" onClick={() => moderateFeedback(feedback._id, 'reject')} className="rounded bg-amber-600 px-2 py-1.5 text-xs text-white">Reject</button>}
-                              <button type="button" onClick={() => deleteFeedback(feedback._id)} className="rounded bg-red-600 px-2 py-1.5 text-xs text-white hover:bg-red-700 disabled:opacity-60" disabled={Boolean(deletingFeedbackById[feedback._id])}>
-                                {deletingFeedbackById[feedback._id] ? 'Deleting...' : 'Delete'}
-                              </button>
-                            </div>
-                          </div>
-                          <p className="mt-2 text-stone-700">{feedback.comment || '-'}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
 
-                <div ref={settingsSectionRef} className="rounded-xl border border-orange-100 bg-white p-4 shadow-sm">
-                  <h2 className="text-2xl font-semibold text-stone-900">Twilio Test</h2>
-                  <p className="mt-1 text-xs text-stone-500">Admin-only tool to test SMS and WhatsApp delivery (plain text or template).</p>
-                  <form className="mt-3 space-y-2" onSubmit={runTwilioTest}>
-                    <input
-                      className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
-                      placeholder="Recipient (example: +919999999999 or whatsapp:+919999999999)"
-                      value={twilioTestForm.to}
-                      onChange={(e) => setTwilioTestForm((prev) => ({ ...prev, to: e.target.value }))}
-                      disabled={twilioTesting}
-                    />
-                    <textarea
-                      className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
-                      placeholder="Optional test message"
-                      rows={3}
-                      value={twilioTestForm.body}
-                      onChange={(e) => setTwilioTestForm((prev) => ({ ...prev, body: e.target.value }))}
-                      disabled={twilioTesting}
-                    />
-                    <input
-                      className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
-                      placeholder="Optional Twilio Content SID (example: HXxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx)"
-                      value={twilioTestForm.contentSid}
-                      onChange={(e) => setTwilioTestForm((prev) => ({ ...prev, contentSid: e.target.value }))}
-                      disabled={twilioTesting}
-                    />
-                    <textarea
-                      className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
-                      placeholder='Optional Content Variables JSON (example: {"1":"12/1","2":"3pm"})'
-                      rows={2}
-                      value={twilioTestForm.contentVariables}
-                      onChange={(e) => setTwilioTestForm((prev) => ({ ...prev, contentVariables: e.target.value }))}
-                      disabled={twilioTesting}
-                    />
-                    <button
-                      type="submit"
-                      className="rounded bg-orange-700 px-3 py-2 text-xs text-white hover:bg-orange-800 disabled:opacity-60"
-                      disabled={twilioTesting}
-                    >
-                      {twilioTesting ? 'Testing...' : 'Run Twilio Test'}
-                    </button>
-                  </form>
-                  {twilioTestError && <p className="mt-2 text-xs text-red-700">{twilioTestError}</p>}
-                  {twilioTestResult && (
-                    <div className="mt-3 rounded border border-stone-200 bg-stone-50 p-2 text-xs text-stone-700">
-                      <p>SMS: {twilioTestResult.smsSent ? 'Sent' : 'Failed'}</p>
-                      <p>WhatsApp: {twilioTestResult.whatsappSent ? 'Sent' : 'Failed'}</p>
-                      <p>SMS To: {twilioTestResult.smsTo || '-'}</p>
-                      <p>WhatsApp To: {twilioTestResult.whatsappTo || '-'}</p>
-                      <p>Used Template SID: {twilioTestResult.usedContentSid || '-'}</p>
+                  <div className="mt-4 rounded-[14px] border border-[#f0e3d4] bg-[#fffaf5] p-3">
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-10 w-10 place-items-center rounded-full bg-[#f3d6a8] text-sm font-bold text-[#5d3d2d]">A</div>
+                      <div>
+                        <div className="font-semibold text-[#2a211b]">Ajay Mandal</div>
+                        <div className="text-[12px] text-[#7a685e]">20 Apr 2026</div>
+                      </div>
                     </div>
-                  )}
+                    <div className="mt-2 flex gap-1 text-[#f59e0b]">★★★★★</div>
+                    <p className="mt-2 text-[13px] leading-6 text-[#544842]">
+                      We booked the Annaprashan Puja through Puja Samriddhi, and the whole experience was excellent. The panditji was knowledgeable, polite, and explained the rituals clearly.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </main>
         </div>
       </div>
 
