@@ -132,6 +132,58 @@ function AdminPage() {
     }))
   }, [bookings, stats.revenue])
 
+  const bookingStatusTotals = useMemo(() => {
+    return bookings.reduce(
+      (totals, booking) => {
+        const status = normalizeBookingStatus(booking.bookingStatus)
+        totals[status] += 1
+        return totals
+      },
+      { pending: 0, confirmed: 0, completed: 0, cancelled: 0 }
+    )
+  }, [bookings])
+
+  const topBookedPoojas = useMemo(() => {
+    const counts = bookings.reduce((result, booking) => {
+      const title = String(booking.poojaId?.title || '').trim()
+      if (title) result[title] = (result[title] || 0) + 1
+      return result
+    }, {})
+
+    return Object.entries(counts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((left, right) => right.count - left.count)
+      .slice(0, 5)
+  }, [bookings])
+
+  const averageRating = useMemo(() => {
+    const ratings = feedbacks.map((feedback) => Number(feedback.rating)).filter((rating) => Number.isFinite(rating) && rating > 0)
+    if (ratings.length === 0) return null
+    return (ratings.reduce((total, rating) => total + rating, 0) / ratings.length).toFixed(1)
+  }, [feedbacks])
+
+  const bookingOverviewBars = useMemo(() => {
+    const days = Array.from({ length: 11 }, (_, index) => {
+      const date = new Date()
+      date.setHours(0, 0, 0, 0)
+      date.setDate(date.getDate() - (10 - index))
+      return date
+    })
+
+    return days.map((day) => {
+      const dayBookings = bookings.filter((booking) => {
+        const createdAt = new Date(booking.createdAt)
+        return createdAt.toDateString() === day.toDateString()
+      })
+      return {
+        label: day.toLocaleDateString([], { month: 'short', day: 'numeric' }),
+        completed: dayBookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'completed').length,
+        pending: dayBookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length,
+        cancelled: dayBookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'cancelled').length,
+      }
+    })
+  }, [bookings])
+
   const packageOptions = useMemo(() => {
     const values = Array.from(
       new Set(
@@ -1178,41 +1230,41 @@ function AdminPage() {
                   <div className="rounded-[20px] border border-[#cfeaf9] bg-[#ebf7ff] p-4 shadow-[0_10px_22px_rgba(61,102,150,0.06)]">
                     <div className="flex items-center justify-between">
                       <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">📅</div>
-                      <div className="text-right text-[12px] font-semibold text-[#0b7f4b]">↑ 40%</div>
+                      <div className="text-right text-[12px] font-semibold text-[#0b7f4b]">Live</div>
                     </div>
                     <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Bookings</div>
-                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">{stats.totalBookings || 28}</div>
+                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">{stats.totalBookings}</div>
                     <div className="mt-1 text-[12px] text-[#6a5c55]">vs last month</div>
                   </div>
 
                   <div className="rounded-[20px] border border-[#f5debc] bg-[#fff7f0] p-4 shadow-[0_10px_22px_rgba(173,122,42,0.06)]">
                     <div className="flex items-center justify-between">
                       <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">⏳</div>
-                      <div className="text-right text-[12px] font-semibold text-[#c96b1d]">↑ 25%</div>
+                      <div className="text-right text-[12px] font-semibold text-[#c96b1d]">Live</div>
                     </div>
                     <div className="mt-4 text-[13px] font-medium text-[#51413d]">Pending Bookings</div>
-                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">{bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'pending').length || 5}</div>
+                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">{bookingStatusTotals.pending}</div>
                     <div className="mt-1 text-[12px] text-[#6a5c55]">Need review</div>
                   </div>
 
                   <div className="rounded-[20px] border border-[#d7f0db] bg-[#ecfdf1] p-4 shadow-[0_10px_22px_rgba(75,160,105,0.06)]">
                     <div className="flex items-center justify-between">
                       <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">₹</div>
-                      <div className="text-right text-[12px] font-semibold text-[#1f9d61]">↑ 65%</div>
+                      <div className="text-right text-[12px] font-semibold text-[#1f9d61]">Live</div>
                     </div>
                     <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Revenue</div>
-                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">₹{Number(stats.revenue || 124500).toLocaleString('en-IN')}</div>
+                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">₹{Number(stats.revenue || 0).toLocaleString('en-IN')}</div>
                     <div className="mt-1 text-[12px] text-[#6a5c55]">vs last month</div>
                   </div>
 
                   <div className="rounded-[20px] border border-[#efe0fa] bg-[#f8f1ff] p-4 shadow-[0_10px_22px_rgba(143,96,170,0.06)]">
                     <div className="flex items-center justify-between">
                       <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">★</div>
-                      <div className="text-right text-[12px] font-semibold text-[#7958a4]">★ 4.8/5</div>
+                      <div className="text-right text-[12px] font-semibold text-[#7958a4]">{averageRating ? `★ ${averageRating}/5` : 'No rating'}</div>
                     </div>
                     <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Reviews</div>
-                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">{feedbacks.length || 12}</div>
-                    <div className="mt-1 text-[12px] text-[#6a5c55]">Average rating</div>
+                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">{feedbacks.length}</div>
+                    <div className="mt-1 text-[12px] text-[#6a5c55]">Real customer reviews</div>
                   </div>
                 </div>
               </div>
@@ -1228,18 +1280,22 @@ function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-14 items-end gap-2 rounded-[16px] bg-[#f9f4ef] p-3 pt-5">
-                    {[20, 16, 18, 10, 12, 15, 13, 17, 11, 14, 9, 10, 12, 15].map((value, index) => (
-                      <div key={index} className="flex flex-col items-center justify-end gap-2">
-                        <div className="flex w-full items-end justify-center gap-1">
-                          <div className="w-2.5 rounded-t-[8px] bg-[#f87171]" style={{ height: `${value * 3}px` }} />
-                          <div className="w-2.5 rounded-t-[8px] bg-[#22c55e]" style={{ height: `${(value * 2.2).toFixed(0)}px` }} />
-                          <div className="w-2.5 rounded-t-[8px] bg-[#f59e0b]" style={{ height: `${(value * 1.8).toFixed(0)}px` }} />
+                  {bookings.length > 0 ? (
+                    <div className="mt-4 grid grid-cols-11 items-end gap-2 rounded-[16px] bg-[#f9f4ef] p-3 pt-5">
+                      {bookingOverviewBars.map((bar) => (
+                        <div key={bar.label} className="flex min-w-0 flex-col items-center justify-end gap-2">
+                          <div className="flex h-32 w-full items-end justify-center gap-1">
+                            <div className="w-2.5 rounded-t-[8px] bg-[#22c55e]" style={{ height: `${Math.max(bar.completed * 18, bar.completed ? 8 : 0)}px` }} />
+                            <div className="w-2.5 rounded-t-[8px] bg-[#f59e0b]" style={{ height: `${Math.max(bar.pending * 18, bar.pending ? 8 : 0)}px` }} />
+                            <div className="w-2.5 rounded-t-[8px] bg-[#f87171]" style={{ height: `${Math.max(bar.cancelled * 18, bar.cancelled ? 8 : 0)}px` }} />
+                          </div>
+                          <span className="truncate text-[10px] text-[#7c6d62]">{bar.label}</span>
                         </div>
-                        <span className="text-[10px] text-[#7c6d62]">{['Aug 25','Aug 28','Aug 31','Sep 3','Sep 6','Sep 9','Sep 12','Sep 15','Sep 18','Sep 21','Sep 24'][index] || `S${index + 1}`}</span>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-4 rounded-[16px] bg-[#f9f4ef] p-8 text-center text-sm text-[#7c6d62]">No booking data available.</div>
+                  )}
                 </div>
 
                 <div className="rounded-[22px] border border-[#f1d7a6] bg-[#fffdfb] p-4 shadow-[0_12px_24px_rgba(123,92,33,0.05)]">
@@ -1251,11 +1307,15 @@ function AdminPage() {
                   <div className="mt-4 flex items-center justify-center">
                     <div
                       className="relative grid h-40 w-40 place-items-center rounded-full"
-                      style={{ background: 'conic-gradient(#1e9f64 0 71%, #f59e0b 71% 86%, #f87171 86% 100%)' }}
+                      style={{
+                        background: stats.totalBookings > 0
+                          ? `conic-gradient(#1e9f64 0 ${(bookingStatusTotals.completed / stats.totalBookings) * 100}%, #f59e0b ${(bookingStatusTotals.completed / stats.totalBookings) * 100}% ${((bookingStatusTotals.completed + bookingStatusTotals.pending) / stats.totalBookings) * 100}%, #f87171 ${((bookingStatusTotals.completed + bookingStatusTotals.pending) / stats.totalBookings) * 100}% 100%)`
+                          : '#eadfd2',
+                      }}
                     >
                       <div className="grid h-28 w-28 place-items-center rounded-full bg-[#fffdfb] text-center shadow-inner">
                         <div>
-                          <div className="text-[2rem] font-bold tracking-[-0.06em] text-[#1d1a18]">28</div>
+                          <div className="text-[2rem] font-bold tracking-[-0.06em] text-[#1d1a18]">{stats.totalBookings}</div>
                           <div className="text-[11px] uppercase tracking-[0.12em] text-[#7e675f]">Total</div>
                         </div>
                       </div>
@@ -1263,9 +1323,13 @@ function AdminPage() {
                   </div>
 
                   <div className="mt-4 space-y-2 text-sm text-[#4e463e]">
-                    <div className="flex items-center justify-between"><span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#1e9f64]" />Completed</span><span>20 (71%)</span></div>
-                    <div className="flex items-center justify-between"><span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]" />Pending</span><span>5 (18%)</span></div>
-                    <div className="flex items-center justify-between"><span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full bg-[#f87171]" />Cancelled</span><span>3 (11%)</span></div>
+                    {[
+                      ['Completed', bookingStatusTotals.completed, '#1e9f64'],
+                      ['Pending', bookingStatusTotals.pending, '#f59e0b'],
+                      ['Cancelled', bookingStatusTotals.cancelled, '#f87171'],
+                    ].map(([label, count, color]) => (
+                      <div key={label} className="flex items-center justify-between"><span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />{label}</span><span>{count} ({stats.totalBookings ? Math.round((count / stats.totalBookings) * 100) : 0}%)</span></div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -1290,20 +1354,25 @@ function AdminPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {[{ id: '001', name: 'Ajay Mandal', pooja: 'Ganesh Pooja', amount: '₹3,500', date: '20 Apr 2026', status: 'Completed' }, { id: '002', name: 'Priya Sharma', pooja: 'Ganesh Pooja', amount: '₹4,500', date: '18 Apr 2026', status: 'Pending' }, { id: '003', name: 'Rahul Verma', pooja: 'Navagraha Pooja', amount: '₹7,500', date: '15 Apr 2026', status: 'Confirmed' }, { id: '004', name: 'Anita Das', pooja: 'Saraswati Pooja', amount: '₹4,300', date: '12 Apr 2026', status: 'Completed' }, { id: '005', name: 'Suresh Kumar', pooja: 'Durga Pooja', amount: '₹6,000', date: '10 Apr 2026', status: 'Cancelled' }].map((row, index) => (
-                          <tr key={row.id} className={index % 2 === 0 ? 'bg-white' : 'bg-[#fcfaf6]'}>
-                            <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#6d5d55]">{row.id}</td>
-                            <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#2a211b] font-medium">{row.name}</td>
-                            <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#5d504b]">{row.pooja}</td>
-                            <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#302b29] font-medium">{row.amount}</td>
-                            <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#5c4e47]">{row.date}</td>
-                            <td className="border-t border-[#f0e4d0] px-3 py-2">
-                              <span className={`inline-block rounded-full px-2 py-1 text-[10px] font-semibold ${row.status === 'Completed' ? 'bg-[#e9fbf2] text-[#18814d]' : row.status === 'Pending' ? 'bg-[#fff2d9] text-[#d98723]' : row.status === 'Confirmed' ? 'bg-[#edfbff] text-[#1774af]' : 'bg-[#ffe4e6] text-[#b32643]'}`}>
-                                {row.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
+                        {filteredRecentBookings.length > 0 ? filteredRecentBookings.map((booking, index) => {
+                          const status = getBookingStatusView(booking.bookingStatus)
+                          return (
+                            <tr key={booking._id} className={index % 2 === 0 ? 'bg-white' : 'bg-[#fcfaf6]'}>
+                              <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#6d5d55]">{index + 1}</td>
+                              <td className="border-t border-[#f0e4d0] px-3 py-2 font-medium">
+                                <button type="button" onClick={() => openBookingDetails(booking)} className="text-left text-[#c45117] hover:underline">
+                                  {booking.name || 'Unnamed customer'}
+                                </button>
+                              </td>
+                              <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#5d504b]">{booking.poojaId?.title || '-'}</td>
+                              <td className="border-t border-[#f0e4d0] px-3 py-2 font-medium text-[#302b29]">{formatCurrency(booking.finalAmount)}</td>
+                              <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#5c4e47]">{booking.date || formatDateTime(booking.createdAt)}</td>
+                              <td className="border-t border-[#f0e4d0] px-3 py-2"><span className={`inline-block rounded-full border px-2 py-1 text-[10px] font-semibold ${status.badgeClass}`}>{status.label}</span></td>
+                            </tr>
+                          )
+                        }) : (
+                          <tr><td colSpan="6" className="border-t border-[#f0e4d0] px-3 py-8 text-center text-sm text-[#7c6d62]">No real bookings found.</td></tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -1316,13 +1385,7 @@ function AdminPage() {
                   </div>
 
                   <div className="mt-4 space-y-3">
-                    {[
-                      { name: 'Ganesh Pooja', count: 12 },
-                      { name: 'Griha Pravesh', count: 8 },
-                      { name: 'Navagraha Pooja', count: 5 },
-                      { name: 'Saraswati Pooja', count: 4 },
-                      { name: 'Durga Pooja', count: 3 },
-                    ].map((item, index) => (
+                    {topBookedPoojas.length > 0 ? topBookedPoojas.map((item, index) => (
                       <div key={item.name} className="flex items-center gap-3">
                         <span className="w-5 text-center text-xs font-semibold text-[#7b655d]">{index + 1}</span>
                         <div className="flex-1">
@@ -1335,7 +1398,7 @@ function AdminPage() {
                           </div>
                         </div>
                       </div>
-                    ))}
+                    )) : <p className="py-8 text-center text-sm text-[#7c6d62]">No real booking data available.</p>}
                   </div>
                 </div>
 
@@ -1345,10 +1408,9 @@ function AdminPage() {
                     <button type="button" className="text-[12px] font-medium text-[#7e645d]">Last 30 days</button>
                   </div>
 
-                  <div className="mt-4 flex h-28 items-end gap-2">
-                    {[18, 24, 15, 32, 22, 28, 26, 20, 30, 35, 22, 31].map((height, index) => (
-                      <div key={index} className="flex-1 rounded-t-[12px] bg-gradient-to-t from-[#f2a15d] to-[#f8d7b5]" style={{ height: `${height}%` }} />
-                    ))}
+                  <div className="mt-4 rounded-[14px] bg-[#fff8ef] p-5 text-center">
+                    <div className="text-3xl font-semibold text-[#2a211b]">₹{Number(stats.revenue || 0).toLocaleString('en-IN')}</div>
+                    <div className="mt-1 text-xs text-[#7c6d62]">Revenue reported by the payment and completed-booking records</div>
                   </div>
                 </div>
 
@@ -1358,19 +1420,19 @@ function AdminPage() {
                     <button type="button" className="text-[12px] font-medium text-[#7e645d]">View all</button>
                   </div>
 
-                  <div className="mt-4 rounded-[14px] border border-[#f0e3d4] bg-[#fffaf5] p-3">
-                    <div className="flex items-center gap-3">
-                      <div className="grid h-10 w-10 place-items-center rounded-full bg-[#f3d6a8] text-sm font-bold text-[#5d3d2d]">A</div>
-                      <div>
-                        <div className="font-semibold text-[#2a211b]">Ajay Mandal</div>
-                        <div className="text-[12px] text-[#7a685e]">20 Apr 2026</div>
+                  {feedbacks.length > 0 ? (
+                    <div className="mt-4 rounded-[14px] border border-[#f0e3d4] bg-[#fffaf5] p-3">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-10 w-10 place-items-center rounded-full bg-[#f3d6a8] text-sm font-bold text-[#5d3d2d]">{String(feedbacks[0].customerName || 'C').charAt(0).toUpperCase()}</div>
+                        <div>
+                          <div className="font-semibold text-[#2a211b]">{feedbacks[0].customerName || 'Customer'}</div>
+                          <div className="text-[12px] text-[#7a685e]">{formatDateTime(feedbacks[0].createdAt)}</div>
+                        </div>
                       </div>
+                      <div className="mt-2 flex gap-1 text-[#f59e0b]">{'★'.repeat(Math.max(0, Math.min(5, Number(feedbacks[0].rating) || 0)))}</div>
+                      <p className="mt-2 text-[13px] leading-6 text-[#544842]">{feedbacks[0].comment || 'No review comment provided.'}</p>
                     </div>
-                    <div className="mt-2 flex gap-1 text-[#f59e0b]">★★★★★</div>
-                    <p className="mt-2 text-[13px] leading-6 text-[#544842]">
-                      We booked the Annaprashan Puja through Puja Samriddhi, and the whole experience was excellent. The panditji was knowledgeable, polite, and explained the rituals clearly.
-                    </p>
-                  </div>
+                  ) : <div className="mt-4 rounded-[14px] bg-[#fffaf5] p-6 text-center text-sm text-[#7c6d62]">No real reviews available.</div>}
                 </div>
               </div>
             </div>
