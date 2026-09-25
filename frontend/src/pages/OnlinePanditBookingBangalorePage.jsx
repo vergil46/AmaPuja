@@ -9,6 +9,19 @@ import satyanarayanPujaBangaloreImg from '../assets/poojas/satyanarayan-puja-ban
 const SITE_URL = 'https://pujasamriddhi.com'
 const PAGE_PATH = '/online-pandit-booking-bangalore'
 
+const serviceLinks = {
+  'Satyanarayan Puja': '/satyanarayan-puja',
+  'Griha Pravesh Puja (Housewarming)': '/griha-pravesh-puja',
+  'Ganesh Puja': '/ganesh-puja',
+  'Lakshmi Puja': '/lakshmi-puja',
+  'Navagraha Puja': '/navagraha-puja',
+  'Rudrabhishek Puja': '/rudrabhishek-puja',
+  'Vastu Puja': '/vastu-shanti-puja',
+  'Wedding Puja rituals': '/marriage-puja',
+  'Naming ceremony (Namkaran)': '/services?search=Namkaran%20Puja',
+  'Annaprashan ceremony': '/services?search=Annaprashan%20Puja',
+}
+
 const galleryItems = [
   {
     image: satyanarayanPujaBangaloreImg,
@@ -146,8 +159,14 @@ function OnlinePanditBookingBangalorePage() {
           'Naming ceremony (Namkaran)',
           'Annaprashan ceremony',
         ].map((service) => (
-          <li key={service} className="rounded-xl border border-[#FFE0A3] bg-white p-4 text-sm text-[#333333]/82 shadow-sm">
-            {service}
+          <li key={service}>
+            <Link
+              to={serviceLinks[service]}
+              className="block rounded-xl border border-[#FFE0A3] bg-white p-4 text-sm text-[#333333]/82 shadow-sm transition hover:-translate-y-0.5 hover:border-[#FFB74D] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#FF6F00] focus:ring-offset-2"
+              aria-label={`View ${service} services`}
+            >
+              {service}
+            </Link>
           </li>
         ))}
       </ul>
