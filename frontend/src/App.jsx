@@ -111,15 +111,24 @@ function App() {
           <Route path="/pandit-near-me" element={<PoojaSeoLandingPage slug="pandit-near-me" />} />
           <Route path="/satyanarayan-puja-booking" element={<PoojaSeoLandingPage slug="satyanarayan-puja-booking" />} />
           <Route path="/satyanarayan-puja" element={<PoojaSeoLandingPage slug="satyanarayan-puja" />} />
+          <Route path="/satyanarayan-puja-bangalore" element={<PoojaSeoLandingPage slug="satyanarayan-puja-bangalore" />} />
           <Route path="/griha-pravesh-puja" element={<PoojaSeoLandingPage slug="griha-pravesh-puja" />} />
+          <Route path="/griha-pravesh-puja-bangalore" element={<PoojaSeoLandingPage slug="griha-pravesh-puja-bangalore" />} />
           <Route path="/ganesh-puja-at-home" element={<PoojaSeoLandingPage slug="ganesh-puja-at-home" />} />
           <Route path="/ganesh-puja" element={<PoojaSeoLandingPage slug="ganesh-puja" />} />
+          <Route path="/ganesh-puja-bangalore" element={<PoojaSeoLandingPage slug="ganesh-puja-bangalore" />} />
           <Route path="/navagraha-puja" element={<PoojaSeoLandingPage slug="navagraha-puja" />} />
+          <Route path="/navagraha-puja-bangalore" element={<PoojaSeoLandingPage slug="navagraha-puja-bangalore" />} />
+          <Route path="/durga-puja-bangalore" element={<PoojaSeoLandingPage slug="durga-puja-bangalore" />} />
+          <Route path="/office-opening-puja-bangalore" element={<PoojaSeoLandingPage slug="office-opening-puja-bangalore" />} />
+          <Route path="/annaprashan-puja-bangalore" element={<PoojaSeoLandingPage slug="annaprashan-puja-bangalore" />} />
           <Route path="/rudrabhishek-puja" element={<PoojaSeoLandingPage slug="rudrabhishek-puja" />} />
           <Route path="/rudrabhishek" element={<PoojaSeoLandingPage slug="rudrabhishek" />} />
           <Route path="/lakshmi-puja-for-wealth" element={<PoojaSeoLandingPage slug="lakshmi-puja-for-wealth" />} />
           <Route path="/lakshmi-puja" element={<PoojaSeoLandingPage slug="lakshmi-puja" />} />
           <Route path="/online-pandit-booking" element={<PoojaSeoLandingPage slug="online-pandit-booking" />} />
+          <Route path="/puja-pandit-bangalore" element={<PoojaSeoLandingPage slug="puja-pandit-bangalore" />} />
+          <Route path="/online-pandit-bangalore" element={<PoojaSeoLandingPage slug="online-pandit-bangalore" />} />
           <Route path="/marriage-puja" element={<PoojaSeoLandingPage slug="marriage-puja" />} />
           <Route path="/vastu-shanti-puja" element={<PoojaSeoLandingPage slug="vastu-shanti-puja" />} />
           <Route path="/online-pandit-booking-bangalore" element={<OnlinePanditBookingBangalorePage />} />

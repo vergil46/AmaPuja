@@ -3,9 +3,43 @@ import { getPoojaImage } from '../assets/poojaImageMap'
 import fallbackImage from '../assets/poojas/puja-ceremony.jpg'
 import { slugify } from '../utils/slug'
 
+const languageLabels = {
+  odia: 'Odia',
+  hindi: 'Hindi',
+  kannada: 'Kannada',
+  bengali: 'Bengali',
+}
+
 function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
   const customImage = getPoojaImage(pooja.title, pooja.image)
   const queryParams = new URLSearchParams()
+  const languageKey = String(selectedLanguage || '').trim().toLowerCase()
+  const languagePackages = Array.isArray(pooja?.pricing?.[languageKey]?.packages)
+    ? pooja.pricing[languageKey].packages
+    : []
+  const primaryPackage = languagePackages.reduce((lowest, current) => {
+    if (!lowest || Number(current?.price) < Number(lowest?.price)) return current
+    return lowest
+  }, null)
+  const packageDurations = Array.from(new Set(
+    languagePackages.map((pkg) => String(pkg?.duration || '').trim()).filter(Boolean)
+  ))
+  const duration = packageDurations.length === 1
+    ? packageDurations[0]
+    : packageDurations.length > 1
+      ? 'Varies by package'
+      : 'Contact for duration'
+  const availableLanguageKeys = Array.isArray(pooja?.availableLanguages)
+    ? pooja.availableLanguages.map((language) => String(language).trim().toLowerCase()).filter(Boolean)
+    : []
+  const availableLanguages = Array.from(new Set(
+    availableLanguageKeys.map((language) => languageLabels[language] || language)
+  ))
+  const includedItems = Array.from(new Set([
+    primaryPackage?.pandits || 'Pandit included',
+    primaryPackage?.includesSamagri ? 'Puja Samagri included' : 'Puja Samagri option',
+    ...(Array.isArray(primaryPackage?.inclusions) ? primaryPackage.inclusions : []),
+  ])).slice(0, 4)
   const isBengaliVivahCard =
     String(selectedLanguage || '').toLowerCase() === 'bengali' &&
     /vivah/i.test(String(pooja?.title || ''))
@@ -45,16 +79,33 @@ function PoojaCard({ pooja, selectedCity, selectedLanguage }) {
       </div>
       <div className="flex flex-1 flex-col p-5">
         <h3 className="line-clamp-2 text-lg font-semibold leading-snug text-stone-900 sm:text-xl">🪔 {pooja.title}</h3>
+        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-stone-600">{pooja.description || 'Traditional puja performed by experienced pandits.'}</p>
 
         {!isBengaliVivahCard && (
           <p className="mt-3 text-base font-semibold text-orange-700 sm:text-lg">Starting ₹{pooja.startPrice}</p>
         )}
 
-        <ul className="mt-3 space-y-2 text-sm text-stone-700 sm:text-base">
-          <li>✓ Pandit included</li>
-          <li>✓ Puja Samagri</li>
-          <li>✓ Experienced Pandit</li>
-        </ul>
+        <div className="mt-4 grid grid-cols-2 gap-2 border-y border-stone-100 py-3 text-sm text-stone-700">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-stone-500">Duration</p>
+            <p className="mt-1 font-semibold">{duration}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-stone-500">City</p>
+            <p className="mt-1 font-semibold">{selectedCity || 'Bangalore'}</p>
+          </div>
+          <div className="col-span-2">
+            <p className="text-xs font-medium uppercase tracking-wide text-stone-500">Languages</p>
+            <p className="mt-1 font-semibold">{availableLanguages.length > 0 ? availableLanguages.join(' / ') : selectedLanguage || 'Contact us'}</p>
+          </div>
+        </div>
+
+        <div className="mt-3">
+          <p className="text-sm font-semibold text-stone-800">What&apos;s included</p>
+          <ul className="mt-2 space-y-1 text-sm text-stone-700">
+            {includedItems.map((item) => <li key={item}>✓ {item}</li>)}
+          </ul>
+        </div>
 
         <Link
           to={`/services/${pooja._id}${cityQuery}`}

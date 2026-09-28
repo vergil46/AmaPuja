@@ -27,6 +27,62 @@ const DiyaIcon = ({ className = 'h-4 w-4' }) => (
   </svg>
 )
 
+const faqItems = [
+  {
+    question: 'Do you provide puja samagri?',
+    answer: 'Yes. Choose a package with samagri to have the listed puja items arranged for your ceremony. Packages without samagri include a preparation list to help you arrange the items yourself.',
+  },
+  {
+    question: 'Can I choose the language of the Pandit?',
+    answer: 'Yes. You can choose Odia, Hindi, or Bengali while searching for a service, subject to pandit availability for your selected city and date.',
+  },
+  {
+    question: 'Do you provide same-day booking?',
+    answer: 'Same-day booking may be available depending on the puja, city, date, and pandit availability. Check the service page or contact us on WhatsApp for the quickest confirmation.',
+  },
+  {
+    question: 'How much advance payment is required?',
+    answer: 'The standard advance payment option is 30%. The available payment options and payable amount are shown during the booking process.',
+  },
+  {
+    question: 'Can I pay after the puja?',
+    answer: 'Yes. Pay-after-puja is available for eligible bookings and can be selected when the option appears during booking.',
+  },
+  {
+    question: 'Which areas of Bangalore do you serve?',
+    answer: 'We serve families across Bangalore, subject to pandit availability for your locality and selected puja. Share your complete address during booking so we can confirm coverage.',
+  },
+  {
+    question: 'Which areas of Bhubaneswar do you serve?',
+    answer: 'We serve families across Bhubaneswar, subject to pandit availability for your locality and selected puja. Share your complete address during booking so we can confirm coverage.',
+  },
+  {
+    question: 'Can I cancel or reschedule my booking?',
+    answer: 'Yes. Rescheduling is allowed once per booking when requested at least 24 hours in advance, subject to pandit availability. Cancellation refunds depend on how far in advance you cancel.',
+  },
+  {
+    question: 'How early should I book a Pandit?',
+    answer: 'Book as early as possible, especially for weekends, festivals, weddings, and auspicious dates. Same-day requests may be possible when a suitable pandit is available.',
+  },
+  {
+    question: 'What happens after I submit a booking?',
+    answer: 'We review your puja, package, date, location, and contact details, then coordinate pandit availability and send booking confirmation or follow-up questions through the contact details you provide.',
+  },
+]
+
+const homeFaqStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqItems.map(({ question, answer }) => ({
+    '@type': 'Question',
+    name: question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: answer,
+    },
+  })),
+}
+
 function HomePage() {
   const navigate = useNavigate()
   const [city, setCity] = useState('Bangalore')
@@ -34,6 +90,7 @@ function HomePage() {
   const [searchTerm, setSearchTerm] = useState('')
 
   const quickSuggestions = ['Satyanarayan Puja', 'Griha Pravesh', 'Ganesh Puja']
+  const [openFaq, setOpenFaq] = useState(null)
 
   const goToServices = (overrideTerm = '') => {
     const nextParams = new URLSearchParams()
@@ -65,6 +122,7 @@ function HomePage() {
       <Seo
         title="Puja Samriddhi | Trusted Pandit Booking"
         description="Book trusted pandits for sacred rituals with transparent packages and secure online booking."
+        structuredData={homeFaqStructuredData}
       />
 
       <section className="relative overflow-hidden border-b border-orange-100/80">
@@ -85,17 +143,24 @@ function HomePage() {
 
         <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-12 sm:pb-20 sm:pt-16">
           <div className="max-w-4xl animate-fade-up">
+            <div className="mb-4 inline-flex rounded-full border border-orange-200 bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-orange-700 shadow-sm">
+              Trusted puja booking
+            </div>
             <h1 className="text-4xl font-semibold leading-tight text-[#291a11] sm:text-5xl md:text-[60px]">
-              Book Trusted Pandit Ji in Minutes
+              Book Experienced Pandits for Puja in Bangalore &amp; Bhubaneswar
             </h1>
-            <p className="mt-4 text-lg font-medium text-[#5b3c24] sm:text-[38px] sm:leading-tight">
-              Verified priests • Same-day booking
-            </p>
-            <p className="mt-2 max-w-3xl text-base font-medium text-[#6a4223] sm:text-xl">
-              Transparent pricing, direct confirmation support, and secure payment with pay-after-pooja option.
+            <p className="mt-4 text-lg font-semibold text-[#5b3c24] sm:text-[28px] sm:leading-tight">
+              Genuine service • Transparent packages • Multiple languages
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <a
+                href="/services"
+                className="inline-flex min-h-14 items-center justify-center gap-2.5 rounded-2xl bg-linear-to-r from-[#d97706] to-[#f59e0b] px-7 py-3 text-base font-bold text-white shadow-[0_14px_28px_rgba(217,119,6,0.28)] transition hover:-translate-y-0.5 hover:brightness-105 sm:text-lg"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/16" aria-hidden="true">🪔</span>
+                <span>Explore Pujas</span>
+              </a>
               <a
                 href="https://wa.me/919739362962"
                 target="_blank"
@@ -107,39 +172,17 @@ function HomePage() {
                     <path d="M19.05 4.94A9.82 9.82 0 0 0 12.05 2a9.94 9.94 0 0 0-8.61 14.93L2 22l5.24-1.38A9.93 9.93 0 0 0 12.05 22 9.95 9.95 0 0 0 22 12.07a9.83 9.83 0 0 0-2.95-7.13ZM12.05 20.3a8.25 8.25 0 0 1-4.2-1.15l-.3-.18-3.1.81.83-3.02-.2-.31a8.25 8.25 0 1 1 6.97 3.85Zm4.52-6.2c-.25-.13-1.5-.74-1.73-.82-.23-.09-.4-.13-.56.12-.17.25-.65.82-.8.98-.15.17-.3.19-.56.06-.25-.12-1.08-.4-2.06-1.27-.76-.67-1.27-1.5-1.42-1.75-.15-.25-.02-.38.11-.5.11-.11.25-.3.38-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.45-.07-.13-.56-1.35-.77-1.85-.2-.48-.4-.42-.56-.43h-.48c-.16 0-.42.06-.64.31-.22.25-.84.82-.84 2.01 0 1.19.86 2.35.98 2.51.12.17 1.69 2.58 4.08 3.62.57.25 1.02.4 1.37.51.58.18 1.1.15 1.52.09.46-.07 1.5-.61 1.71-1.2.21-.59.21-1.1.15-1.2-.06-.1-.23-.16-.48-.29Z" />
                   </svg>
                 </span>
-                <span>Book on WhatsApp Now</span>
-              </a>
-              <a
-                href="tel:+919739362962"
-                className="inline-flex min-h-14 items-center justify-center gap-2.5 rounded-2xl border border-[#d48a52] bg-white/90 px-7 py-3 text-base font-bold text-[#7a3c16] shadow-[0_10px_24px_rgba(122,60,22,0.18)] transition hover:-translate-y-0.5 hover:bg-white sm:text-lg"
-              >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[#d9a179] bg-[#fff3e8]" aria-hidden="true">
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 4.75H8.3C8.78 4.75 9.19 5.09 9.28 5.56L9.88 8.7C9.96 9.14 9.8 9.58 9.46 9.86L7.93 11.13C9.2 13.93 11.44 16.17 14.24 17.44L15.51 15.91C15.79 15.57 16.23 15.41 16.67 15.49L19.81 16.09C20.28 16.18 20.62 16.59 20.62 17.07V20.37C20.62 20.86 20.23 21.25 19.74 21.25H18.5C10.49 21.25 3.99 14.75 3.99 6.74V5.5C3.99 5.01 4.38 4.62 4.87 4.62H5V4.75Z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-                <span>Call Pandit Instantly</span>
+                <span>Book on WhatsApp</span>
               </a>
             </div>
 
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className="rounded-full border border-[#f4b37f] bg-[#fff3e8] px-4 py-1.5 text-sm font-semibold text-[#9a4e1f]">
-                Available Today
-              </span>
-              <span className="rounded-full border border-[#f4b37f] bg-[#fff3e8] px-4 py-1.5 text-sm font-semibold text-[#9a4e1f]">
-                Quick Booking in 30 Minutes
-              </span>
-              <span className="rounded-full border border-[#f4b37f] bg-[#fff3e8] px-4 py-1.5 text-sm font-semibold text-[#9a4e1f]">
-                No Hidden Charges
-              </span>
-              <span className="rounded-full border border-[#f4b37f] bg-[#fff3e8] px-4 py-1.5 text-sm font-semibold text-[#9a4e1f]">
-                Pay After Pooja Available
-              </span>
-            </div>
+            <p className="mt-4 text-sm font-semibold text-[#5b3c24] sm:text-base">
+              Serving Bangalore and Bhubaneswar
+            </p>
 
             <form
               onSubmit={handleSearchSubmit}
-              className="mt-8 rounded-3xl border border-[#e7d2bf] bg-white/80 p-4 shadow-[0_24px_60px_rgba(97,55,22,0.18)] backdrop-blur-md"
+              className="mt-5 rounded-3xl border border-[#e7d2bf] bg-white/80 p-4 shadow-[0_24px_60px_rgba(97,55,22,0.18)] backdrop-blur-md"
             >
               <div className="grid grid-cols-1 gap-3 md:grid-cols-12">
                 <label className="relative md:col-span-3">
@@ -210,8 +253,9 @@ function HomePage() {
             <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 { label: '25+ Poojas', icon: <DiyaIcon className="h-5 w-5" /> },
-                { label: city, icon: <MapPinIcon className="h-5 w-5" /> },
-                { label: language, icon: <LanguageIcon className="h-5 w-5" /> },
+                { label: '3 Languages', icon: <LanguageIcon className="h-5 w-5" /> },
+                { label: '2 Cities', icon: <MapPinIcon className="h-5 w-5" /> },
+                { label: 'Experienced Pandits', icon: <DiyaIcon className="h-5 w-5" /> },
               ].map(({ label, icon }) => (
                 <div
                   key={label}
@@ -230,6 +274,67 @@ function HomePage() {
                 <p>Call support: +91 97393 62962</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#fffaf2] px-4 py-12 sm:py-16" aria-labelledby="popular-pujas-title">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#FF6F00]">Popular services</p>
+              <h2 id="popular-pujas-title" className="mt-2 text-2xl font-semibold text-stone-900 sm:text-4xl">Choose a puja to get started</h2>
+            </div>
+            <Link to="/services" className="hidden text-sm font-semibold text-[#FF6F00] hover:text-[#D84315] sm:inline-flex">
+              View all pujas →
+            </Link>
+          </div>
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { label: 'Griha Pravesh', href: '/griha-pravesh-puja-bangalore' },
+              { label: 'Satyanarayan Puja', href: '/satyanarayan-puja-bangalore' },
+              { label: 'Ganesh Puja', href: '/ganesh-puja-bangalore' },
+              { label: 'Marriage Puja', href: '/marriage-puja' },
+              { label: 'Vastu Shanti', href: '/vastu-shanti-puja' },
+              { label: 'Birthday Puja', href: '/services?search=Birthday%20Puja' },
+            ].map(({ label, href }) => (
+              <Link
+                key={label}
+                to={href}
+                className="group flex items-center justify-between rounded-2xl border border-orange-100 bg-white px-5 py-4 text-base font-semibold text-stone-900 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-md"
+              >
+                <span>{label}</span>
+                <span className="text-xl text-[#FF6F00] transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white px-4 py-12 sm:py-16">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#FF6F00]">How it works</p>
+            <h2 className="mt-2 text-2xl font-semibold text-stone-900 sm:text-4xl">Book a puja in 3 simple steps</h2>
+          </div>
+
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {[
+              'Choose a Puja',
+              'Select Package',
+              'Confirm Booking',
+            ].map((step, index) => (
+              <div key={step} className="rounded-2xl border border-orange-100 bg-[#fffaf3] p-5 text-center shadow-sm">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-r from-[#F9A825] to-[#FF6F00] text-lg font-bold text-white">
+                  {index + 1}
+                </div>
+                <div className="mt-4 flex items-center justify-center gap-2 text-base font-semibold text-stone-900">
+                  <span>{index === 0 ? '①' : index === 1 ? '②' : '③'}</span>
+                  <span>{step}</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -304,10 +409,68 @@ function HomePage() {
       {/* ── Google Business Profile ── */}
       <GoogleBusinessCard variant="full" />
 
+      <section className="bg-[#fffaf2] px-4 py-8">
+        <div className="mx-auto max-w-4xl rounded-3xl border border-orange-100 bg-white p-6 shadow-[0_16px_32px_rgba(95,56,27,0.08)] sm:p-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xl font-bold text-stone-900 sm:text-2xl">⭐ 4.8/5 Customer Rating</p>
+              <p className="mt-1 text-sm text-stone-600">Based on Google Reviews</p>
+            </div>
+            <Link to="/ratings" className="inline-flex items-center justify-center rounded-full border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-700 transition hover:bg-orange-100">
+              View All Reviews
+            </Link>
+          </div>
+
+          <blockquote className="mt-5 border-l-4 border-orange-300 pl-4 text-base italic text-stone-700 sm:text-lg">
+            “Excellent service and experienced Pandit...”
+          </blockquote>
+        </div>
+      </section>
+
       <Testimonials />
+
+      <section className="bg-white px-4 py-12 sm:py-16" aria-labelledby="home-faq-title">
+        <div className="mx-auto max-w-4xl">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#FF6F00]">Need to know</p>
+            <h2 id="home-faq-title" className="mt-2 text-2xl font-semibold text-stone-900 sm:text-4xl">Frequently Asked Questions</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-stone-600 sm:text-base">
+              A few quick answers before you choose a puja and date.
+            </p>
+          </div>
+
+          <div className="mt-8 space-y-3">
+            {faqItems.map(({ question, answer }, index) => {
+              const isOpen = openFaq === index
+
+              return (
+                <div key={question} className="overflow-hidden rounded-2xl border border-orange-100 bg-[#fffaf3]">
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={`home-faq-answer-${index}`}
+                    onClick={() => setOpenFaq(isOpen ? null : index)}
+                    className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-stone-900 transition hover:bg-orange-50 sm:px-6 sm:py-5"
+                  >
+                    <span>{question}</span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-100 text-lg font-medium text-orange-700" aria-hidden="true">
+                      {isOpen ? '−' : '+'}
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <p id={`home-faq-answer-${index}`} className="border-t border-orange-100 px-5 pb-5 pt-3 text-sm leading-relaxed text-stone-600 sm:px-6 sm:text-base">
+                      {answer}
+                    </p>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
     </>
   )
 }
 
 export default HomePage
-

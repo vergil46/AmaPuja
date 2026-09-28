@@ -645,6 +645,105 @@ const vastuShantiPage = {
   ],
 }
 
+const durgaPujaPage = {
+  canonicalPath: '/durga-puja-bangalore',
+  badge: 'Bangalore Puja Service',
+  title: 'Durga Puja in Bangalore | Book Experienced Pandit | Puja Samriddhi',
+  heading: 'Durga Puja in Bangalore',
+  h1: 'Book Durga Puja with Experienced Pandit in Bangalore',
+  description: 'Book Durga Puja in Bangalore with an experienced pandit for home worship, Navratri rituals, protection, and family blessings.',
+  intro: 'Durga Puja is a devotional ritual dedicated to Goddess Durga and is performed by families seeking strength, protection, peace, and auspicious blessings. Puja Samriddhi helps you plan a guided Durga Puja at home in Bangalore.',
+  keywords: ['durga puja bangalore', 'durga puja at home', 'durga puja pandit bangalore'],
+  searchTerm: 'Durga Puja',
+  sections: [
+    {
+      title: 'When Families Perform Durga Puja',
+      body: 'Families commonly book Durga Puja during Navratri, Durga Ashtami, festivals, new beginnings, and important family occasions.',
+      points: ['Suitable for home worship and family gatherings', 'Date and procedure can be planned around family tradition'],
+    },
+    {
+      title: 'Durga Puja Ritual Process',
+      body: 'The ceremony may include sankalp, Goddess Durga invocation, mantra recitation, offerings, aarti, and prasad according to the selected format.',
+      points: ['The exact vidhi depends on the chosen package', 'A pandit can guide the family through the required samagri'],
+    },
+    {
+      title: 'Book Durga Puja in Bangalore',
+      body: 'Choose a package, share your preferred date and location, and confirm pandit availability through the Puja Samriddhi booking flow.',
+      points: ['Home service availability depends on locality and date', 'Language preferences can be shared during booking'],
+    },
+  ],
+  faqItems: [
+    { question: 'Can Durga Puja be performed at home in Bangalore?', answer: 'Yes. Durga Puja can be arranged at home with a suitable altar, required samagri, and guidance from an experienced pandit.' },
+    { question: 'Can I book Durga Puja during Navratri?', answer: 'Yes. Navratri is a popular time for Durga worship, but availability depends on the date, locality, and pandit schedule.' },
+  ],
+}
+
+const officeOpeningPujaPage = {
+  canonicalPath: '/office-opening-puja-bangalore',
+  badge: 'Bangalore Business Puja',
+  title: 'Office Opening Puja in Bangalore | Book Pandit | Puja Samriddhi',
+  heading: 'Office Opening Puja in Bangalore',
+  h1: 'Book Office Opening Puja with Experienced Pandit in Bangalore',
+  description: 'Book an office opening puja in Bangalore with an experienced pandit for a new office, shop, business, or commercial space.',
+  intro: 'An office opening puja is performed to begin work in a new business space with auspicious blessings, positive intention, and a properly guided ritual. Puja Samriddhi helps businesses coordinate a pandit for ceremonies across Bangalore.',
+  keywords: ['office opening puja bangalore', 'shop opening puja', 'office puja pandit bangalore'],
+  searchTerm: 'Office Opening Puja',
+  sections: [
+    {
+      title: 'Why Perform an Office Opening Puja',
+      body: 'Business owners commonly perform Ganesh, Lakshmi, Vastu, and related rituals before starting operations in a new office, shop, or commercial property.',
+      points: ['Suitable for offices, shops, studios, and workplaces', 'The ceremony can be adapted to the space and business schedule'],
+    },
+    {
+      title: 'What the Ceremony May Include',
+      body: 'Depending on the selected package, the ritual may include Ganesh Puja, Lakshmi Puja, Vastu-related worship, homam, aarti, and blessings.',
+      points: ['The pandit can share a preparation and samagri list', 'Package inclusions should be reviewed before confirming the booking'],
+    },
+    {
+      title: 'Book an Office Opening Pandit in Bangalore',
+      body: 'Share the office location, preferred date, ceremony requirements, and language preference so pandit availability can be coordinated.',
+      points: ['Advance booking is recommended for auspicious dates', 'Same-day support may be available when a suitable pandit is free'],
+    },
+  ],
+  faqItems: [
+    { question: 'Can office opening puja be performed in a shop or commercial space?', answer: 'Yes. The ceremony can be planned for offices, shops, studios, and other commercial spaces based on the location and selected ritual.' },
+    { question: 'What should I prepare before an office opening puja?', answer: 'Keep the space clean and share the location, preferred date, and ceremony requirements. The pandit or selected package can provide the relevant samagri guidance.' },
+  ],
+}
+
+const annaprashanPujaPage = {
+  canonicalPath: '/annaprashan-puja-bangalore',
+  badge: 'Bangalore Family Ceremony',
+  title: 'Annaprashan Puja in Bangalore | Book Pandit | Puja Samriddhi',
+  heading: 'Annaprashan Puja in Bangalore',
+  h1: 'Book Annaprashan Puja with Experienced Pandit in Bangalore',
+  description: 'Book Annaprashan Puja in Bangalore with an experienced pandit for your baby’s first rice ceremony and family blessings.',
+  intro: 'Annaprashan, also called the first rice ceremony, marks an important milestone when a baby begins eating solid food. Puja Samriddhi helps families arrange a traditional, guided ceremony at home in Bangalore.',
+  keywords: ['annaprashan puja bangalore', 'annaprashan ceremony at home', 'annaprashan pandit bangalore'],
+  searchTerm: 'Annaprashan Puja',
+  sections: [
+    {
+      title: 'Meaning of Annaprashan',
+      body: 'Annaprashan is a family ceremony that introduces a baby to solid food while elders offer prayers for health, growth, and well-being.',
+      points: ['The timing may be selected according to family custom and priest guidance', 'The ceremony can be hosted at home or another suitable family venue'],
+    },
+    {
+      title: 'Annaprashan Puja Procedure',
+      body: 'The ritual may include a sankalp, family deity worship, blessings, offerings, and the ceremonial first feeding according to the chosen tradition.',
+      points: ['The exact steps vary by family and regional practice', 'A pandit can guide the family on preparation and samagri'],
+    },
+    {
+      title: 'Book an Annaprashan Pandit in Bangalore',
+      body: 'Choose the ceremony package, share your preferred date and location, and coordinate the pandit booking through Puja Samriddhi.',
+      points: ['Early booking helps with preferred dates and family planning', 'Language preferences can be requested subject to availability'],
+    },
+  ],
+  faqItems: [
+    { question: 'Can Annaprashan Puja be performed at home?', answer: 'Yes. Annaprashan is commonly performed at home with the family, a simple puja setup, and guidance from an experienced pandit.' },
+    { question: 'When should I book a pandit for Annaprashan?', answer: 'Book as early as possible after choosing the ceremony date, especially for weekends and auspicious dates when pandit availability may be limited.' },
+  ],
+}
+
 const pageContent = {
   'pandit-near-me': panditNearMePage,
   'satyanarayan-puja-booking': satyanarayanBookingPage,
@@ -655,7 +754,23 @@ const pageContent = {
     heading: 'Satyanarayan Puja',
     h1: 'Book Satyanarayan Puja with Experienced Pandit',
   },
+  'satyanarayan-puja-bangalore': {
+    ...satyanarayanBookingPage,
+    canonicalPath: '/satyanarayan-puja-bangalore',
+    title: 'Satyanarayan Puja in Bangalore | Puja Samriddhi',
+    heading: 'Satyanarayan Puja in Bangalore',
+    h1: 'Book Satyanarayan Puja with Experienced Pandit in Bangalore',
+    keywords: [...satyanarayanBookingPage.keywords, 'satyanarayan puja bangalore'],
+  },
   'griha-pravesh-puja': grihaPraveshPage,
+  'griha-pravesh-puja-bangalore': {
+    ...grihaPraveshPage,
+    canonicalPath: '/griha-pravesh-puja-bangalore',
+    title: 'Griha Pravesh Puja in Bangalore | Puja Samriddhi',
+    heading: 'Griha Pravesh Puja in Bangalore',
+    h1: 'Book Griha Pravesh Puja with Experienced Pandit in Bangalore',
+    keywords: [...grihaPraveshPage.keywords, 'griha pravesh puja bangalore'],
+  },
   'ganesh-puja-at-home': ganeshAtHomePage,
   'ganesh-puja': {
     ...ganeshAtHomePage,
@@ -664,7 +779,26 @@ const pageContent = {
     heading: 'Ganesh Puja',
     h1: 'Book Ganesh Puja with Experienced Pandit',
   },
+  'ganesh-puja-bangalore': {
+    ...ganeshAtHomePage,
+    canonicalPath: '/ganesh-puja-bangalore',
+    title: 'Ganesh Puja in Bangalore | Puja Samriddhi',
+    heading: 'Ganesh Puja in Bangalore',
+    h1: 'Book Ganesh Puja with Experienced Pandit in Bangalore',
+    keywords: [...ganeshAtHomePage.keywords, 'ganesh puja bangalore'],
+  },
   'navagraha-puja': navagrahaPage,
+  'navagraha-puja-bangalore': {
+    ...navagrahaPage,
+    canonicalPath: '/navagraha-puja-bangalore',
+    title: 'Navagraha Puja in Bangalore | Puja Samriddhi',
+    heading: 'Navagraha Puja in Bangalore',
+    h1: 'Book Navagraha Puja with Experienced Pandit in Bangalore',
+    keywords: [...navagrahaPage.keywords, 'navagraha puja bangalore'],
+  },
+  'durga-puja-bangalore': durgaPujaPage,
+  'office-opening-puja-bangalore': officeOpeningPujaPage,
+  'annaprashan-puja-bangalore': annaprashanPujaPage,
   'rudrabhishek-puja': rudrabhishekPage,
   rudrabhishek: {
     ...rudrabhishekPage,
@@ -682,6 +816,22 @@ const pageContent = {
     h1: 'Book Lakshmi Puja with Experienced Pandit',
   },
   'online-pandit-booking': onlinePanditBookingPage,
+  'puja-pandit-bangalore': {
+    ...panditNearMePage,
+    canonicalPath: '/puja-pandit-bangalore',
+    title: 'Puja Pandit in Bangalore | Book Experienced Priest | Puja Samriddhi',
+    heading: 'Puja Pandit in Bangalore',
+    h1: 'Book an Experienced Puja Pandit in Bangalore',
+    keywords: [...panditNearMePage.keywords, 'puja pandit bangalore'],
+  },
+  'online-pandit-bangalore': {
+    ...onlinePanditBookingPage,
+    canonicalPath: '/online-pandit-bangalore',
+    title: 'Online Pandit Booking in Bangalore | Puja Samriddhi',
+    heading: 'Online Pandit Booking in Bangalore',
+    h1: 'Book an Experienced Pandit Online in Bangalore',
+    keywords: [...onlinePanditBookingPage.keywords, 'online pandit bangalore'],
+  },
   'marriage-puja': marriagePujaPage,
   'vastu-shanti-puja': vastuShantiPage,
 }

@@ -28,6 +28,11 @@ const normalizeStringArray = (items) =>
 
 const uniqueStrings = (items) => Array.from(new Set((Array.isArray(items) ? items : []).filter(Boolean)));
 
+const extractDuration = (description) => {
+  const match = normalizeText(description).match(/duration\s*:?[\s-]*([^.;]+)/i);
+  return match ? match[1].trim() : '';
+};
+
 const getPreferredLanguage = (languageKeys = []) => {
   const preferredOrder = ['hindi', 'odia', 'bengali', 'kannada'];
   for (const languageKey of preferredOrder) {
@@ -325,6 +330,10 @@ const compactPricingForList = (pricing) => {
           name,
           price: Math.round(price),
           includesSamagri: Boolean(pkg?.includesSamagri),
+          pandits: normalizeText(pkg?.pandits),
+          description: normalizeText(pkg?.description),
+          duration: extractDuration(pkg?.description),
+          inclusions: normalizeStringArray(pkg?.inclusions),
         };
       })
       .filter(Boolean);
