@@ -47,6 +47,7 @@ const parseArray = (value) => {
     return String(value || '').split(',').map((item) => item.trim()).filter(Boolean);
   }
 };
+const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
 
 const nextApplicationId = async () => {
   const year = new Date().getFullYear();
@@ -68,12 +69,13 @@ router.post('/applications', upload.fields([
   { name: 'experienceDocument', maxCount: 1 },
 ]), async (req, res) => {
   try {
-    const required = ['fullName', 'mobileNumber', 'city', 'area', 'yearsOfExperience', 'samagri', 'rulesAccepted'];
+    const required = ['fullName', 'mobileNumber', 'email', 'city', 'area', 'yearsOfExperience', 'samagri', 'rulesAccepted'];
     const missing = required.filter((field) => !String(req.body?.[field] || '').trim());
     if (missing.length || !req.files?.profilePhoto?.[0] || !req.files?.identityDocument?.[0]) {
       return res.status(400).json({ message: `Missing required fields or documents: ${missing.join(', ') || 'profilePhoto, identityDocument'}` });
     }
     if (String(req.body.rulesAccepted) !== 'true') return res.status(400).json({ message: 'You must accept the Pandit Rules.' });
+    if (!isValidEmail(req.body.email)) return res.status(400).json({ message: 'A valid email address is required.' });
 
     const application = await PanditApplication.create({
       applicationId: await nextApplicationId(),
@@ -198,7 +200,6 @@ router.patch('/bookings/:id/accept', protect, panditOnly, async (req, res) => {
 router.patch('/bookings/:id/complete', protect, panditOnly, async (req, res) => {
   const booking = await Booking.findOneAndUpdate({ _id: req.params.id, panditId: req.user._id, bookingStatus: { $in: ['accepted', 'pandit-assigned'] } }, { bookingStatus: 'completed' }, { new: true });
   if (!booking) return res.status(404).json({ message: 'Booking not found' });
-  sendPanditAssignmentNotification({ pandit, booking }).catch((error) => console.error('Pandit assignment notification failed:', error));
   return res.json(booking);
 });
 
@@ -210,6 +211,7 @@ router.patch('/bookings/:id/assign', protect, adminOnly, async (req, res) => {
   const split = payout(amount, settings.normalPanditPercentage);
   const booking = await Booking.findByIdAndUpdate(req.params.id, { panditId: pandit._id, assignedAt: new Date(), assignedBy: req.user._id, bookingStatus: 'pandit-assigned', payout: { normalPanditPercentage: settings.normalPanditPercentage, normalPlatformPercentage: settings.normalPlatformPercentage, finalPanditPercentage: settings.normalPanditPercentage, finalPlatformPercentage: settings.normalPlatformPercentage, originalPanditAmount: split.panditAmount, finalPanditAmount: split.panditAmount, platformAmount: split.platformAmount } }, { new: true }).populate('panditId', 'name phone');
   if (!booking) return res.status(404).json({ message: 'Booking not found' });
+  sendPanditAssignmentNotification({ pandit, booking }).catch((error) => console.error('Pandit assignment notification failed:', error));
   return res.json(booking);
 });
 

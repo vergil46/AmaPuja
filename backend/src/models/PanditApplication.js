@@ -6,7 +6,7 @@ const panditApplicationSchema = new mongoose.Schema(
     fullName: { type: String, required: true, trim: true, maxlength: 120 },
     mobileNumber: { type: String, required: true, trim: true },
     whatsappNumber: { type: String, trim: true, default: '' },
-    email: { type: String, trim: true, lowercase: true, default: '' },
+    email: { type: String, required: true, trim: true, lowercase: true },
     city: { type: String, required: true, trim: true },
     area: { type: String, required: true, trim: true },
     profilePhotoPath: { type: String, required: true, select: false },
