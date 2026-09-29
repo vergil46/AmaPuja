@@ -106,6 +106,13 @@ router.post('/applications', upload.fields([
   }
 });
 
+router.get('/applications/status/:applicationId', async (req, res) => {
+  const mobileNumber = String(req.query.mobile || '').replace(/\D/g, '');
+  const application = await PanditApplication.findOne({ applicationId: String(req.params.applicationId).trim(), mobileNumber }).select('applicationId status createdAt reviewedAt rejectionReason suspensionReason');
+  if (!application) return res.status(404).json({ message: 'Application ID and mobile number do not match.' });
+  return res.json(application);
+});
+
 router.get('/applications', protect, adminOnly, async (req, res) => {
   const filter = req.query.status && req.query.status !== 'All' ? { status: req.query.status } : {};
   const [applications, counts, total] = await Promise.all([

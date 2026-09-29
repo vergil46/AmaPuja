@@ -192,6 +192,7 @@ function Footer() {
                 { to: '/privacy-policy', label: 'Privacy Policy', icon: <ShieldIcon /> },
                 { to: '/terms-and-conditions', label: 'Terms & Conditions', icon: <DocumentIcon /> },
                 { to: '/join-as-pandit', label: 'Join as a Pandit', icon: <ShieldIcon /> },
+                { to: '/pandit/application-status', label: 'Check application status', icon: <DocumentIcon /> },
               ].map(({ to, label, icon }) => (
                 <Link
                   key={to}

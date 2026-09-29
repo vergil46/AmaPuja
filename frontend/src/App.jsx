@@ -28,6 +28,7 @@ const PolicyPage = lazy(() => import('./pages/PolicyPage'))
 const HealthPage = lazy(() => import('./pages/HealthPage'))
 const JoinAsPanditPage = lazy(() => import('./pages/JoinAsPanditPage'))
 const PanditDashboardPage = lazy(() => import('./pages/PanditDashboardPage'))
+const PanditApplicationStatusPage = lazy(() => import('./pages/PanditApplicationStatusPage'))
 
 function RouteFallback() {
   return (
@@ -138,6 +139,7 @@ function App() {
           <Route path="/admin-login" element={<AdminLoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/join-as-pandit" element={<JoinAsPanditPage />} />
+          <Route path="/pandit/application-status" element={<PanditApplicationStatusPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
