@@ -12,6 +12,7 @@ function PanditManagementPanel() {
   const [complaints, setComplaints] = useState([])
   const [settings, setSettings] = useState(null)
   const [selected, setSelected] = useState(null)
+  const [documentPreview, setDocumentPreview] = useState(null)
   const [message, setMessage] = useState('')
 
   const load = async () => {
@@ -52,22 +53,18 @@ function PanditManagementPanel() {
   }
 
   const openPrivateDocument = async (applicationId, kind) => {
-    const documentWindow = window.open('', '_blank')
-    if (!documentWindow) {
-      setMessage('Please allow pop-ups for this admin page to open private documents.')
-      return
-    }
-
-    documentWindow.document.write('<p style="font-family: sans-serif; padding: 2rem">Loading private document...</p>')
     try {
       const response = await api.get(`/pandits/applications/${applicationId}/files/${kind}`, { responseType: 'blob' })
       const url = URL.createObjectURL(response.data)
-      documentWindow.location.href = url
-      window.setTimeout(() => URL.revokeObjectURL(url), 60000)
+      setDocumentPreview({ url, contentType: response.data.type, title: `${kind} document` })
     } catch (error) {
-      documentWindow.close()
       setMessage(error.response?.data?.message || 'Unable to open private document.')
     }
+  }
+
+  const closeDocumentPreview = () => {
+    if (documentPreview?.url) URL.revokeObjectURL(documentPreview.url)
+    setDocumentPreview(null)
   }
 
   const resolveComplaint = async (complaintId, adminDecision) => {
@@ -89,6 +86,7 @@ function PanditManagementPanel() {
       ))}
     </select></div>)}</div></div>{settings && <div><h3 className="font-semibold">Payout settings (%)</h3><div className="mt-2 grid grid-cols-2 gap-2 text-sm">{Object.keys(settings).filter((key) => key.includes('Percentage')).map((key) => <label key={key} className="text-stone-600">{key}<input type="number" min="0" max="100" value={settings[key]} onChange={(event) => setSettings({ ...settings, [key]: Number(event.target.value) })} className="mt-1 w-full rounded border border-stone-300 px-2 py-1 text-stone-900" /></label>)}</div><button onClick={saveSettings} className="mt-3 rounded-lg bg-orange-600 px-3 py-2 text-sm font-semibold text-white">Save payout settings</button></div>}</div>
     <div className="mt-6"><h3 className="font-semibold">Complaints and payout decisions</h3><div className="mt-2 space-y-2">{complaints.length === 0 && <p className="text-sm text-stone-500">No complaints submitted.</p>}{complaints.map((complaint) => <div key={complaint._id} className="rounded-lg border border-stone-200 bg-white p-3 text-sm"><p className="font-medium">{complaint.reason} · Booking {complaint.bookingId?._id || complaint.bookingId}</p><p className="mt-1 text-stone-600">{complaint.description}</p><p className="mt-1 text-xs text-stone-500">Status: {complaint.status} · Original Pandit payout: ₹{complaint.originalPayout || 0}</p>{complaint.status !== 'Resolved' && <div className="mt-2 flex flex-wrap gap-2">{decisions.map((decision) => <button key={decision} onClick={() => resolveComplaint(complaint._id, decision)} className="rounded bg-stone-800 px-2 py-1 text-xs font-semibold text-white">{decision}</button>)}</div>}{complaint.status === 'Resolved' && <p className="mt-1 text-green-700">Decision: {complaint.adminDecision} · Final Pandit payout: ₹{complaint.adjustedPayout || complaint.originalPayout || 0}</p>}</div>)}</div></div>
+    {documentPreview && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"><div className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"><div className="flex items-center justify-between border-b border-stone-200 px-4 py-3"><h3 className="font-semibold text-stone-900">{documentPreview.title}</h3><button type="button" onClick={closeDocumentPreview} className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm text-stone-700">Close</button></div><div className="min-h-[60vh] overflow-auto bg-stone-100 p-4">{documentPreview.contentType?.startsWith('image/') ? <img src={documentPreview.url} alt={documentPreview.title} className="mx-auto max-h-[76vh] max-w-full object-contain" /> : <iframe title={documentPreview.title} src={documentPreview.url} className="h-[76vh] w-full rounded-lg border border-stone-300 bg-white" />}</div></div></div>}
   </section>
 }
 
