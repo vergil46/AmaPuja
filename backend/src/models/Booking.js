@@ -47,8 +47,22 @@ const bookingSchema = new mongoose.Schema(
 
     bookingStatus: {
       type: String,
-      enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+      enum: ['pending', 'confirmed', 'pandit-assigned', 'accepted', 'completed', 'cancelled', 'complaint-under-review'],
       default: 'pending',
+    },
+    panditId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    assignedAt: { type: Date },
+    assignedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    payout: {
+      normalPanditPercentage: { type: Number, default: 75 },
+      normalPlatformPercentage: { type: Number, default: 25 },
+      finalPanditPercentage: { type: Number, default: 75 },
+      finalPlatformPercentage: { type: Number, default: 25 },
+      originalPanditAmount: { type: Number, default: 0 },
+      finalPanditAmount: { type: Number, default: 0 },
+      platformAmount: { type: Number, default: 0 },
+      paidAmount: { type: Number, default: 0 },
+      adjustmentReason: { type: String, trim: true, default: '' },
     },
   },
   { timestamps: true }

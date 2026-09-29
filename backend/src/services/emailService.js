@@ -250,6 +250,24 @@ const sendAdminEnquiryAlertEmail = async (enquiry) => {
   }
 };
 
+const sendPanditNotificationEmail = async ({ to, name, subject, heading, message, details = [] }) => {
+  const transporter = createTransporter();
+  if (!transporter || !to) return false;
+
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
+      to,
+      subject,
+      html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px"><h2 style="color:#b45309">${heading}</h2><p>Namaste ${name || 'Pandit'},</p><p>${message}</p><ul>${details.map((detail) => `<li>${detail}</li>`).join('')}</ul><p>Thank you,<br>PujaSamriddhi</p></div>`,
+    });
+    return true;
+  } catch (error) {
+    console.error('Pandit notification email failed:', error);
+    return false;
+  }
+};
+
 const sendOpsAlertEmail = async ({ title, message, metadata = {} }) => {
   const transporter = createTransporter();
   if (!transporter) return false;
@@ -365,5 +383,6 @@ module.exports = {
   sendAdminEnquiryAlertEmail,
   sendOpsAlertEmail,
   sendDailyOpsSummaryEmail,
+  sendPanditNotificationEmail,
 };
 

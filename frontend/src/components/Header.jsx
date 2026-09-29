@@ -11,7 +11,7 @@ function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [accountMenuOpen, setAccountMenuOpen] = useState(false)
   const accountMenuRef = useRef(null)
-  const accountRoute = user?.role === 'admin' ? '/admin' : '/dashboard'
+  const accountRoute = user?.role === 'admin' ? '/admin' : user?.role === 'pandit' ? '/pandit/dashboard' : '/dashboard'
   const bookingsRoute = '/dashboard#bookings'
   const feedbackRoute = '/dashboard#feedback'
   const accountLabel = user?.role === 'admin' ? t('admin') : t('dashboard')
@@ -80,6 +80,7 @@ function Header() {
           <NavLink to="/ratings" className={navClass}>
             Reviews
           </NavLink>
+          {!user && <NavLink to="/join-as-pandit" className={navClass}>Join as Pandit</NavLink>}
           <NavLink to="/gallery" className={navClass}>
             Gallery
           </NavLink>

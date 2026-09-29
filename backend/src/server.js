@@ -35,6 +35,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const galleryRoutes = require('./routes/galleryRoutes');
+const panditRoutes = require('./routes/panditRoutes');
 const { protect, adminOnly } = require('./middleware/auth');
 
 const normalizeOrigin = (value) => String(value || '').trim().replace(/\/+$/, '');
@@ -224,6 +225,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/pandits', panditRoutes);
 
 if (process.env.SENTRY_DSN) {
   app.use(Sentry.Handlers.errorHandler());

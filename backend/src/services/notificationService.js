@@ -2,6 +2,7 @@ const {
   sendBookingConfirmationEmail,
   sendPoojaCompletionReviewEmail,
   sendAdminBookingAlertEmail,
+  sendPanditNotificationEmail,
 } = require('./emailService');
 const { alertCriticalIssue } = require('./monitoringService');
 
@@ -212,6 +213,24 @@ const sendEnquiryCreatedNotifications = async (enquiry) => {
   };
 };
 
+const sendPanditApprovalNotification = (application) => sendPanditNotificationEmail({
+  to: application?.email,
+  name: application?.fullName,
+  subject: 'Your PujaSamriddhi Pandit application was approved',
+  heading: 'Pandit application approved',
+  message: 'Your Pandit account is active. You can sign in using the email and password submitted with your application.',
+  details: [`Application ID: ${application?.applicationId}`, 'Dashboard: /pandit/dashboard'],
+});
+
+const sendPanditAssignmentNotification = ({ pandit, booking }) => sendPanditNotificationEmail({
+  to: pandit?.email,
+  name: pandit?.name,
+  subject: 'New PujaSamriddhi booking assigned to you',
+  heading: 'New booking assignment',
+  message: 'A new booking is waiting for your acceptance in the Pandit dashboard.',
+  details: [`Booking ID: ${booking?._id}`, `Date and time: ${booking?.date || '-'} ${booking?.time || ''}`, `Location: ${booking?.city || '-'}`],
+});
+
 const sendCompletionReviewNotifications = async ({ booking, pooja }) => {
   const phone = normalizePhone(booking.phone);
   const poojaTitle = pooja?.title || 'your pooja';
@@ -321,6 +340,8 @@ module.exports = {
   sendBookingCreatedNotifications,
   sendCompletionReviewNotifications,
   sendEnquiryCreatedNotifications,
+  sendPanditApprovalNotification,
+  sendPanditAssignmentNotification,
   sendTestTwilioNotifications,
 };
 

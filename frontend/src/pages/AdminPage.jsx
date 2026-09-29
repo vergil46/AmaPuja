@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import Seo from '../components/Seo'
 import api from '../services/api'
+import PanditManagementPanel from '../components/PanditManagementPanel'
 
 function OverviewMetricCard({ title, value, caption, className = 'rounded-xl border border-[#FFE0A3] bg-white p-4 shadow-sm' }) {
   return (
@@ -1211,6 +1212,8 @@ function AdminPage() {
                 <button type="button" className="rounded-lg bg-[#f26f1b] px-3 py-1.5 text-xs font-semibold text-white">Review now</button>
               </div>
             </div>
+
+            <PanditManagementPanel />
 
             <div className="mt-5">
               <div ref={dashboardSectionRef}>

@@ -49,6 +49,7 @@ function DashboardPage() {
   const [feedbackSubmittingById, setFeedbackSubmittingById] = useState({})
   const [feedbackPhotoProcessingById, setFeedbackPhotoProcessingById] = useState({})
   const [feedbackMessage, setFeedbackMessage] = useState({ type: '', text: '' })
+  const [complaintForm, setComplaintForm] = useState({})
   const [trackForm, setTrackForm] = useState({ email: '', phone: '' })
   const [trackError, setTrackError] = useState('')
   const [tracking, setTracking] = useState(false)
@@ -126,6 +127,22 @@ function DashboardPage() {
   const completedBookingsWithoutFeedback = bookings.filter(
     (booking) => normalizeBookingStatus(booking.bookingStatus) === 'completed' && !feedbackByBookingId[booking._id]
   )
+  const completedBookings = bookings.filter((booking) => normalizeBookingStatus(booking.bookingStatus) === 'completed')
+
+  const submitComplaint = async (bookingId) => {
+    const payload = complaintForm[bookingId] || {}
+    if (!payload.reason?.trim() || !payload.description?.trim()) {
+      setFeedbackMessage({ type: 'error', text: 'Please provide a complaint reason and description.' })
+      return
+    }
+    try {
+      await api.post('/pandits/complaints', { bookingId, reason: payload.reason, description: payload.description })
+      setComplaintForm((previous) => ({ ...previous, [bookingId]: { submitted: true } }))
+      setFeedbackMessage({ type: 'success', text: 'Your complaint was submitted for admin review. It will not automatically change the Pandit payout.' })
+    } catch (error) {
+      setFeedbackMessage({ type: 'error', text: error?.response?.data?.message || 'Unable to submit complaint.' })
+    }
+  }
 
   const reviewBookingId = new URLSearchParams(location.search).get('reviewBooking')
 
@@ -647,6 +664,7 @@ function DashboardPage() {
             ))}
           </div>
         )}
+        {completedBookings.length > 0 && <div className="mt-6 border-t border-stone-200 pt-5"><h3 className="font-semibold text-stone-900">Report a service problem</h3><p className="mt-1 text-sm text-stone-600">Complaints are reviewed by an admin before any booking-specific payout adjustment.</p><div className="mt-3 space-y-3">{completedBookings.map((booking) => <div key={booking._id} className="rounded-lg border border-stone-200 p-3"><p className="text-sm font-medium">{booking.poojaId?.title || booking.package} · {booking.date}</p>{complaintForm[booking._id]?.submitted ? <p className="mt-2 text-sm text-green-700">Complaint submitted for review.</p> : <div className="mt-2 grid gap-2 sm:grid-cols-[1fr_2fr_auto]"><input placeholder="Reason" value={complaintForm[booking._id]?.reason || ''} onChange={(event) => setComplaintForm((previous) => ({ ...previous, [booking._id]: { ...previous[booking._id], reason: event.target.value } }))} className="rounded border border-stone-300 px-2 py-2 text-sm" /><textarea placeholder="Describe the issue" rows={2} value={complaintForm[booking._id]?.description || ''} onChange={(event) => setComplaintForm((previous) => ({ ...previous, [booking._id]: { ...previous[booking._id], description: event.target.value } }))} className="rounded border border-stone-300 px-2 py-2 text-sm" /><button type="button" onClick={() => submitComplaint(booking._id)} className="rounded bg-stone-800 px-3 py-2 text-sm font-semibold text-white">Report</button></div>}</div>)}</div></div>}
       </div>
       )}
     </section>
