@@ -80,7 +80,6 @@ function Header() {
           <NavLink to="/ratings" className={navClass}>
             Reviews
           </NavLink>
-          {!user && <NavLink to="/join-as-pandit" className={navClass}>Join as Pandit</NavLink>}
           <NavLink to="/gallery" className={navClass}>
             Gallery
           </NavLink>
