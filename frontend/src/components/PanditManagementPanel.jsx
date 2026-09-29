@@ -52,10 +52,22 @@ function PanditManagementPanel() {
   }
 
   const openPrivateDocument = async (applicationId, kind) => {
-    const response = await api.get(`/pandits/applications/${applicationId}/files/${kind}`, { responseType: 'blob' })
-    const url = URL.createObjectURL(response.data)
-    window.open(url, '_blank', 'noopener,noreferrer')
-    window.setTimeout(() => URL.revokeObjectURL(url), 60000)
+    const documentWindow = window.open('', '_blank')
+    if (!documentWindow) {
+      setMessage('Please allow pop-ups for this admin page to open private documents.')
+      return
+    }
+
+    documentWindow.document.write('<p style="font-family: sans-serif; padding: 2rem">Loading private document...</p>')
+    try {
+      const response = await api.get(`/pandits/applications/${applicationId}/files/${kind}`, { responseType: 'blob' })
+      const url = URL.createObjectURL(response.data)
+      documentWindow.location.href = url
+      window.setTimeout(() => URL.revokeObjectURL(url), 60000)
+    } catch (error) {
+      documentWindow.close()
+      setMessage(error.response?.data?.message || 'Unable to open private document.')
+    }
   }
 
   const resolveComplaint = async (complaintId, adminDecision) => {
