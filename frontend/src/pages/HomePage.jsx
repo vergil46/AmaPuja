@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import homeBackground from '../assets/poojas/background-optimized-1280.webp'
+const homeBackground = '/hero-background-1280.webp'
+const homeBackgroundMobile = '/hero-background-768.webp'
 import Seo from '../components/Seo'
 import WorkProofGallery from '../components/WorkProofGallery'
 import GoogleBusinessCard from '../components/GoogleBusinessCard'
@@ -126,18 +127,21 @@ function HomePage() {
       />
 
       <section className="relative overflow-hidden border-b border-orange-100/80">
-        <img
-          src={homeBackground}
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-          width="1280"
-          height="853"
-          sizes="100vw"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+        <picture className="absolute inset-0 block h-full w-full">
+          <source media="(max-width: 767px)" srcSet={homeBackgroundMobile} />
+          <img
+            src={homeBackground}
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            width="1280"
+            height="853"
+            sizes="100vw"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </picture>
         <div className="absolute inset-0 bg-linear-to-br from-[#f7efe8]/92 via-[#f8ece2]/68 to-[#c78851]/44" />
         <div className="absolute inset-0 bg-linear-to-t from-[#5f3416]/30 via-[#7a4a20]/8 to-transparent" />
 
@@ -190,6 +194,7 @@ function HomePage() {
                     <MapPinIcon />
                   </span>
                   <select
+                    aria-label="Choose service city"
                     value={city}
                     onChange={(event) => setCity(event.target.value)}
                     className="h-12 w-full rounded-xl border border-[#eadbcc] bg-white pl-10 pr-3 text-lg text-stone-800 outline-none transition focus:border-orange-300"
@@ -204,6 +209,7 @@ function HomePage() {
                     <LanguageIcon />
                   </span>
                   <select
+                    aria-label="Choose Pandit language"
                     value={language}
                     onChange={(event) => setLanguage(event.target.value)}
                     className="h-12 w-full rounded-xl border border-[#eadbcc] bg-white pl-10 pr-3 text-lg text-stone-800 outline-none transition focus:border-orange-300"
