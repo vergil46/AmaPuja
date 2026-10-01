@@ -79,7 +79,7 @@ router.post('/login', async (req, res) => {
 
     const normalizedEmail = String(email).trim().toLowerCase();
 
-    const user = await User.findOne({ email: normalizedEmail }).select('name email phone role emailVerified password');
+    const user = await User.findOne({ email: normalizedEmail }).select('name email phone role panditStatus emailVerified password');
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -98,12 +98,46 @@ router.post('/login', async (req, res) => {
         email: user.email,
         phone: user.phone,
         role: user.role,
+        panditStatus: user.panditStatus,
         emailVerified: user.emailVerified,
       },
     });
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ message: error.message || 'Login failed' });
+  }
+});
+
+router.post('/pandit-login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail }).select('name email phone role panditStatus emailVerified password');
+    if (!user || user.role !== 'pandit' || user.panditStatus !== 'approved') {
+      return res.status(401).json({ message: 'Only approved Pandit accounts can use this login.' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+
+    const token = signToken(user._id);
+    return res.json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        panditStatus: user.panditStatus,
+        emailVerified: user.emailVerified,
+      },
+    });
+  } catch (error) {
+    console.error('Pandit login error:', error);
+    return res.status(500).json({ message: error.message || 'Pandit login failed' });
   }
 });
 

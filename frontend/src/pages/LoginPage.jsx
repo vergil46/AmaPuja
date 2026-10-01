@@ -43,6 +43,11 @@ function LoginPage() {
         return
       }
 
+      if (res.data.user?.role === 'pandit') {
+        setError('Pandit account detected. Please use the Pandit Login page.')
+        return
+      }
+
       login(res.data)
       navigate('/dashboard')
     } catch (err) {

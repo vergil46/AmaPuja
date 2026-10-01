@@ -183,6 +183,12 @@ function Header() {
                 >
                   {t('admin')} {t('login')}
                 </Link>
+                <Link
+                  to="/pandit-login"
+                  className="whitespace-nowrap px-4 py-2 rounded-xl border border-[#FF6F00]/35 bg-white text-[#D84315] text-sm font-semibold hover:bg-[#FFF8E1] transition-colors"
+                >
+                  Pandit Login
+                </Link>
               </>
             )}
           </div>
@@ -290,6 +296,13 @@ function Header() {
                     className="w-full px-4 py-2.5 rounded-2xl border border-stone-500/70 bg-stone-100 text-stone-800 text-sm font-semibold text-center hover:bg-white transition-colors"
                   >
                     {t('admin')} {t('login')}
+                  </Link>
+                  <Link
+                    to="/pandit-login"
+                    onClick={closeMobileMenu}
+                    className="w-full px-4 py-2.5 rounded-2xl border border-[#FF6F00]/35 bg-white text-[#D84315] text-sm font-semibold text-center hover:bg-[#FFF8E1] transition-colors"
+                  >
+                    Pandit Login
                   </Link>
                 </>
               )}

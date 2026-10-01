@@ -17,6 +17,7 @@ const PujaGalleryPage = lazy(() => import('./pages/PujaGalleryPage'))
 const PoojaSeoLandingPage = lazy(() => import('./pages/PoojaSeoLandingPage'))
 const OnlinePanditBookingBangalorePage = lazy(() => import('./pages/OnlinePanditBookingBangalorePage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
+const PanditLoginPage = lazy(() => import('./pages/PanditLoginPage'))
 const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'))
 const SignupPage = lazy(() => import('./pages/SignupPage'))
 const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'))
@@ -136,6 +137,7 @@ function App() {
           <Route path="/vastu-shanti-puja" element={<PoojaSeoLandingPage slug="vastu-shanti-puja" />} />
           <Route path="/online-pandit-booking-bangalore" element={<OnlinePanditBookingBangalorePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/pandit-login" element={<PanditLoginPage />} />
           <Route path="/admin-login" element={<AdminLoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/join-as-pandit" element={<JoinAsPanditPage />} />
