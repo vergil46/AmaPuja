@@ -4,7 +4,7 @@ import { getPoojaImage } from '../assets/poojaImageMap'
 import Seo from '../components/Seo'
 import api from '../services/api'
 import { PoojaDetailSkeleton } from '../components/LoadingSkeleton'
-import { trackGoogleAdsConversion } from '../utils/googleAds'
+import { trackGoogleAdsConversion, trackGoogleAdsPurchaseConversion } from '../utils/googleAds'
 
 const FUNNEL_SESSION_KEY = 'pujasamriddhi_funnel_session'
 
@@ -837,7 +837,10 @@ function PoojaDetailPage() {
         order_id: order.id,
         handler: async (response) => {
           await api.post('/payments/verify', response)
-          trackGoogleAdsConversion()
+          trackGoogleAdsPurchaseConversion({
+            value: packagePrice,
+            transactionId: response?.razorpay_payment_id,
+          })
           setBookingMessage(
             'Booking and payment completed successfully. Track status from Dashboard using email + phone, or login for full account access.'
           )
