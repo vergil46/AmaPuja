@@ -15,14 +15,29 @@
       content="Book trusted pandits for puja and sacred rituals online with Puja Samrddhi."
     />
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18482036720"></script>
+    <!-- Google tag bootstrap; the external script loads after the first page load. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'AW-18482036720');
+
+      window.addEventListener('load', function () {
+        var loadGoogleTag = function () {
+          if (document.querySelector('script[data-google-ads-tag]')) return;
+          var script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18482036720';
+          script.dataset.googleAdsTag = 'true';
+          document.head.appendChild(script);
+        };
+
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(loadGoogleTag, { timeout: 2500 });
+        } else {
+          window.setTimeout(loadGoogleTag, 1500);
+        }
+      });
     </script>
     
     <!-- Preconnect Google Fonts origins -->
@@ -46,9 +61,6 @@
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Cinzel:wght@600;700&display=swap"
       />
     </noscript>
-    
-    <!-- Preload critical CSS -->
-    <link rel="preload" href="/src/index.css" as="style" />
     
   </head>
   <body>
