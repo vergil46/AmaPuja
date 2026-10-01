@@ -8,9 +8,11 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import { LanguageProvider } from './context/LanguageContext.jsx'
 import { initSentry } from './monitoring/sentry.js'
 import { injectSpeedInsights } from '@vercel/speed-insights'
+import { initializeGoogleAdsTag } from './utils/googleAds.js'
 
 initSentry()
 injectSpeedInsights()
+initializeGoogleAdsTag()
 
 const isRenderHost = typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')
 const Router = isRenderHost ? HashRouter : BrowserRouter
