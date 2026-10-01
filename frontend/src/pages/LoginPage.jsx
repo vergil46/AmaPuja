@@ -96,6 +96,7 @@ function LoginPage() {
       </form>
       <p className="text-sm mt-3 wrap-break-word">No customer account? <Link to="/signup" className="text-[#FF6F00]">Sign up</Link></p>
       <p className="text-sm mt-2 wrap-break-word">Admin account? <Link to="/admin-login" className="text-stone-800">Admin login</Link></p>
+      <p className="text-sm mt-2 wrap-break-word">Pandit account? <Link to="/pandit-login" className="text-[#FF6F00]">Pandit login</Link></p>
       <p className="text-sm mt-2 wrap-break-word"><Link to="/forgot-password" className="text-[#FF6F00]">Forgot Password?</Link></p>
     </section>
   )
