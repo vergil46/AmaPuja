@@ -8,6 +8,9 @@ function PanditManagementPanel() {
   const [status, setStatus] = useState('All')
   const [data, setData] = useState({ applications: [], stats: {} })
   const [active, setActive] = useState([])
+  const [pujas, setPujas] = useState([])
+  const [pujaAssignments, setPujaAssignments] = useState({})
+  const [savingPujaAssignment, setSavingPujaAssignment] = useState('')
   const [bookings, setBookings] = useState([])
   const [complaints, setComplaints] = useState([])
   const [settings, setSettings] = useState(null)
@@ -16,15 +19,18 @@ function PanditManagementPanel() {
   const [message, setMessage] = useState('')
 
   const load = async () => {
-    const [applications, pandits, bookingResponse, complaintResponse, payoutSettings] = await Promise.all([
+    const [applications, pandits, pujaResponse, bookingResponse, complaintResponse, payoutSettings] = await Promise.all([
       api.get('/pandits/applications', { params: { status } }),
       api.get('/pandits/active'),
+      api.get('/pandits/pujas'),
       api.get('/bookings/admin/all'),
       api.get('/pandits/complaints'),
       api.get('/pandits/payout-settings'),
     ])
     setData(applications.data)
     setActive(pandits.data)
+    setPujas(pujaResponse.data)
+    setPujaAssignments(Object.fromEntries(pandits.data.map((pandit) => [pandit._id, pandit.pujaIds || []])))
     setBookings(bookingResponse.data)
     setComplaints(complaintResponse.data)
     setSettings(payoutSettings.data)
@@ -44,6 +50,26 @@ function PanditManagementPanel() {
     await api.patch(`/pandits/bookings/${bookingId}/assign`, { panditId })
     await load()
     setMessage('Pandit assigned successfully.')
+  }
+
+  const togglePujaAssignment = (panditId, pujaId) => {
+    setPujaAssignments((previous) => {
+      const current = previous[panditId] || []
+      return { ...previous, [panditId]: current.includes(pujaId) ? current.filter((id) => id !== pujaId) : [...current, pujaId] }
+    })
+  }
+
+  const savePujaAssignment = async (panditId) => {
+    setSavingPujaAssignment(panditId)
+    try {
+      await api.patch(`/pandits/${panditId}/pujas`, { pujaIds: pujaAssignments[panditId] || [] })
+      setMessage('Puja services assigned successfully.')
+      await load()
+    } catch (error) {
+      setMessage(error.response?.data?.message || 'Unable to assign puja services.')
+    } finally {
+      setSavingPujaAssignment('')
+    }
   }
 
   const saveSettings = async () => {
@@ -78,6 +104,7 @@ function PanditManagementPanel() {
     {message && <p className="mt-3 rounded-lg bg-green-50 p-2 text-sm text-green-800">{message}</p>}
     <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">{statuses.map((value) => <div key={value} className="rounded-lg bg-orange-50 p-3"><p className="text-xs text-stone-600">{value}</p><p className="text-xl font-semibold">{value === 'All' ? data.stats.total || 0 : data.stats[value] || 0}</p></div>)}</div>
     <div className="mt-4 overflow-x-auto"><table className="w-full min-w-[780px] text-left text-sm"><thead className="border-b border-stone-200 text-stone-500"><tr><th className="p-2">Name</th><th className="p-2">Mobile</th><th className="p-2">City</th><th className="p-2">Experience</th><th className="p-2">Pujas</th><th className="p-2">Languages</th><th className="p-2">Status</th><th className="p-2">Actions</th></tr></thead><tbody>{data.applications.map((application) => <tr key={application._id} className="border-b border-stone-100"><td className="p-2 font-medium"><button type="button" onClick={() => api.get(`/pandits/applications/${application._id}`).then((response) => setSelected(response.data))} className="text-left text-orange-700 underline-offset-2 hover:underline">{application.fullName}</button></td><td className="p-2">{application.mobileNumber}</td><td className="p-2">{application.city}</td><td className="p-2">{application.yearsOfExperience} years</td><td className="max-w-40 p-2">{application.pujaNames?.join(', ')}</td><td className="p-2">{application.languages?.join(', ')}</td><td className="p-2">{application.status}</td><td className="p-2"><div className="flex flex-wrap gap-1"><button onClick={() => api.get(`/pandits/applications/${application._id}`).then((response) => setSelected(response.data))} className="rounded bg-stone-100 px-2 py-1 text-xs">View</button>{['Pending', 'Under Review'].includes(application.status) && <><button onClick={() => action(application._id, 'approve')} className="rounded bg-green-100 px-2 py-1 text-xs text-green-800">Approve</button><button onClick={() => action(application._id, 'reject')} className="rounded bg-red-100 px-2 py-1 text-xs text-red-800">Reject</button></>}{application.status === 'Approved' && <button onClick={() => action(application._id, 'suspend')} className="rounded bg-amber-100 px-2 py-1 text-xs text-amber-800">Suspend</button>}</div></td></tr>)}</tbody></table></div>
+    <div className="mt-6 rounded-xl border border-orange-200 bg-orange-50 p-4"><div><h3 className="font-semibold text-stone-900">Assign puja services to approved Pandits</h3><p className="mt-1 text-sm text-stone-600">Choose which services each Pandit can receive and perform.</p></div><div className="mt-3 space-y-3">{active.length === 0 && <p className="text-sm text-stone-500">No approved Pandits available.</p>}{active.map((pandit) => <div key={pandit._id} className="rounded-lg border border-orange-200 bg-white p-3"><div className="flex flex-wrap items-center justify-between gap-2"><div><p className="font-semibold">{pandit.name}</p><p className="text-xs text-stone-500">{pandit.email} · {pandit.pujaNames?.length || 0} services assigned</p></div><button type="button" onClick={() => savePujaAssignment(pandit._id)} disabled={savingPujaAssignment === pandit._id} className="rounded bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60">{savingPujaAssignment === pandit._id ? 'Saving...' : 'Save services'}</button></div><div className="mt-3 grid max-h-48 gap-1 overflow-y-auto rounded border border-stone-200 p-2 sm:grid-cols-2 lg:grid-cols-3">{pujas.map((puja) => <label key={puja._id} className="flex items-center gap-2 rounded px-2 py-1.5 text-xs text-stone-700 hover:bg-orange-50"><input type="checkbox" checked={(pujaAssignments[pandit._id] || []).includes(puja._id)} onChange={() => togglePujaAssignment(pandit._id, puja._id)} className="h-4 w-4 accent-orange-600" />{puja.title}</label>)}</div></div>)}</div></div>
     {selected && <div className="mt-4 rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm"><div className="flex justify-between"><h3 className="font-semibold">Complete application details <span className="ml-2 rounded bg-orange-100 px-2 py-1 text-xs text-orange-800">{selected.applicationId}</span></h3><button onClick={() => setSelected(null)}>Close</button></div><div className="mt-3 grid gap-2 sm:grid-cols-2"><p><strong>Application number:</strong> {selected.applicationId}</p><p><strong>Name:</strong> {selected.fullName}</p><p><strong>Mobile:</strong> {selected.mobileNumber}</p><p><strong>WhatsApp:</strong> {selected.whatsappNumber || '-'}</p><p><strong>Email:</strong> {selected.email}</p><p><strong>City:</strong> {selected.city}</p><p><strong>Area:</strong> {selected.area}</p><p><strong>Experience:</strong> {selected.yearsOfExperience} years</p><p><strong>Specialization:</strong> {selected.specialization || '-'}</p><p><strong>Samagri:</strong> {selected.samagri}</p><p><strong>Travel distance:</strong> {selected.maxTravelDistance || 0} km</p><p><strong>Available days:</strong> {selected.availableDays?.join(', ') || '-'}</p><p><strong>Available time:</strong> {selected.availableTime || '-'}</p></div><p className="mt-2"><strong>Pujas:</strong> {selected.pujaNames?.join(', ') || '-'}</p><p className="mt-1"><strong>Languages:</strong> {selected.languages?.join(', ') || '-'}</p><p className="mt-1"><strong>Service areas:</strong> {selected.serviceAreas?.join(', ') || '-'}</p><p className="mt-1"><strong>Status:</strong> {selected.status}</p><p className="mt-1"><strong>Rules accepted:</strong> {new Date(selected.rulesAcceptedAt).toLocaleString()} · Version {selected.rulesVersion}</p><div className="mt-3 flex flex-wrap gap-2"><button onClick={() => openPrivateDocument(selected._id, 'profile')} className="rounded bg-white px-2 py-1 text-xs">Open profile photo</button><button onClick={() => openPrivateDocument(selected._id, 'identity')} className="rounded bg-white px-2 py-1 text-xs">Open identity document</button>{selected.experienceDocumentPath && <button onClick={() => openPrivateDocument(selected._id, 'experience')} className="rounded bg-white px-2 py-1 text-xs">Open experience document</button>}</div></div>}
     <div className="mt-6 grid gap-4 lg:grid-cols-2"><div><h3 className="font-semibold">Assign approved Pandit</h3><div className="mt-2 space-y-2">{bookings.filter((booking) => ['pending', 'confirmed'].includes(booking.bookingStatus)).slice(0, 10).map((booking) => <div key={booking._id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-stone-200 bg-white p-2 text-sm"><span>{booking.poojaId?.title || booking.package} · {booking.name}</span><select defaultValue="" onChange={(event) => assign(booking._id, event.target.value)} className="rounded border border-stone-300 px-2 py-1">
       <option value="">Select Pandit</option>

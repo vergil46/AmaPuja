@@ -215,7 +215,35 @@ router.patch('/bookings/:id/assign', protect, adminOnly, async (req, res) => {
   return res.json(booking);
 });
 
-router.get('/active', protect, adminOnly, async (_req, res) => res.json(await User.find({ role: 'pandit', panditStatus: 'approved' }).select('name phone email')));
+router.patch('/:panditId/pujas', protect, adminOnly, async (req, res) => {
+  const pandit = await User.findOne({ _id: req.params.panditId, role: 'pandit', panditStatus: 'approved' });
+  if (!pandit) return res.status(404).json({ message: 'Approved Pandit not found' });
+
+  const pujaIds = [...new Set(parseArray(req.body?.pujaIds).filter((id) => mongoose.isValidObjectId(id)))];
+  const pujas = await Pooja.find({ _id: { $in: pujaIds } }).select('_id title');
+  const orderedPujas = pujaIds.map((id) => pujas.find((puja) => String(puja._id) === id)).filter(Boolean);
+  const application = await PanditApplication.findOneAndUpdate(
+    { userId: pandit._id },
+    { $set: { pujaIds: orderedPujas.map((puja) => puja._id), pujaNames: orderedPujas.map((puja) => puja.title) } },
+    { new: true }
+  ).select('pujaIds pujaNames');
+  if (!application) return res.status(404).json({ message: 'Pandit application not found' });
+  return res.json({ panditId: pandit._id, pujaIds: application.pujaIds, pujaNames: application.pujaNames });
+});
+
+router.get('/active', protect, adminOnly, async (_req, res) => {
+  const pandits = await User.find({ role: 'pandit', panditStatus: 'approved' })
+    .select('name phone email panditApplicationId')
+    .populate('panditApplicationId', 'pujaIds pujaNames');
+  return res.json(pandits.map((pandit) => ({
+    _id: pandit._id,
+    name: pandit.name,
+    phone: pandit.phone,
+    email: pandit.email,
+    pujaIds: pandit.panditApplicationId?.pujaIds || [],
+    pujaNames: pandit.panditApplicationId?.pujaNames || [],
+  })));
+});
 router.get('/payout-settings', protect, adminOnly, async (_req, res) => res.json(await getPayoutSettings()));
 router.patch('/payout-settings', protect, adminOnly, async (req, res) => {
   const values = ['normalPanditPercentage', 'normalPlatformPercentage', 'verifiedIssuePanditPercentage', 'verifiedIssuePlatformPercentage'].reduce((result, key) => ({ ...result, [key]: Number(req.body?.[key]) }), {});

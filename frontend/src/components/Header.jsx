@@ -14,7 +14,7 @@ function Header() {
   const accountRoute = user?.role === 'admin' ? '/admin' : user?.role === 'pandit' ? '/pandit/dashboard' : '/dashboard'
   const bookingsRoute = '/dashboard#bookings'
   const feedbackRoute = '/dashboard#feedback'
-  const accountLabel = user?.role === 'admin' ? t('admin') : t('dashboard')
+  const accountLabel = user?.role === 'admin' ? t('admin') : user?.role === 'pandit' ? 'Pandit Dashboard' : t('dashboard')
   const accountInitial = (user?.name?.trim()?.[0] || user?.email?.trim()?.[0] || accountLabel?.[0] || 'A').toUpperCase()
 
   const navClass = ({ isActive }) =>
@@ -84,8 +84,8 @@ function Header() {
             Gallery
           </NavLink>
           {user && (
-            <NavLink to="/dashboard" className={navClass}>
-              {t('dashboard')}
+            <NavLink to={accountRoute} className={navClass}>
+              {accountLabel}
             </NavLink>
           )}
           {user?.role === 'admin' && (
@@ -231,8 +231,8 @@ function Header() {
               {t('contact')}
             </NavLink>
             {user && (
-              <NavLink to="/dashboard" className={mobileNavClass} onClick={closeMobileMenu}>
-                {t('dashboard')}
+              <NavLink to={accountRoute} className={mobileNavClass} onClick={closeMobileMenu}>
+                {accountLabel}
               </NavLink>
             )}
             {user?.role === 'admin' && (
