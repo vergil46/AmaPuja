@@ -14,6 +14,8 @@ function WorkProofGallery({
   description = 'Real photos and videos from pujas and rituals completed by our team.',
   className = '',
 }) {
+  if (proofVideos.length === 0 && proofImages.length === 0) return null
+
   return (
     <section className={`mx-auto max-w-6xl px-4 pb-12 sm:pb-16 ${className}`.trim()}>
       <div className="animate-fade-up" style={{ animationDelay: '0.2s' }}>

@@ -6,6 +6,7 @@ import Seo from '../components/Seo'
 import WorkProofGallery from '../components/WorkProofGallery'
 import GoogleBusinessCard from '../components/GoogleBusinessCard'
 import Testimonials from '../components/Testimonials'
+import durgaPujaImage from '../assets/poojas/Durga Puja.jpeg'
 
 const MapPinIcon = ({ className = 'h-4 w-4' }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -91,7 +92,6 @@ function HomePage() {
   const [searchTerm, setSearchTerm] = useState('')
 
   const quickSuggestions = ['Satyanarayan Puja', 'Griha Pravesh', 'Ganesh Puja']
-  const [openFaq, setOpenFaq] = useState(null)
 
   const goToServices = (overrideTerm = '') => {
     const nextParams = new URLSearchParams()
@@ -163,7 +163,7 @@ function HomePage() {
                 className="inline-flex min-h-14 items-center justify-center gap-2.5 rounded-2xl bg-linear-to-r from-[#d97706] to-[#f59e0b] px-7 py-3 text-base font-bold text-white shadow-[0_14px_28px_rgba(217,119,6,0.28)] transition hover:-translate-y-0.5 hover:brightness-105 sm:text-lg"
               >
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/16" aria-hidden="true">🪔</span>
-                <span>Explore Pujas</span>
+                <span>Book a Puja</span>
               </a>
               <a
                 href="https://wa.me/919739362962"
@@ -281,6 +281,19 @@ function HomePage() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="relative isolate overflow-hidden bg-[#7f1d1d] px-4 py-8 text-white sm:py-10" aria-labelledby="navratri-banner-title">
+        <img src={durgaPujaImage} alt="Durga Puja ceremony" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-35" />
+        <div className="absolute inset-0 -z-10 bg-linear-to-r from-[#5b1017]/95 via-[#7f1d1d]/85 to-[#9f351d]/65" />
+        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-200">🌺 Navratri special</p>
+            <h2 id="navratri-banner-title" className="mt-2 text-2xl font-semibold sm:text-3xl">Navratri Puja Booking Open</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-red-50 sm:text-base">Celebrate Navratri with a traditional Durga Puja performed by experienced Pandits in Bangalore and Bhubaneswar.</p>
+          </div>
+          <Link to="/durga-puja-bangalore" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-[#5b1017] shadow-lg transition hover:bg-amber-200">Book Navratri Puja</Link>
         </div>
       </section>
 
@@ -433,45 +446,18 @@ function HomePage() {
         </div>
       </section>
 
-      <Testimonials />
+      <div className="bg-[#fff7ec]">
+        <Testimonials />
+      </div>
 
-      <section className="bg-white px-4 py-12 sm:py-16" aria-labelledby="home-faq-title">
-        <div className="mx-auto max-w-4xl">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#FF6F00]">Need to know</p>
-            <h2 id="home-faq-title" className="mt-2 text-2xl font-semibold text-stone-900 sm:text-4xl">Frequently Asked Questions</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-stone-600 sm:text-base">
-              A few quick answers before you choose a puja and date.
-            </p>
+      <section className="bg-[#fffaf2] px-4 py-12 sm:py-16" aria-labelledby="home-booking-cta-title">
+        <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-5 rounded-3xl border border-orange-200 bg-white p-6 shadow-[0_16px_32px_rgba(95,56,27,0.08)] sm:flex-row sm:items-center sm:p-8">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#FF6F00]">Ready to plan your ceremony?</p>
+            <h2 id="home-booking-cta-title" className="mt-2 text-2xl font-semibold text-stone-900 sm:text-3xl">Book a trusted Pandit for your puja</h2>
+            <p className="mt-2 text-sm leading-relaxed text-stone-600 sm:text-base">Choose your puja, compare packages, and request your preferred date.</p>
           </div>
-
-          <div className="mt-8 space-y-3">
-            {faqItems.map(({ question, answer }, index) => {
-              const isOpen = openFaq === index
-
-              return (
-                <div key={question} className="overflow-hidden rounded-2xl border border-orange-100 bg-[#fffaf3]">
-                  <button
-                    type="button"
-                    aria-expanded={isOpen}
-                    aria-controls={`home-faq-answer-${index}`}
-                    onClick={() => setOpenFaq(isOpen ? null : index)}
-                    className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-stone-900 transition hover:bg-orange-50 sm:px-6 sm:py-5"
-                  >
-                    <span>{question}</span>
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-orange-100 text-lg font-medium text-orange-700" aria-hidden="true">
-                      {isOpen ? '−' : '+'}
-                    </span>
-                  </button>
-                  {isOpen && (
-                    <p id={`home-faq-answer-${index}`} className="border-t border-orange-100 px-5 pb-5 pt-3 text-sm leading-relaxed text-stone-600 sm:px-6 sm:text-base">
-                      {answer}
-                    </p>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+          <Link to="/services" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-linear-to-r from-[#D84315] to-[#FF6F00] px-6 py-3 font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:brightness-105">Book a Puja</Link>
         </div>
       </section>
 
