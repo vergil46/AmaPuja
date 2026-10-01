@@ -19,6 +19,8 @@ const createTransporter = () => {
   });
 };
 
+const emailFrom = () => process.env.EMAIL_FROM || process.env.SMTP_FROM || 'PujaSamriddhi <no-reply@pujasamriddhi.com>';
+
 // Generate verification token
 const generateVerificationToken = () => crypto.randomBytes(32).toString('hex');
 
@@ -31,7 +33,7 @@ const sendVerificationEmail = async (user, token) => {
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
+      from: emailFrom(),
       to: user.email,
       subject: 'Verify Your Puja Samriddhi Account',
       html: `
@@ -342,27 +344,28 @@ const sendPasswordResetEmail = async (user, token) => {
   const transporter = createTransporter();
   if (!transporter) return false;
 
-  const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
+  const clientUrl = String(process.env.CLIENT_URL || 'http://localhost:5173').replace(/\/+$/, '');
+  const resetUrl = `${clientUrl}/reset-password?token=${encodeURIComponent(token)}`;
 
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'Puja Samriddhi <no-reply@pujasamriddhi.com>',
+      from: emailFrom(),
       to: user.email,
-      subject: 'Reset Your Puja Samriddhi Password',
+      subject: 'Reset Your PujaSamrddhi Password',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #b45309;">Password Reset Request 🔐</h2>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #292524;">
+          <h2 style="color: #b45309;">Reset Your PujaSamrddhi Password</h2>
           <p>Hello ${user.name},</p>
-          <p>We received a request to reset your password for your Puja Samriddhi account.</p>
+          <p>We received a request to reset your PujaSamrddhi account password.</p>
+          <p>Click the button below to create a new password.</p>
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetUrl}" style="background-color: #b45309; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            <a href="${resetUrl}" style="background-color: #d84315; color: white; padding: 13px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
               Reset Password
             </a>
           </div>
-          <p style="color: #666; font-size: 14px;">Or copy this link to your browser:</p>
-          <p style="color: #666; font-size: 12px; word-break: break-all;">${resetUrl}</p>
-          <p style="color: #999; font-size: 12px; margin-top: 30px;">This link will expire in 1 hour.</p>
-          <p style="color: #999; font-size: 12px;">If you didn't request a password reset, please ignore this email.</p>
+          <p style="color: #78716c; font-size: 14px;">This link will expire in 15 minutes.</p>
+          <p style="color: #78716c; font-size: 14px;">If you did not request this password reset, you can safely ignore this email.</p>
+          <p style="margin-top: 30px;">Regards,<br>PujaSamrddhi Team<br><a href="https://www.pujasamriddhi.com" style="color: #b45309;">www.pujasamriddhi.com</a></p>
         </div>
       `,
     });

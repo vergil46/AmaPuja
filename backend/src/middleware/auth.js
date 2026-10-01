@@ -16,6 +16,10 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid token user' });
     }
 
+    if (decoded.tokenVersion !== undefined && decoded.tokenVersion !== Number(user.authTokenVersion || 0)) {
+      return res.status(401).json({ message: 'Session expired. Please login again.' });
+    }
+
     req.user = user;
     next();
   } catch (error) {
@@ -41,7 +45,7 @@ const optionalAuth = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id).select('-password');
 
-    if (user) {
+    if (user && (decoded.tokenVersion === undefined || decoded.tokenVersion === Number(user.authTokenVersion || 0))) {
       req.user = user;
     }
 

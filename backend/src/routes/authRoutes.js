@@ -1,14 +1,27 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 const { generateVerificationToken, sendVerificationEmail, sendPasswordResetEmail } = require('../services/emailService');
 
 const router = express.Router();
 
-const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+const signToken = (id, tokenVersion = 0) => jwt.sign({ id, tokenVersion }, process.env.JWT_SECRET, { expiresIn: '7d' });
 const isStrongPassword = (value) =>
   typeof value === 'string' && value.length >= 8 && /[A-Z]/.test(value) && /[a-z]/.test(value) && /\d/.test(value);
+const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
+const genericResetMessage = 'If an account exists with this email, a password reset link has been sent.';
+const hashResetToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
+const forgotPasswordRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false,
+  message: { message: 'Too many reset requests. Please try again later.' },
+});
 
 router.post('/register', async (req, res) => {
   try {
@@ -49,7 +62,7 @@ router.post('/register', async (req, res) => {
       }
     });
 
-    const token = signToken(user._id);
+    const token = signToken(user._id, user.authTokenVersion);
 
     return res.status(201).json({
       token,
@@ -79,7 +92,7 @@ router.post('/login', async (req, res) => {
 
     const normalizedEmail = String(email).trim().toLowerCase();
 
-    const user = await User.findOne({ email: normalizedEmail }).select('name email phone role panditStatus emailVerified password');
+    const user = await User.findOne({ email: normalizedEmail }).select('name email phone role panditStatus emailVerified password authTokenVersion');
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -89,7 +102,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const token = signToken(user._id);
+    const token = signToken(user._id, user.authTokenVersion);
     return res.json({
       token,
       user: {
@@ -114,7 +127,7 @@ router.post('/pandit-login', async (req, res) => {
     if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
 
     const normalizedEmail = String(email).trim().toLowerCase();
-    const user = await User.findOne({ email: normalizedEmail }).select('name email phone role panditStatus emailVerified password');
+    const user = await User.findOne({ email: normalizedEmail }).select('name email phone role panditStatus emailVerified password authTokenVersion');
     if (!user || user.role !== 'pandit' || user.panditStatus !== 'approved') {
       return res.status(401).json({ message: 'Only approved Pandit accounts can use this login.' });
     }
@@ -122,7 +135,7 @@ router.post('/pandit-login', async (req, res) => {
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const token = signToken(user._id);
+    const token = signToken(user._id, user.authTokenVersion);
     return res.json({
       token,
       user: {
@@ -174,71 +187,63 @@ router.get('/verify-email', async (req, res) => {
   }
 });
 
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', forgotPasswordRateLimiter, async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = String(req.body?.email || '').trim().toLowerCase();
 
-    if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({ message: 'Please enter a valid email address.' });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
-      // Don't reveal whether email exists for security
-      return res.json({ message: 'If your email is registered, you will receive a password reset link.' });
+      return res.json({ message: genericResetMessage });
     }
 
-    // Generate reset token
-    const resetToken = generateVerificationToken();
-    const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    const resetToken = crypto.randomBytes(32).toString('hex');
 
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpiry = resetExpiry;
+    user.resetPasswordToken = hashResetToken(resetToken);
+    user.resetPasswordExpires = new Date(Date.now() + 15 * 60 * 1000);
     await user.save();
 
-    // Send reset email
-    const emailSent = await sendPasswordResetEmail(user, resetToken);
-    
-    if (emailSent) {
-      console.log(`✅ Password reset email sent to ${email}`);
-    } else {
-      console.warn(`⚠️ Could not send password reset email to ${email}`);
-    }
+    await sendPasswordResetEmail(user, resetToken);
 
-    return res.json({ message: 'If your email is registered, you will receive a password reset link.' });
+    return res.json({ message: genericResetMessage });
   } catch (error) {
     console.error('Forgot password error:', error);
-    return res.status(500).json({ message: 'Failed to process password reset request' });
+    return res.json({ message: genericResetMessage });
   }
 });
 
 router.post('/reset-password', async (req, res) => {
   try {
-    const { token, newPassword } = req.body;
+    const token = String(req.body?.token || '').trim();
+    const password = String(req.body?.password || '');
 
-    if (!token || !newPassword) {
-      return res.status(400).json({ message: 'Token and new password are required' });
+    if (!token || !password) {
+      return res.status(400).json({ message: 'Reset token and password are required.' });
     }
 
-    if (!isStrongPassword(newPassword)) {
+    if (!isStrongPassword(password)) {
       return res.status(400).json({ message: 'Password must be at least 8 characters and include uppercase, lowercase, and a number' });
     }
 
-    const user = await User.findOne({
-      resetPasswordToken: token,
-      resetPasswordExpiry: { $gt: Date.now() },
-    });
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = await User.findOneAndUpdate(
+      { resetPasswordToken: hashResetToken(token), resetPasswordExpires: { $gt: new Date() } },
+      {
+        $set: { password: passwordHash },
+        $unset: { resetPasswordToken: 1, resetPasswordExpires: 1 },
+        $inc: { authTokenVersion: 1 },
+      },
+      { new: true }
+    );
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid or expired reset token' });
+      return res.status(400).json({ message: 'This reset link is invalid or has expired.' });
     }
 
-    user.password = newPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpiry = undefined;
-    await user.save();
-
-    return res.json({ message: 'Password reset successful! You can now login with your new password.' });
+    return res.json({ message: 'Password reset successfully.' });
   } catch (error) {
     console.error('Reset password error:', error);
     return res.status(500).json({ message: 'Password reset failed' });
