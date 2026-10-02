@@ -108,7 +108,7 @@ function AdminPage() {
 
   const normalizeBookingStatus = (status) => {
     const normalized = String(status || '').toLowerCase()
-    if (normalized === 'confirmed' || normalized === 'completed' || normalized === 'cancelled') {
+    if (['confirmed', 'pandit-assigned', 'accepted', 'completed', 'cancelled', 'complaint-under-review'].includes(normalized)) {
       return normalized
     }
     return 'pending'
@@ -683,6 +683,20 @@ function AdminPage() {
       }
     }
 
+    if (normalizedStatus === 'pandit-assigned') {
+      return {
+        label: 'Pandit assigned',
+        badgeClass: 'bg-orange-50 text-orange-700 border-orange-200',
+      }
+    }
+
+    if (normalizedStatus === 'accepted') {
+      return {
+        label: 'Accepted by Pandit',
+        badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
+      }
+    }
+
     if (normalizedStatus === 'cancelled') {
       return {
         label: 'Cancelled',
@@ -876,6 +890,7 @@ function AdminPage() {
 
   const saveDetailsStatus = async () => {
     if (!selectedBookingDetails?._id) return
+    if (detailsBookingStatus === 'cancelled' && !window.confirm('Cancel this booking?')) return
 
     setUpdatingDetailsStatus(true)
     try {
@@ -1564,8 +1579,11 @@ function AdminPage() {
                   >
                     <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
+                    <option value="pandit-assigned">Pandit assigned</option>
+                    <option value="accepted">Accepted</option>
                     <option value="completed">Completed</option>
                     <option value="cancelled">Cancelled</option>
+                    <option value="complaint-under-review">Complaint under review</option>
                   </select>
                   <button
                     type="button"

@@ -520,6 +520,11 @@ router.get('/admin/recent', protect, adminOnly, async (req, res) => {
 router.patch('/:id/status', protect, adminOnly, async (req, res) => {
   try {
     const { bookingStatus } = req.body;
+    const allowedStatuses = ['pending', 'confirmed', 'pandit-assigned', 'accepted', 'completed', 'cancelled', 'complaint-under-review'];
+
+    if (!allowedStatuses.includes(bookingStatus)) {
+      return res.status(400).json({ message: 'Invalid booking status' });
+    }
 
     const booking = await Booking.findById(req.params.id)
       .populate('poojaId');

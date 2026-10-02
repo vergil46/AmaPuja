@@ -197,6 +197,17 @@ router.patch('/bookings/:id/accept', protect, panditOnly, async (req, res) => {
   return res.json(booking);
 });
 
+router.patch('/bookings/:id/cancel', protect, panditOnly, async (req, res) => {
+  const booking = await Booking.findOne({ _id: req.params.id, panditId: req.user._id });
+  if (!booking) return res.status(404).json({ message: 'Assigned booking not found' });
+  if (booking.bookingStatus === 'completed') return res.status(400).json({ message: 'Completed booking cannot be cancelled' });
+  if (booking.bookingStatus === 'cancelled') return res.status(400).json({ message: 'Booking is already cancelled' });
+  if (!['pandit-assigned', 'accepted'].includes(booking.bookingStatus)) return res.status(400).json({ message: 'Only assigned or accepted bookings can be cancelled' });
+  booking.bookingStatus = 'cancelled';
+  await booking.save();
+  return res.json(booking);
+});
+
 router.patch('/bookings/:id/complete', protect, panditOnly, async (req, res) => {
   const booking = await Booking.findOneAndUpdate({ _id: req.params.id, panditId: req.user._id, bookingStatus: { $in: ['accepted', 'pandit-assigned'] } }, { bookingStatus: 'completed' }, { new: true });
   if (!booking) return res.status(404).json({ message: 'Booking not found' });
