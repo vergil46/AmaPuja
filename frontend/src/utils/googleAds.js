@@ -1,6 +1,6 @@
 const GOOGLE_ADS_ID = 'AW-18482036720'
 const GOOGLE_ADS_CONVERSION_SEND_TO = 'AW-18026538115/9rCOCNbAmYwcEIPJ3JND'
-const GOOGLE_ADS_PURCHASE_SEND_TO = 'AW-18482036720/id4WCMzWwIwdEFD_9exF'
+const GOOGLE_ADS_PURCHASE_SEND_TO = 'AW-18482036720/id4WCMzWwIwdEPD_9exE'
 
 export const initializeGoogleAdsTag = () => {
   if (typeof window === 'undefined') return false

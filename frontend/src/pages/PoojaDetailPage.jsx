@@ -838,7 +838,7 @@ function PoojaDetailPage() {
         handler: async (response) => {
           await api.post('/payments/verify', response)
           trackGoogleAdsPurchaseConversion({
-            value: packagePrice,
+            value: payableAmount,
             transactionId: response?.razorpay_payment_id,
           })
           setBookingMessage(
