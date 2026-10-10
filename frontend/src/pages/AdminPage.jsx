@@ -579,6 +579,16 @@ function AdminPage() {
                 </div>
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+                  <div className="order-first rounded-[20px] border border-[#f3dfc2] bg-[#fffaf0] p-4 shadow-[0_10px_22px_rgba(173,122,42,0.06)]">
+                    <div className="flex items-center justify-between">
+                      <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">₹</div>
+                      <div className="text-right text-[12px] font-semibold text-[#b7791f]">Live</div>
+                    </div>
+                    <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Amount</div>
+                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">₹{totalBookingAmount.toLocaleString('en-IN')}</div>
+                    <div className="mt-1 text-[12px] text-[#6a5c55]">All booking amounts</div>
+                  </div>
+
                   <div className="rounded-[20px] border border-[#cfeaf9] bg-[#ebf7ff] p-4 shadow-[0_10px_22px_rgba(61,102,150,0.06)]">
                     <div className="flex items-center justify-between">
                       <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">📅</div>
@@ -607,16 +617,6 @@ function AdminPage() {
                     <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Earnings</div>
                     <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">₹{completedPujaAmount.toLocaleString('en-IN')}</div>
                     <div className="mt-1 text-[12px] text-[#6a5c55]">From completed pujas</div>
-                  </div>
-
-                  <div className="rounded-[20px] border border-[#f3dfc2] bg-[#fffaf0] p-4 shadow-[0_10px_22px_rgba(173,122,42,0.06)]">
-                    <div className="flex items-center justify-between">
-                      <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">₹</div>
-                      <div className="text-right text-[12px] font-semibold text-[#b7791f]">Live</div>
-                    </div>
-                    <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Amount</div>
-                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">₹{totalBookingAmount.toLocaleString('en-IN')}</div>
-                    <div className="mt-1 text-[12px] text-[#6a5c55]">All booking amounts</div>
                   </div>
 
                   <div className="rounded-[20px] border border-[#efe0fa] bg-[#f8f1ff] p-4 shadow-[0_10px_22px_rgba(143,96,170,0.06)]">
