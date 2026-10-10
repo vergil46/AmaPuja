@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const bookingSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    poojaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pooja', required: true },
+    poojaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Pooja' },
+    poojaName: { type: String, trim: true, default: '' },
     package: { type: String, required: true, trim: true },
     selectedAddOns: { type: [String], default: [] },
 
