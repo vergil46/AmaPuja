@@ -366,6 +366,68 @@ router.post('/', optionalAuth, async (req, res) => {
   }
 });
 
+router.post('/admin/manual', protect, adminOnly, async (req, res) => {
+  try {
+    const {
+      poojaName,
+      name,
+      phone,
+      email = 'no-email@internal.local',
+      city,
+      date,
+      time = '',
+      finalAmount,
+      bookingStatus = 'pending',
+      paymentStatus = 'pending',
+    } = req.body;
+
+    const normalizedPhone = normalizePhone(phone);
+    const amount = parseAmount(finalAmount);
+    const allowedStatuses = ['pending', 'confirmed', 'pandit-assigned', 'accepted', 'completed', 'cancelled', 'complaint-under-review'];
+    const allowedPaymentStatuses = ['pending', 'paid', 'failed', 'manual-pending'];
+
+    if (!String(poojaName || '').trim() || !String(name || '').trim() || !String(city || '').trim() || !String(date || '').trim()) {
+      return res.status(400).json({ message: 'Puja name, customer name, city, and date are required' });
+    }
+    if (normalizedPhone.length !== 10) {
+      return res.status(400).json({ message: 'Phone number must be exactly 10 digits' });
+    }
+    if (!isValidEmail(email) || !amount || amount < 0) {
+      return res.status(400).json({ message: 'A valid email and amount are required' });
+    }
+    if (!allowedStatuses.includes(bookingStatus) || !allowedPaymentStatuses.includes(paymentStatus)) {
+      return res.status(400).json({ message: 'Invalid booking or payment status' });
+    }
+
+    const booking = await Booking.create({
+      poojaName: String(poojaName).trim(),
+      package: 'Manual dashboard booking',
+      name: String(name).trim(),
+      phone: normalizedPhone,
+      email: normalizeEmail(email),
+      city: String(city).trim(),
+      date: String(date).trim(),
+      time: String(time || '').trim(),
+      address: String(city).trim(),
+      addressDetails: {
+        city: String(city).trim(),
+        formattedAddress: String(city).trim(),
+      },
+      paymentOption: 'full',
+      finalAmount: amount,
+      paymentAmount: amount,
+      paymentStatus,
+      bookingStatus,
+      specialNotes: 'Dashboard-only manual booking; not listed as a public service.',
+    });
+
+    return res.status(201).json(withBookingDefaults(booking));
+  } catch (error) {
+    console.error('Create manual dashboard booking error:', error);
+    return res.status(500).json({ message: error.message || 'Failed to create manual dashboard booking' });
+  }
+});
+
 /**
  * GET MY BOOKINGS
  */
