@@ -53,7 +53,7 @@ function AdminPage() {
       bookingToPayment: 0,
     },
   })
-  const [analyticsRange, setAnalyticsRange] = useState('30d')
+  const [analyticsRange, setAnalyticsRange] = useState('all')
   const [, setPoojas] = useState([])
   const [, setGalleryItems] = useState([])
   const [bookings, setBookings] = useState([])
