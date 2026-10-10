@@ -55,7 +55,8 @@ const isAllowedOrigin = (origin) => {
   if (!origin) return true;
   const normalizedOrigin = normalizeOrigin(origin);
   const isLocalhostVitePort = /^http:\/\/localhost:\d+$/.test(normalizedOrigin);
-  return configuredOrigins.includes(normalizedOrigin) || isLocalhostVitePort;
+  const isProjectVercelPreview = /^https:\/\/(?:pujasmarddhi|pujasamriddhi)-[a-z0-9-]+\.vercel\.app$/i.test(normalizedOrigin);
+  return configuredOrigins.includes(normalizedOrigin) || isLocalhostVitePort || isProjectVercelPreview;
 };
 
 const apiRateLimiter = rateLimit({
