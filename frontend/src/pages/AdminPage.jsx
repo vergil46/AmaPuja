@@ -67,6 +67,7 @@ function AdminPage() {
   const [selectedBookingDetails, setSelectedBookingDetails] = useState(null)
   const [detailsBookingStatus, setDetailsBookingStatus] = useState('pending')
   const [updatingDetailsStatus, setUpdatingDetailsStatus] = useState(false)
+  const [detailsStatusError, setDetailsStatusError] = useState('')
   const [activeSidebarSection, setActiveSidebarSection] = useState('dashboard')
   const [isDarkMode] = useState(() => {
     if (typeof window === 'undefined') return false
@@ -279,12 +280,14 @@ function AdminPage() {
   const openBookingDetails = (booking) => {
     setSelectedBookingDetails(booking)
     setDetailsBookingStatus(normalizeBookingStatus(booking.bookingStatus))
+    setDetailsStatusError('')
   }
 
   const closeBookingDetails = () => {
     setSelectedBookingDetails(null)
     setDetailsBookingStatus('pending')
     setUpdatingDetailsStatus(false)
+    setDetailsStatusError('')
   }
 
   const formatDateTime = (value) => {
@@ -306,6 +309,7 @@ function AdminPage() {
     if (detailsBookingStatus === 'cancelled' && !window.confirm('Cancel this booking?')) return
 
     setUpdatingDetailsStatus(true)
+    setDetailsStatusError('')
     try {
       const response = await api.patch(`/bookings/${selectedBookingDetails._id}/status`, {
         bookingStatus: detailsBookingStatus,
@@ -343,6 +347,9 @@ function AdminPage() {
             }
           : prev
       )
+      await Promise.all([loadData(), loadStats(analyticsRange)])
+    } catch (error) {
+      setDetailsStatusError(error.response?.data?.message || 'Failed to update booking status. Please try again.')
     } finally {
       setUpdatingDetailsStatus(false)
     }
@@ -922,6 +929,7 @@ function AdminPage() {
 
               <div className="rounded-xl border border-orange-200 bg-orange-50/40 p-3.5">
                 <p className="text-xs text-stone-500">Update Booking Status</p>
+                {detailsStatusError ? <p className="mt-2 text-sm font-medium text-red-600">{detailsStatusError}</p> : null}
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <select
                     className="border border-stone-300 rounded-xl px-3 py-2 text-base"
