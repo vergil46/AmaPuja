@@ -42,6 +42,7 @@ const normalizeOrigin = (value) => String(value || '').trim().replace(/\/+$/, ''
 
 const configuredOrigins = [
   'https://pujasamriddhi.vercel.app',
+  'https://pujasmarddhi.vercel.app',
   'https://pujasamriddhi.com',
   'https://www.pujasamriddhi.com',
   process.env.CLIENT_URL,
