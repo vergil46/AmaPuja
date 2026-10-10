@@ -28,6 +28,9 @@ function DetailFieldCard({
   )
 }
 
+const getBookingPoojaName = (booking) =>
+  String(booking?.poojaId?.title || booking?.poojaName || '').trim()
+
 function AdminPage() {
   const [stats, setStats] = useState({
     totalBookings: 0,
@@ -144,9 +147,16 @@ function AdminPage() {
     )
   }, [bookings])
 
+  const completedPujaAmount = useMemo(() => {
+    return bookings.reduce((total, booking) => {
+      if (normalizeBookingStatus(booking.bookingStatus) !== 'completed') return total
+      return total + (Number(booking.finalAmount) || 0)
+    }, 0)
+  }, [bookings])
+
   const topBookedPoojas = useMemo(() => {
     const counts = bookings.reduce((result, booking) => {
-      const title = String(booking.poojaId?.title || '').trim()
+      const title = getBookingPoojaName(booking)
       if (title) result[title] = (result[title] || 0) + 1
       return result
     }, {})
@@ -213,7 +223,7 @@ function AdminPage() {
         booking.name,
         booking.phone,
         booking.email,
-        booking.poojaId?.title,
+        getBookingPoojaName(booking),
       ]
         .map((value) => String(value || '').toLowerCase())
         .join(' ')
@@ -499,7 +509,7 @@ function AdminPage() {
   }
 
   const buildPanditMessageFromBooking = (booking) => {
-    const poojaName = String(booking?.poojaId?.title || 'Pooja Service').trim()
+    const poojaName = getBookingPoojaName(booking) || 'Pooja Service'
     const bookingId = String(booking?._id || '').trim()
     const customerName = String(booking?.name || '').trim() || 'N/A'
     const customerPhone = String(booking?.phone || '').trim() || 'N/A'
@@ -822,7 +832,7 @@ function AdminPage() {
       name: booking.name,
       phone: booking.phone,
       email: booking.email,
-      poojaTitle: booking.poojaId?.title,
+      poojaTitle: getBookingPoojaName(booking),
       package: booking.package || 'Without Samagri',
       bookingDate: booking.date,
       bookingTime: booking.time,
@@ -1342,11 +1352,19 @@ function AdminPage() {
 
                   <div className="mt-4 space-y-2 text-sm text-[#4e463e]">
                     {[
-                      ['Completed', bookingStatusTotals.completed, '#1e9f64'],
+                      ['Completed Pujas', bookingStatusTotals.completed, '#1e9f64'],
                       ['Pending', bookingStatusTotals.pending, '#f59e0b'],
                       ['Cancelled', bookingStatusTotals.cancelled, '#f87171'],
                     ].map(([label, count, color]) => (
-                      <div key={label} className="flex items-center justify-between"><span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />{label}</span><span>{count} ({stats.totalBookings ? Math.round((count / stats.totalBookings) * 100) : 0}%)</span></div>
+                      <div key={label} className="flex items-center justify-between">
+                        <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />{label}</span>
+                        <span className="text-right">
+                          <span className="block">{count} ({stats.totalBookings ? Math.round((count / stats.totalBookings) * 100) : 0}%)</span>
+                          {label === 'Completed Pujas' && (
+                            <span className="block text-xs font-medium text-[#1e9f64]">₹{completedPujaAmount.toLocaleString('en-IN')}</span>
+                          )}
+                        </span>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -1382,7 +1400,7 @@ function AdminPage() {
                                   {booking.name || 'Unnamed customer'}
                                 </button>
                               </td>
-                              <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#5d504b]">{booking.poojaId?.title || '-'}</td>
+                              <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#5d504b]">{getBookingPoojaName(booking) || '-'}</td>
                               <td className="border-t border-[#f0e4d0] px-3 py-2 font-medium text-[#302b29]">{formatCurrency(booking.finalAmount)}</td>
                               <td className="border-t border-[#f0e4d0] px-3 py-2 text-[#5c4e47]">{booking.date || formatDateTime(booking.createdAt)}</td>
                               <td className="border-t border-[#f0e4d0] px-3 py-2"><span className={`inline-block rounded-full border px-2 py-1 text-[10px] font-semibold ${status.badgeClass}`}>{status.label}</span></td>
@@ -1478,7 +1496,7 @@ function AdminPage() {
             <div className="px-4 sm:px-5 py-4 space-y-4 text-sm">
               <div className="grid sm:grid-cols-2 gap-3">
                 <DetailFieldCard label="User Name" value={selectedBookingDetails.name} />
-                <DetailFieldCard label="Puja" value={selectedBookingDetails.poojaId?.title} />
+                <DetailFieldCard label="Puja" value={getBookingPoojaName(selectedBookingDetails)} />
                 <DetailFieldCard label="Phone" value={selectedBookingDetails.phone} />
                 <DetailFieldCard
                   label="Email"
@@ -1604,4 +1622,3 @@ function AdminPage() {
 }
 
 export default AdminPage
-
