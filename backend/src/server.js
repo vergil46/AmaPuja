@@ -176,7 +176,6 @@ if (process.env.SENTRY_DSN) {
     environment: process.env.NODE_ENV || 'development',
     tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE || 0.2),
   });
-  app.use(Sentry.Handlers.requestHandler());
 }
 
 app.use(helmet());
@@ -228,7 +227,7 @@ app.use('/api/gallery', galleryRoutes);
 app.use('/api/pandits', panditRoutes);
 
 if (process.env.SENTRY_DSN) {
-  app.use(Sentry.Handlers.errorHandler());
+  Sentry.setupExpressErrorHandler(app);
 }
 
 app.use((err, req, res, next) => {
