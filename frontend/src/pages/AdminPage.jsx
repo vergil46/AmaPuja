@@ -35,6 +35,7 @@ function AdminPage() {
   const [stats, setStats] = useState({
     totalBookings: 0,
     revenue: 0,
+    completedRevenue: 0,
     totalEnquiries: 0,
     totalPayments: 0,
     conversionRate: 0,
@@ -148,11 +149,11 @@ function AdminPage() {
   }, [bookings])
 
   const completedPujaAmount = useMemo(() => {
-    return bookings.reduce((total, booking) => {
+    return Number(stats.completedRevenue) || bookings.reduce((total, booking) => {
       if (normalizeBookingStatus(booking.bookingStatus) !== 'completed') return total
       return total + (Number(booking.finalAmount) || 0)
     }, 0)
-  }, [bookings])
+  }, [bookings, stats.completedRevenue])
 
   const topBookedPoojas = useMemo(() => {
     const counts = bookings.reduce((result, booking) => {
@@ -1280,9 +1281,9 @@ function AdminPage() {
                       <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xl shadow-sm">₹</div>
                       <div className="text-right text-[12px] font-semibold text-[#1f9d61]">Live</div>
                     </div>
-                    <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Revenue</div>
-                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">₹{Number(stats.revenue || 0).toLocaleString('en-IN')}</div>
-                    <div className="mt-1 text-[12px] text-[#6a5c55]">vs last month</div>
+                    <div className="mt-4 text-[13px] font-medium text-[#51413d]">Total Earnings</div>
+                    <div className="text-[2.1rem] font-bold leading-none tracking-[-0.05em] text-[#1d1a18]">₹{completedPujaAmount.toLocaleString('en-IN')}</div>
+                    <div className="mt-1 text-[12px] text-[#6a5c55]">From completed pujas</div>
                   </div>
 
                   <div className="rounded-[20px] border border-[#efe0fa] bg-[#f8f1ff] p-4 shadow-[0_10px_22px_rgba(143,96,170,0.06)]">
@@ -1445,8 +1446,8 @@ function AdminPage() {
                   </div>
 
                   <div className="mt-4 rounded-[14px] bg-[#fff8ef] p-5 text-center">
-                    <div className="text-3xl font-semibold text-[#2a211b]">₹{Number(stats.revenue || 0).toLocaleString('en-IN')}</div>
-                    <div className="mt-1 text-xs text-[#7c6d62]">Revenue reported by the payment and completed-booking records</div>
+                    <div className="text-3xl font-semibold text-[#2a211b]">₹{completedPujaAmount.toLocaleString('en-IN')}</div>
+                    <div className="mt-1 text-xs text-[#7c6d62]">Total earnings from completed pujas</div>
                   </div>
                 </div>
 

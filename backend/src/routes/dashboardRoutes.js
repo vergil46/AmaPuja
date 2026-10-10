@@ -58,6 +58,10 @@ router.get('/admin/stats', protect, adminOnly, async (req, res) => {
     bookingStatus: 'completed',
     ...(hasCreatedAtFilter ? createdAtFilter : {}),
   };
+  const completedRevenueMatchFilter = {
+    bookingStatus: 'completed',
+    ...(hasCreatedAtFilter ? createdAtFilter : {}),
+  };
 
   const [
     totalBookings,
@@ -65,6 +69,7 @@ router.get('/admin/stats', protect, adminOnly, async (req, res) => {
     totalPayments,
     revenueResult,
     payAfterRevenueResult,
+    completedRevenueResult,
     topServicesResult,
     bookingStatusBreakdown,
     funnelBreakdown,
@@ -74,6 +79,7 @@ router.get('/admin/stats', protect, adminOnly, async (req, res) => {
     Payment.countDocuments(createdAtFilter),
     Payment.aggregate([{ $match: paymentMatchFilter }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
     Booking.aggregate([{ $match: payAfterRevenueMatchFilter }, { $group: { _id: null, total: { $sum: '$finalAmount' } } }]),
+    Booking.aggregate([{ $match: completedRevenueMatchFilter }, { $group: { _id: null, total: { $sum: '$finalAmount' } } }]),
     Booking.aggregate([
       ...bookingPipelinePrefix,
       {
@@ -183,6 +189,7 @@ router.get('/admin/stats', protect, adminOnly, async (req, res) => {
 
   const onlineRevenue = Number(revenueResult[0]?.total || 0);
   const payAfterRevenue = Number(payAfterRevenueResult[0]?.total || 0);
+  const completedRevenue = Number(completedRevenueResult[0]?.total || 0);
   const totalRevenue = onlineRevenue + payAfterRevenue;
 
   return res.json({
@@ -190,6 +197,7 @@ router.get('/admin/stats', protect, adminOnly, async (req, res) => {
     totalEnquiries,
     totalPayments,
     revenue: totalRevenue,
+    completedRevenue,
     revenueBreakdown: {
       onlinePaid: onlineRevenue,
       payAfterCompleted: payAfterRevenue,
