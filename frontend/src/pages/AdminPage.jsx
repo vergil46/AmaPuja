@@ -36,6 +36,7 @@ function AdminPage() {
     totalBookings: 0,
     revenue: 0,
     completedRevenue: 0,
+    totalBookingAmount: 0,
     totalEnquiries: 0,
     totalPayments: 0,
     conversionRate: 0,
@@ -105,8 +106,8 @@ function AdminPage() {
   }, [bookings, stats.completedRevenue])
 
   const totalBookingAmount = useMemo(
-    () => bookings.reduce((total, booking) => total + (Number(booking.finalAmount) || 0), 0),
-    [bookings]
+    () => Number(stats.totalBookingAmount) || bookings.reduce((total, booking) => total + (Number(booking.finalAmount) || 0), 0),
+    [bookings, stats.totalBookingAmount]
   )
 
   const topBookedPoojas = useMemo(() => {
