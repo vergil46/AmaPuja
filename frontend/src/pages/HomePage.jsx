@@ -6,7 +6,6 @@ import Seo from '../components/Seo'
 import WorkProofGallery from '../components/WorkProofGallery'
 import GoogleBusinessCard from '../components/GoogleBusinessCard'
 import Testimonials from '../components/Testimonials'
-import durgaPujaImage from '../assets/poojas/Durga Puja.jpeg'
 
 const MapPinIcon = ({ className = 'h-4 w-4' }) => (
   <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -281,19 +280,6 @@ function HomePage() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="relative isolate overflow-hidden bg-[#7f1d1d] px-4 py-8 text-white sm:py-10" aria-labelledby="navratri-banner-title">
-        <img src={durgaPujaImage} alt="Durga Puja ceremony" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-35" />
-        <div className="absolute inset-0 -z-10 bg-linear-to-r from-[#5b1017]/95 via-[#7f1d1d]/85 to-[#9f351d]/65" />
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-200">🌺 Navratri special</p>
-            <h2 id="navratri-banner-title" className="mt-2 text-2xl font-semibold sm:text-3xl">Navratri Puja Booking Open</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-red-50 sm:text-base">Celebrate Navratri with a traditional Durga Puja performed by experienced Pandits in Bangalore and Bhubaneswar.</p>
-          </div>
-          <Link to="/durga-puja-bangalore" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-amber-300 px-5 py-3 text-sm font-bold text-[#5b1017] shadow-lg transition hover:bg-amber-200">Book Navratri Puja</Link>
         </div>
       </section>
 
